@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | LibRed</title>
+    <link rel="icon" href="img/LogoSinFodo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="admin-theme">
+
+    <div id="page-loader" class="page-loader">
+        <div class="spinner"></div>
+        <h2 style="color: var(--c-text-main); font-size: 1.5rem; margin-bottom: 0.5rem;">Iniciando sesión...</h2>
+        <p style="color: var(--c-text-muted);">Accediendo a la plataforma</p>
+    </div>
+
+    <div id="vista-dashboard-admin" class="app-layout" style="display: none;">
+        
+        <aside class="app-sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="img/LogoSinFodo.png" alt="Logo LibRed" class="logo-img" style="height: 50px; object-fit: contain;">
+                <button class="btn-collapse" onclick="toggleSidebar()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M9 3v18"/></svg>
+                </button>
+            </div>
+
+            <div class="sidebar-scroll-area">
+                <div class="sidebar-menu-title">MENÚ PRINCIPAL</div>
+                <ul class="sidebar-menu">
+                    <li class="active" onclick="cambiarSeccion('inicio', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span> 
+                        <span class="menu-text">Panel de Control</span>
+                    </li>
+                    <li onclick="cambiarSeccion('usuarios', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span> 
+                        <span class="menu-text">Lectores y Usuarios</span>
+                    </li>
+                    <li onclick="cambiarSeccion('inventario', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span> 
+                        <span class="menu-text">Gestión de Inventario</span>
+                    </li>
+                    <li onclick="cambiarSeccion('prestamos-dev', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><polyline points="9 10 12 13 15 10"></polyline><line x1="12" y1="13" x2="12" y2="4"></line></svg></span> 
+                        <span class="menu-text">Préstamos y Devoluciones</span>
+                    </li>
+                    <li onclick="cambiarSeccion('reservas', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></span> 
+                        <span class="menu-text">Material Apartado</span>
+                    </li>
+                </ul>
+
+                <div class="sidebar-menu-title">GESTIÓN</div>
+                <ul class="sidebar-menu">
+                    <li onclick="cambiarSeccion('finanzas', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></span> 
+                        <span class="menu-text">Multas e Ingresos</span>
+                    </li>
+                    
+                    <li onclick="cambiarSeccion('reportes', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg></span> 
+                        <span class="menu-text">Reportes y Estadísticas</span>
+                    </li>
+                </ul>
+
+                <div class="sidebar-menu-title">SISTEMA</div>
+                <ul class="sidebar-menu">
+                    <li onclick="cambiarSeccion('configuracion', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> 
+                        <span class="menu-text">Ajustes</span>
+                    </li>
+                    <li onclick="cambiarSeccion('soporte', event)">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span> 
+                        <span class="menu-text">Ayuda y Soporte</span>
+                    </li>
+                    <li class="btn-logout" onclick="abrirModalLogout()">
+                        <span class="icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span> 
+                        <span class="menu-text">Cerrar Sesión</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-user-profile">
+                <div class="user-avatar-container" style="background-color: var(--c-brand);">
+                    <div class="avatar-placeholder">A</div>
+                </div>
+                <div class="user-info menu-text">
+                    <strong class="user-name">Admin Central</strong>
+                    <span class="user-email">admin@libreria.pe</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="app-main">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="header-title" id="header-titulo">Panel de Control</h1>
+                    <p class="header-subtitle" id="header-subtitle">Resumen operativo general de la libreria</p>
+                </div>
+                <div class="header-center">
+                    <div class="header-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Buscar usuarios, inventario o transacciones...">
+                        <span class="shortcut">⌘F</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                   <button class="header-plan-btn">
+    <!-- Ícono de cuenta/plan minimalista -->
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+    Ver plan actual
+</button>
+
+                    <div class="theme-switch" onclick="toggleTheme()">
+                        <div class="theme-btn active" id="icon-sun"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></div>
+                        <div class="theme-btn" id="icon-moon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
+                    </div>
+                    <button class="header-icon-btn">
+                        <span class="notification-dot"></span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </button>
+                    <button class="add-member-btn" style="background: var(--c-brand);">+ Invitar</button>
+                </div>
+            </header>
+
+            <div class="app-content-body">
+                
+                <div id="sec-inicio" class="seccion-panel active" style="height: 100%; display: flex; flex-direction: column;">
+                    
+                    <div class="dashboard-grid-layout" style="grid-template-columns: 2fr 1.2fr;">
+                        
+                        <div class="dashboard-main-col">
+                            
+                            <!-- MÉTRICAS DE 4 COLUMNAS -->
+                            <div class="stats-grid-4">
+                                <div class="stat-card-admin">
+                                    <div class="stat-header">
+                                        <div class="stat-icon-mini" style="background: rgba(51,65,85,0.15); color: #334155;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+                                        <span class="stat-label">RECURSOS</span>
+                                    </div>
+                                    <span class="stat-num">3,842</span>
+                                    <span class="stat-trend" style="color: #334155;">+124 este mes</span>
+                                </div>
+                                <div class="stat-card-admin">
+                                    <div class="stat-header">
+                                        <div class="stat-icon-mini" style="background: rgba(16,185,129,0.15); color: #10B981;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                                        <span class="stat-label">USUARIOS</span>
+                                    </div>
+                                    <span class="stat-num">5,126</span>
+                                    <span class="stat-trend neutral">+45 nuevos este mes</span>
+                                </div>
+                                <div class="stat-card-admin">
+                                    <div class="stat-header">
+                                        <div class="stat-icon-mini" style="background: rgba(59,130,246,0.15); color: #3B82F6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div>
+                                        <span class="stat-label">PRÉSTAMOS</span>
+                                    </div>
+                                    <span class="stat-num">284</span>
+                                    <span class="stat-trend" style="color: #3B82F6;">+12% esta semana</span>
+                                </div>
+                                <div class="stat-card-admin alert-bg">
+                                    <div class="stat-header">
+                                        <div class="stat-icon-mini" style="background: rgba(185,28,28,0.15); color: #B91C1C;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                                        <span class="stat-label">VENCIDOS</span>
+                                    </div>
+                                    <span class="stat-num" style="color:#B91C1C;">17</span>
+                                    <span class="stat-trend danger">Requieren acción</span>
+                                </div>
+                            </div>
+
+                            <!-- GRÁFICO DE BARRAS -->
+                            <div class="table-card" style="flex-shrink: 0;">
+                                <div style="display:flex; justify-content: space-between; align-items:center;">
+                                    <div>
+                                        <h3>Tráfico y Circulación</h3>
+                                        <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.2rem; margin-bottom: 0.5rem;">Préstamos procesados por hora.</p>
+                                    </div>
+                                    <span class="badge" style="background: rgba(51,65,85,0.15); color: #334155;">Hoy</span>
+                                </div>
+                                <div style="height: 200px; width: 100%;">
+                                    <canvas id="adminTrafficChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- LIBROS MÁS POPULARES -->
+                            <div class="table-card dynamic-scroll-card">
+                                <h3>Recursos Más Solicitados</h3>
+                                <div class="inner-scroll-area">
+                                    <table class="app-table">
+                                        <thead>
+                                            <tr><th>RECURSO</th><th>TIPO</th><th>PRÉSTAMOS (MES)</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Patrones de Diseño (GoF)</strong></td>
+                                                <td>Libro</td>
+                                                <td>
+                                                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                                                        <div style="flex:1; background:var(--c-border); height:6px; border-radius:3px; overflow:hidden;"><div style="width:90%; background:var(--c-brand); height:100%;"></div></div>
+                                                        <span style="font-size:0.8rem; font-weight:700;">142</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>IA en la Educación</strong></td>
+                                                <td>Tesis</td>
+                                                <td>
+                                                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                                                        <div style="flex:1; background:var(--c-border); height:6px; border-radius:3px; overflow:hidden;"><div style="width:75%; background:#10B981; height:100%;"></div></div>
+                                                        <span style="font-size:0.8rem; font-weight:700;">89</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Clean Architecture</strong></td>
+                                                <td>Libro</td>
+                                                <td>
+                                                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                                                        <div style="flex:1; background:var(--c-border); height:6px; border-radius:3px; overflow:hidden;"><div style="width:60%; background:#3B82F6; height:100%;"></div></div>
+                                                        <span style="font-size:0.8rem; font-weight:700;">64</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA DERECHA REORDENADA Y BALANCEADA -->
+                        <div class="dashboard-side-col">
+                            
+                      <!-- ACTIVIDAD Y ACCESOS EN RED GLOBAL -->
+                            <div class="widget-card dynamic-scroll-card" style="flex: 1.1; min-height: 210px;">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 0.8rem;">Actividad Reciente</h3>
+                                <div class="inner-scroll-area">
+                                    <div class="alert-item">
+                                        <span class="status-dot" style="background:#10B981;"></span>
+                                        <div>
+                                            <strong>3 consultas en red</strong>
+                                            <p class="sub-text">Lectores de otras librerías revisando nuestro catálogo local</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-item">
+                                        <span class="status-dot" style="background:#3B82F6;"></span>
+                                        <div>
+                                            <strong>Nuevos Lectores</strong>
+                                            <p class="sub-text">5 Usuarios nuevos se registraron hoy</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert-item">
+                                        <span class="status-dot" style="background:#8B5CF6;"></span>
+                                        <div>
+                                            <strong>Devoluciones</strong>
+                                            <p class="sub-text">15 lectores tienen devoluciones programadas para hoy</p>
+                                        </div>
+                                    </div>
+                                    
+                                   
+                                </div>
+                            </div>
+
+                            <!-- 2. MULTAS PENDIENTES -->
+                            <div class="widget-card" style="background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.35); flex-shrink: 0;">
+                                <h3 style="color: #DC2626; display:flex; justify-content:space-between;">
+                                    Multas Pendientes 
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                </h3>
+                                <div style="margin: 0.8rem 0 0.2rem 0;">
+                                    <span style="font-size:2rem; font-weight:800; color:#B91C1C;">S/ 842.50</span>
+                                    <p style="font-size:0.8rem; color:var(--c-text-muted);">Saldo total sin pagar de 45 usuarios.</p>
+                                </div>
+                            </div>
+
+                            <!-- 3. INGRESOS POR FUENTE -->
+                            <div class="widget-card" style="flex-shrink: 0; padding: 0.8rem 1rem;">
+                                <h3 style="margin-bottom: 0.1rem; font-size: 1rem;">Ingresos por Fuente</h3>
+                                <p class="text-muted" style="font-size: 0.7rem; margin-bottom: 0.3rem;">Distribución financiera actual.</p>
+                                
+                                <div class="donut-container" style="margin-top: 0.2rem; gap: 0.5rem;">
+                                    <div style="height: 95px; width: 95px;">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                    <div class="donut-legend">
+                                        <div class="legend-item" style="font-size: 0.7rem;"><span class="color-dot" style="background:#334155;"></span> Préstamos (65%)</div>
+                                        <div class="legend-item" style="font-size: 0.7rem;"><span class="color-dot" style="background:#3B82F6;"></span> Servicios (15%)</div>
+                                        <div class="legend-item" style="font-size: 0.7rem;"><span class="color-dot" style="background:#B91C1C;"></span> Multas (20%)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIONES DE LOS MÓDULOS -->
+                <div id="sec-usuarios" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Gestión de Lectores y Usuarios</h3></div></div>
+                <div id="sec-inventario" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Control e Inventario</h3></div></div>
+                <div id="sec-prestamos-dev" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Gestión de Préstamos y Devoluciones</h3></div></div>
+                <div id="sec-reservas" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Administración de Reservas</h3></div></div>
+                <div id="sec-finanzas" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Control de Multas e Ingresos</h3></div></div>
+                <div id="sec-salas" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Gestión de Salas de Estudio</h3></div></div>
+                <div id="sec-reportes" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Reportes y Estadísticas del Sistema</h3></div></div>
+                <div id="sec-configuracion" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Ajustes del Sistema</h3></div></div>
+                <div id="sec-soporte" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Ayuda y Soporte Técnico</h3></div></div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DE CERRAR SESIÓN (Exclusivo para Administrador) -->
+    <div id="logout-modal" class="custom-modal-overlay" style="display: none;">
+        <div class="custom-modal-box">
+            <div class="modal-icon">🚪</div>
+            <h3>¿Cerrar Sesión Administrativa?</h3>
+            <p>Se cerrará el acceso a la plataforma de la sede.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModalLogout()">Cancelar</button>
+                <button class="btn-confirm" onclick="confirmarLogout()">Sí, salir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

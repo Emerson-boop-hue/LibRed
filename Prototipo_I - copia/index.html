@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibRed | Acceso a Plataforma</title>
+    <link rel="icon" href="img/LogoSinFodo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="vista-login" class="split-login-wrapper">
+        <div class="split-visual-panel">
+            <div class="bg-slider-container">
+                <div class="bg-slide active" style="background-image: url('img/bg1.jpg');">
+                    <div class="slide-text-content">
+                        <h2>Conectando el inventario de librerías locales</h2>
+                        <p>Una sola plataforma para consultar libros físicos, tesis y espacios académicos en tu distrito.</p>
+                    </div>
+                </div>
+                <div class="bg-slide" style="background-image: url('img/bg2.jpg');">
+                    <div class="slide-text-content">
+                        <h2>Aparta tus ejemplares favoritos</h2>
+                        <p>Asegura libros, revistas y tesis desde la plataforma y recógelos en tu librería local de manera rápida y segura.</p>
+                    </div>
+                </div>
+                <div class="bg-slide" style="background-image: url('img/bg3.jpg');">
+                    <div class="slide-text-content">
+                        <h2>Digitaliza tu sucursal desde <span style="white-space: nowrap;">S/ 29/mes</span></h2>
+                        <p>Punto de venta (POS), control de stock atómico y aislamiento total de datos garantizado.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="moverSlider(-1)" class="slider-btn prev-btn">&#10094;</button>
+            <button onclick="moverSlider(1)" class="slider-btn next-btn">&#10095;</button>
+            <div class="bottom-gradient-overlay"></div> 
+        </div>
+
+        <div class="split-form-panel">
+            <nav class="login-navbar">
+                <a href="#">Conócenos</a>
+                <a href="#">Contáctenos</a>
+                <a href="#">Ayuda</a>
+            </nav>
+
+            <div class="form-center-wrapper">
+                <!-- INICIO DE LA TARJETA BLANCA -->
+                <div class="form-card">
+                    <div class="brand-header-split">
+                        <img src="img/LogoSinFodo.png" alt="Logo LibRed" style="height: 70px;">
+                    </div>
+
+                    <!-- VISTA LECTOR -->
+                    <div id="vista-lector">
+                        <div class="form-title-split" style="text-align: center;">
+                            <h1>Bienvenido de nuevo</h1>
+                            <p>Ingresa tus credenciales para iniciar sesión.</p>
+                        </div>
+                        <form onsubmit="iniciarSesionLector(event)" class="auth-form-split">
+                            <div class="split-group">
+                                <label>Usuario o Correo</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="text" id="input-user" required value="estudiante@libred.pe" class="split-input">
+                                    <span class="input-icon-right"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                                </div>
+                            </div>
+                            
+                            <div class="split-group">
+                                <label>Librería Afiliada</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="text" id="input-sede" list="sedes-list" placeholder="Busca tu librería..." class="split-input" autocomplete="off" value="Librería El Ateneo - San Juan de Lurigancho">
+                                    <datalist id="sedes-list">
+                                        <option value="Librería El Ateneo - San Juan de Lurigancho">
+                                        <option value="Librería Sur - Lima Centro">
+                                        <option value="Bookstore Garcilaso - Surco">
+                                        <option value="Librería Communitas - Los Olivos">
+                                        <option value="Crisol - Miraflores">
+                                        <option value="Fondo de Cultura Económica - San Miguel">
+                                    </datalist>
+                                    <span class="input-icon-right" style="pointer-events: none;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="split-group">
+                                <label>Contraseña</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="password" id="pass-lector" required value="123456" class="split-input" style="padding-right: 2.8rem;">
+                                    <button type="button" class="btn-toggle-pass" onclick="togglePassword('pass-lector', this)">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- NUEVA FILA DE BOTÓN Y RECUPERAR -->
+                            <div class="login-actions">
+                                <button type="submit" class="btn-primary-compact">Iniciar sesión</button>
+                                <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                            </div>
+
+                            <div class="login-divider">o</div>
+
+                            <div style="text-align: center; margin-bottom: 0.5rem;">
+                                <p style="font-size: 0.85rem; color: var(--c-text-muted); margin-bottom: 0.8rem;">¿No tienes una cuenta?</p>
+                                <a href="#" class="btn-subscribe-login">Regístrate aquí</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- VISTA ADMINISTRADOR -->
+                    <div id="vista-libreria" style="display: none;">
+                        <div class="form-title-split" style="text-align: center;">
+                            <h1>Panel Administrativo</h1>
+                            <p>Gestión exclusiva para sedes y librerías.</p>
+                        </div>
+                        <form onsubmit="ejecutarLoginApp(event)" class="auth-form-split">
+                            <div class="split-group">
+                                <label>Correo Administrativo</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="email" required value="admin@libreria.pe" class="split-input">
+                                    <span class="input-icon-right"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path></svg></span>
+                                </div>
+                            </div>
+                            <div class="split-group">
+                                <label>Contraseña</label>
+                                <div class="input-icon-wrapper">
+                                    <input type="password" id="pass-admin" required value="123456" class="split-input" style="padding-right: 2.8rem;">
+                                    <button type="button" class="btn-toggle-pass" onclick="togglePassword('pass-admin', this)">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- NUEVA FILA DE BOTÓN Y RECUPERAR -->
+                            <div class="login-actions">
+                                <button type="submit" class="btn-primary-compact" style="background-color: #0F172A;">Acceder al Sistema</button>
+                                <a href="#" class="forgot-link">Recuperar acceso</a>
+                            </div>
+
+                            <div class="login-divider">o</div>
+
+                            <div style="text-align: center; margin-bottom: 0.5rem;">
+                                <p style="font-size: 0.85rem; color: var(--c-text-muted); margin-bottom: 0.8rem;">¿Tu librería aún no está en la red?</p>
+                                <a href="#" class="btn-subscribe-login">Conoce nuestros planes</a>
+                            </div>
+                        </form>
+                    </div>
+                </div> 
+                <!-- FIN DE LA TARJETA BLANCA -->
+
+                <!-- BOTÓN FLOTANTE FUERA DE LA TARJETA -->
+                <div class="floating-switch">
+                    <!-- Fíjate que conservamos tu ID y evento onclick para que tu JavaScript (app.js) siga funcionando sin problemas -->
+                    <a href="#" id="mode-switch-link" onclick="cambiarModoLogin(event)">¿Eres administrador de libreria? Ingresa aquí</a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

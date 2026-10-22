@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Panel Académico | LibRed</title>
+    <link rel="icon" href="img/LogoSinFodo.png" type="image/png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- PANTALLA DE CARGA (Aparece primero) -->
+    <div id="page-loader" class="page-loader">
+        <div class="spinner"></div>
+        <h2 style="color: var(--c-text-main); font-size: 1.5rem; margin-bottom: 0.5rem;">Iniciando sesión...</h2>
+        <p style="color: var(--c-text-muted);">Accediendo a la plataforma</p>
+    </div>
+
+    <div id="vista-dashboard-lector" class="app-layout" style="display: none;">
+        
+        <!-- BARRA LATERAL -->
+        <aside class="app-sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <img src="img/LogoSinFodo.png" alt="Logo LibRed" class="logo-img" style="height: 55px; object-fit: contain;">
+                <button class="btn-collapse" onclick="toggleSidebar()">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M9 3v18"/></svg>
+                </button>
+            </div>
+
+            <div class="sidebar-scroll-area">
+                <div class="sidebar-menu-title">MENÚ PRINCIPAL</div>
+                <ul class="sidebar-menu">
+                    <li class="active" onclick="cambiarSeccion('inicio', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span> 
+                        <span class="menu-text">Vista General</span>
+                    </li>
+                    <li onclick="cambiarSeccion('catalogo', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span> 
+                        <span class="menu-text">Catálogo</span>
+                    </li>
+                    <li onclick="cambiarSeccion('prestamos', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><path d="M14 12h8m-3-3l3 3-3 3"/></svg></span> 
+                        <span class="menu-text">Préstamos</span>
+                    </li>
+                    <li onclick="cambiarSeccion('devoluciones', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><path d="M22 12h-8m3-3l-3 3 3 3"/></svg></span> 
+                        <span class="menu-text">Devoluciones</span>
+                    </li>
+                    <li onclick="cambiarSeccion('historial', event)">
+                        <span class="icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 8v4l3 3"></path>
+                                <circle cx="12" cy="12" r="9"></circle>
+                            </svg>
+                        </span> 
+                        <span class="menu-text">Historial</span>
+                    </li>
+                    
+                </ul>
+
+                <div class="sidebar-menu-title">EXPLORAR</div>
+                <ul class="sidebar-menu">
+                    <li onclick="cambiarSeccion('red', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg></span> 
+                        <span class="menu-text">Red Global</span>
+                    </li>
+                </ul>
+
+                <div class="sidebar-menu-title">CONFIGURACIÓN Y OTROS</div>
+                <ul class="sidebar-menu">
+                    <li onclick="cambiarSeccion('configuracion', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> 
+                        <span class="menu-text">Ajustes</span>
+                    </li>
+                    <li onclick="cambiarSeccion('soporte', event)">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><circle cx="12" cy="17.5" r="1.5" fill="currentColor" stroke="none"></circle></svg></span> 
+                        <span class="menu-text">Ayuda y Soporte</span>
+                    </li>
+                    <li class="btn-logout" onclick="abrirModalLogout()">
+                        <span class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></span> 
+                        <span class="menu-text">Cerrar Sesión</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- TARJETA DE PERFIL -->
+            <div class="sidebar-user-profile">
+                <div class="user-avatar-container">
+                    <div class="avatar-placeholder">V</div>
+                    <div class="upload-overlay">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                    </div>
+                </div>
+                <div class="user-info menu-text">
+                    <strong class="user-name">Vainilla de Élite</strong>
+                    <span class="user-email">estudiante@libred.pe</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="app-main">
+            <!-- HEADER -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="header-title" id="header-titulo">Vista General</h1>
+                    <p class="header-subtitle" id="header-subtitle">Buenos días, Vainilla de Élite</p>
+                </div>
+                <div class="header-center">
+                    <div class="header-search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" placeholder="Busca libros, autores o temas...">
+                        <span class="shortcut">⌘F</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="theme-switch" onclick="toggleTheme()">
+                        <div class="theme-btn active" id="icon-sun"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></div>
+                        <div class="theme-btn" id="icon-moon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></div>
+                    </div>
+                    <button class="header-icon-btn">
+                        <span class="notification-dot"></span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </button>
+                    <button class="add-member-btn">+ Invitar</button>
+                </div>
+            </header>
+
+            <div class="app-content-body">
+                
+                <!-- 1. MÓDULO INICIO -->
+                <div id="sec-inicio" class="seccion-panel active" style="height: 100%; display: flex; flex-direction: column;">
+                    
+                    <div class="dashboard-grid-layout">
+                        
+                        <!-- COLUMNA PRINCIPAL -->
+                        <div class="dashboard-main-col">
+                          <!-- ESTADÍSTICAS SUPERIORES DEL LECTOR (Las 3 tarjetas originales restauradas) -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background: #EFF6FF; color: #2563EB;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8"/><path d="M14 12h8m-3-3l3 3-3 3"/></svg></div>
+                                    <div><span class="stat-label">Préstamos Activos</span><span class="stat-num">2</span></div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background: #F0FDF4; color: #16A34A;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <span class="stat-label">Recursos Utilizados</span>
+                                        <span class="stat-num">18</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon" style="background: #FDF4FF; color: #C026D3;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                                    <div><span class="stat-label">Libros Donados</span><span class="stat-num">3</span></div>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-two-col">
+                                <!-- Izquierda: Gráfico y Nuevas Llegadas -->
+                                <div class="dashboard-inner-col">
+                                    <div class="table-card" style="flex-shrink: 0;">
+                                        <h3>Afluencia de la Libreria</h3>
+                                        <p class="text-muted" style="font-size: 0.8rem; margin-top: 0.2rem; margin-bottom: 0.5rem;">Estimación de horarios con mayor concurrencia.</p>
+                                        <div style="height: 140px; width: 100%;">
+                                            <canvas id="trafficChart"></canvas>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-card dynamic-scroll-card">
+                                        <div style="display:flex; justify-content: space-between; align-items:center;">
+                                            <h3>Nuevas Llegadas</h3>
+                                        </div>
+                                        <div class="inner-scroll-area">
+                                            
+                                            <div class="arrival-list-item">
+                                                <div class="arrival-icon-box" style="background: #FEF3C7; color: #D97706;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M14 3v5h5M16 13H8M16 17H8M10 9H8"/></svg>
+                                                </div>
+                                                <div class="arrival-info">
+                                                    <h4>Adopción de IA en PYMEs Peruanas</h4>
+                                                    <p>Trabajo de Investigación</p>
+                                                </div>
+                                                <span class="badge" style="background: #FEF3C7; color: #D97706;">Paper</span>
+                                            </div>
+
+                                            <div class="arrival-list-item">
+                                                <div class="arrival-icon-box thesis-color">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                                </div>
+                                                <div class="arrival-info">
+                                                    <h4>Arquitectura N-Tier en Sistemas</h4>
+                                                    <p>Tesis de Grado</p>
+                                                </div>
+                                                <span class="badge badge-purple">Tesis</span>
+                                            </div>
+
+                                            <div class="arrival-list-item">
+                                                <div class="arrival-icon-box" style="background: #E0E7FF; color: #1D4ED8;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                                </div>
+                                                <div class="arrival-info">
+                                                    <h4>Journal of Software Engineering</h4>
+                                                    <p>Revista Académica (Edición Agosto)</p>
+                                                </div>
+                                                <span class="badge badge-blue">Revista</span>
+                                            </div>
+
+                                            <div class="arrival-list-item">
+                                                <div class="arrival-icon-box" style="background: #F3F4F6; color: #475569;">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path></svg>
+                                                </div>
+                                                <div class="arrival-info">
+                                                    <h4>El Comercio - Hemeroteca</h4>
+                                                    <p>Diario de Circulación Nacional</p>
+                                                </div>
+                                                <span class="badge" style="background:#F1F5F9; color:#475569;">Diario</span>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Derecha: Actividad Reciente -->
+                                <div class="table-card dynamic-scroll-card">
+                                    <div style="display:flex; justify-content: space-between; align-items:center;">
+                                        <h3>Actividad Reciente</h3>
+                                        <span class="badge badge-purple" style="font-size:0.7rem;">Librería SJL</span>
+                                    </div>
+                                    
+                                    <div class="inner-scroll-area">
+                                        <table class="app-table">
+                                            <thead>
+                                                <tr><th>RECURSO</th><th>ESTADO</th></tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Estructuras en Java</strong><br><span style="font-size:0.75rem; color:var(--c-text-muted);">Préstamo</span></td>
+                                                    <td><span class="badge badge-success">En Plazo</span></td>
+                                                </tr>
+                                                
+                                                <tr>
+                                                    <td><strong>Clean Code</strong><br><span style="font-size:0.75rem; color:var(--c-text-muted);">Devolución</span></td>
+                                                    <td><span class="badge badge-blue">Completado</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Bases de Datos SQL</strong><br><span style="font-size:0.75rem; color:var(--c-text-muted);">Renovación</span></td>
+                                                    <td><span class="badge badge-success">Extendida</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Diseño Web HTML5</strong><br><span style="font-size:0.75rem; color:var(--c-text-muted);">Préstamo</span></td>
+                                                    <td><span class="badge badge-success">En Plazo</span></td>
+                                                </tr>
+                                               
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA LATERAL (Widgets) -->
+                        <div class="dashboard-side-col">
+                            
+                            <div class="widget-card text-center" style="flex-shrink: 0;">
+                                <svg class="widget-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <h3>Horario</h3>
+                                <p class="sub-text">Lunes a Viernes:<br><strong style="color:var(--c-text-main);">8:00 a 20:00 hrs.</strong></p>
+                                <hr class="widget-divider">
+                                <p class="sub-text">Sábados:<br><strong style="color:var(--c-text-main);">10:00 a 17:00 hrs.</strong></p>
+                                <hr class="widget-divider">
+                                <p style="color: #EF4444; font-weight: 600;">Domingo: Cerrado</p>
+                            </div>
+
+                            <div class="widget-card dynamic-scroll-card">
+                                <h3 style="font-size: 1.1rem; margin-bottom: 0.8rem; text-align: left; display:flex; align-items:center; gap:0.5rem;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                    Notificaciones
+                                </h3>
+                                
+                                <div class="inner-scroll-area">
+                                    <div class="date-group-header">Hoy, 28 ago 2026</div>
+                                    <div class="alert-item">
+                                        <span class="status-dot available"></span>
+                                        <div>
+                                            <strong>Llegada de Nuevos Textos</strong>
+                                            <p class="sub-text">Ya se encuentran disponibles los ejemplares de la nueva edición de investigación académica.</p>
+                                        </div>
+                                    </div>
+                                    <div class="alert-item">
+                                        <span class="status-dot" style="background:#3B82F6;"></span>
+                                        <div>
+                                            <strong>Horario Especial de Atención</strong>
+                                            <p class="sub-text">Este sábado atenderemos en horario corrido hasta las 18:00 hrs.</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="date-group-header" style="margin-top:1rem;">Ayer, 27 ago 2026</div>
+                                    <div class="alert-item">
+                                        <span class="status-dot book-color"></span>
+                                        <div>
+                                            <strong>Catálogo Digital Actualizado</strong>
+                                            <p class="sub-text">Se añadieron más de 50 nuevos artículos y tesis en la sección de ingeniería.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EL RESTO DE LOS MÓDULOS -->
+                <div id="sec-catalogo" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Catálogo General</h3></div></div>
+                <div id="sec-prestamos" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Mis Préstamos Vigentes</h3></div></div>
+                <div id="sec-devoluciones" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Historial de Devoluciones</h3></div></div>
+                <div id="sec-reservas" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Gestión de Cabinas y Salas</h3></div></div>
+
+               <!-- MÓDULO RED GLOBAL (DIRECTORIO INFORMATIVO) -->
+<div id="sec-red" class="seccion-panel" style="display: none; height: 100%; flex-direction: column;">
+    
+    <!-- Contenedor Principal en Grid para mantener la estructura estática -->
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 1.5rem; height: calc(100vh - 140px); overflow: hidden;">
+        
+        <!-- COLUMNA IZQUIERDA: Buscador y Lista con Scroll Interno -->
+        <div style="display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+            
+            <!-- Buscador de Ubicación / Nombre -->
+            <div class="table-card" style="margin-bottom: 1rem; flex-shrink: 0; padding: 1rem 1.25rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.2rem; color: var(--c-text-main);">Directorio de Librerías</h3>
+                <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.8rem; color: var(--c-text-muted);">Busca por nombre de librería o ubicación geográfica.</p>
+                <div style="display: flex; gap: 0.75rem;">
+                    <input type="text" id="input-buscador-librerias" oninput="filtrarLibrerias()" placeholder="Ej. San Juan de Lurigancho, Surco, Ateneo..." style="flex: 1; padding: 0.5rem 0.8rem; border: 1px solid var(--c-border); background: var(--c-bg); color: var(--c-text-main); border-radius: 0.5rem; font-family: inherit; font-size: 0.85rem; outline: none;">
+                </div>
+            </div>
+
+            <!-- Contenedor con Scroll Interno -->
+            <div id="lista-librerias-container" class="inner-scroll-area" style="flex: 1; overflow-y: auto; padding-right: 0.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                
+                <!-- Tarjeta 1 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Librería El Ateneo', 'Av. Próceres de la Independencia 1632, San Juan de Lurigancho', 'Frente a la estación San Carlos del Metro', '8,500 volúmenes', '4.8 ⭐ (120 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Librería El Ateneo</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 San Juan de Lurigancho</p>
+                        </div>
+                        <span class="badge badge-success">4.8 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 8,500 volúmenes</span>
+                        <span>🕒 Lun - Vie: 8:00 - 20:00 hrs • Sáb: 9:00 - 17:00 • Dom: Cerrado</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Bookstore Garcilaso', 'Av. Caminos del Inca 350, Surco', 'A media cuadra del óvalo de Chacarilla', '12,000 volúmenes', '4.9 ⭐ (240 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Bookstore Garcilaso</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 Surco</p>
+                        </div>
+                        <span class="badge badge-success">4.9 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 12,000 volúmenes</span>
+                        <span>🕒 Lun - Vie: 9:00 - 21:00 hrs • Sáb - Dom: 10:00 - 18:00</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Librería Sur', 'Av. Pardo y Aliaga 683, Lima Centro', 'Frente al Country Club de Lima', '15,400 volúmenes', '4.7 ⭐ (98 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Librería Sur</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 Lima Centro</p>
+                        </div>
+                        <span class="badge badge-success">4.7 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 15,400 volúmenes</span>
+                        <span>🕒 Lun - Sáb: 8:30 - 19:30 hrs • Dom: Cerrado</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 4 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Crisol', 'Larcomar, Malecón de la Reserva 610, Miraflores', 'Interior del centro comercial Larcomar (Nivel Plaza)', '10,100 volúmenes', '4.9 ⭐ (310 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Crisol</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 Miraflores</p>
+                        </div>
+                        <span class="badge badge-success">4.9 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 10,100 volúmenes</span>
+                        <span>🕒 Lunes a Domingo: 10:00 - 22:00 hrs</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 5 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Librería Communitas', 'Av. Universitaria 1875, Los Olivos', 'Al costado de la puerta principal de la PUCP / zona universitaria', '7,200 volúmenes', '4.6 ⭐ (75 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Librería Communitas</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 Los Olivos</p>
+                        </div>
+                        <span class="badge badge-success">4.6 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 7,200 volúmenes</span>
+                        <span>🕒 Lun - Vie: 9:00 - 19:00 • Sáb: 9:00 - 14:00 • Dom: Cerrado</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 6 -->
+                <div class="table-card tarjeta-libreria" onclick="mostrarDetalleLibreria('Fondo de Cultura Económica', 'Calle Esperanza 275, Miraflores', 'A una cuadra del Parque Kennedy', '9,800 volúmenes', '4.8 ⭐ (145 reseñas)', 'https://maps.google.com', 'https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&w=600&q=80')" style="padding: 1.25rem; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="margin-bottom: 0.2rem; font-size: 1rem; color: var(--c-text-main);">Fondo de Cultura Económica</h4>
+                            <p class="text-muted" style="font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--c-text-muted);">📍 Miraflores</p>
+                        </div>
+                        <span class="badge badge-success">4.8 ⭐</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.75rem; color: var(--c-text-muted);">
+                        <span>📚 9,800 volúmenes</span>
+                        <span>🕒 Lun - Vie: 9:00 - 18:30 • Sáb: 10:00 - 14:00 • Dom: Cerrado</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: Panel de Ubicación, Referencia e Imagen -->
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            
+            <div class="widget-card" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--c-text-main);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        Detalle de Ubicación
+                    </h3>
+                    <hr class="widget-divider" style="margin: 0.75rem 0; border-color: var(--c-border);">
+                    
+                    <!-- Contenido por defecto (Estado inicial) -->
+                    <div id="panel-detalle-contenido" style="text-align: center; padding: 1rem 0.5rem; color: var(--c-text-muted);">
+                        <div style="height: 200px; background: var(--c-bg); border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--c-border);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.5;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                        </div>
+                        <p style="font-size: 0.85rem; font-weight: 500; color: var(--c-text-muted);">Seleccione una librería para ver los detalles.</p>
+                    </div>
+                </div>
+
+                <div id="panel-detalle-footer" style="display: none; margin-top: 1rem;">
+                    <a id="btn-google-maps" href="#" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; background: var(--c-brand-dark); color: white; padding: 0.75rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;">
+                        <!-- Ícono SVG de Mapa / Geolocalización minimalista -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+                        Abrir en Google Maps
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Script actualizado con Referencia en lugar de Horarios y Opción A -->
+<script>
+function filtrarLibrerias() {
+    const input = document.getElementById('input-buscador-librerias').value.toLowerCase();
+    const tarjetas = document.querySelectorAll('.tarjeta-libreria');
+
+    tarjetas.forEach(tarjeta => {
+        const textoTarjeta = tarjeta.innerText.toLowerCase();
+        if (textoTarjeta.includes(input)) {
+            tarjeta.style.display = "flex";
+        } else {
+            tarjeta.style.display = "none";
+        }
+    });
+}
+
+function mostrarDetalleLibreria(nombre, direccion, referencia, volumenes, calificacion, mapsUrl, imageUrl) {
+    const contenedor = document.getElementById('panel-detalle-contenido');
+    const footer = document.getElementById('panel-detalle-footer');
+    const btnMaps = document.getElementById('btn-google-maps');
+
+    contenedor.style.textAlign = 'left';
+    contenedor.innerHTML = `
+        <div style="height: 200px; background: var(--c-bg); border-radius: 0.5rem; margin-bottom: 1rem; overflow: hidden; position: relative; border: 1px solid var(--c-border);">
+            <img src="${imageUrl}" alt="${nombre}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.95;">
+        </div>
+        <h4 style="font-size: 1.05rem; color: var(--c-text-main); margin-bottom: 0.4rem;">${nombre}</h4>
+        <p style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--c-text-muted);"><strong>Dirección:</strong><br><span style="color: var(--c-text-main);">${direccion}</span></p>
+        <p style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--c-text-muted);"><strong>Referencia:</strong><br><span style="color: var(--c-text-main);">${referencia}</span></p>
+        <p style="font-size: 0.8rem; margin-bottom: 0.4rem; color: var(--c-text-muted);"><strong>Inventario:</strong><br><span style="color: var(--c-text-main);">${volumenes}</span></p>
+        <p style="font-size: 0.8rem; margin-bottom: 0.2rem; color: var(--c-text-muted);"><strong>Calificación:</strong><br><span style="color: var(--c-text-main);">${calificacion}</span></p>
+    `;
+    
+    btnMaps.href = mapsUrl;
+    footer.style.display = 'block';
+}
+</script>
+
+                <div id="sec-configuracion" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Ajustes de Perfil</h3></div></div>
+                <div id="sec-soporte" class="seccion-panel" style="display: none;"><div class="table-card"><h3>Centro de Ayuda y Soporte</h3></div></div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL DE CERRAR SESIÓN -->
+    <div id="logout-modal" class="custom-modal-overlay" style="display: none;">
+        <div class="custom-modal-box">
+            <div class="modal-icon">🥺</div>
+            <h3>¿Cerrar Sesión?</h3>
+            <p>¿Estás seguro de que deseas cerrar tu sesión actual?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModalLogout()">Cancelar</button>
+                <button class="btn-confirm" onclick="confirmarLogout()">Sí, salir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
