@@ -1,0 +1,232 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { display: flex; height: 100vh; overflow: hidden; background-color: #f8f9fa; }
+
+/* --- LADO IZQUIERDO (Carrusel Estático / Nunca se recarga) --- */
+.left-side {
+    flex: 1.5;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px;
+    color: white;
+    background-color: #111;
+    overflow: hidden;
+}
+
+.slide-bg {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 1;
+}
+.slide-bg.active { opacity: 1; }
+
+.slide-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.45));
+    z-index: 2;
+    pointer-events: none;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: rgba(17, 17, 17, 0.7);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    z-index: 4;
+}
+.slider-btn:hover {
+    background-color: rgba(17, 17, 17, 0.95);
+    transform: translateY(-50%) scale(1.1);
+}
+.prev-btn { left: 30px; }
+.next-btn { right: 30px; }
+
+.left-bottom {
+    position: relative;
+    z-index: 3;
+    transition: opacity 0.5s ease-in-out;
+    opacity: 1;
+}
+.left-bottom h1 { font-size: 42px; font-weight: 700; margin-bottom: 15px; line-height: 1.1; }
+.left-bottom p { font-size: 16px; opacity: 0.9; max-width: 500px; line-height: 1.5; }
+
+
+/* --- LADO DERECHO Y FORMULARIO --- */
+.right-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    background-color: #f3f4f6;
+    position: relative;
+}
+
+.top-nav {
+    position: absolute;
+    top: 40px;
+    display: flex;
+    gap: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+}
+.top-nav span { 
+    cursor: pointer; 
+    position: relative;
+    padding-bottom: 5px;
+    transition: color 0.3s;
+}
+.top-nav span:hover { color: #1d4ed8; }
+
+.top-nav span::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #1d4ed8;
+    transition: width 0.3s ease;
+}
+.top-nav span:hover::after { width: 100%; }
+
+.login-card-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 25px 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.login-card { width: 100%; text-align: center; }
+
+.logo-area { display: flex; justify-content: center; margin-bottom: 15px; }
+.custom-logo { max-height: 75px; object-fit: contain; }
+
+.login-card h2 { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 6px; }
+.login-card p { font-size: 13px; color: #6b7280; margin-bottom: 20px; }
+
+.form-group { margin-bottom: 12px; text-align: left; }
+.form-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #111; margin-bottom: 6px; letter-spacing: 0.5px; }
+
+.input-container { position: relative; display: flex; align-items: center; }
+.input-container input, .input-container select {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f9fafb;
+    transition: all 0.3s ease;
+}
+.input-container select { cursor: pointer; appearance: none; }
+.input-container i.field-icon, .input-container i.toggle-password { 
+    position: absolute; 
+    right: 14px; 
+    color: #9ca3af; 
+    font-size: 15px; 
+}
+.input-container i.toggle-password { cursor: pointer; transition: color 0.2s; }
+.input-container i.toggle-password:hover { color: #111; }
+
+.input-container input:focus, .input-container select:focus {
+    border-color: #1d4ed8;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    outline: none;
+}
+
+.form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+
+/* Botones específicos de sesión */
+.btn-submit {
+    flex: 1;
+    padding: 12px;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-submit:hover { background-color: #1d4ed8; }
+
+.btn-submit-admin {
+    flex: 1.2;
+    padding: 12px;
+    background-color: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-submit-admin:hover { background-color: #1e293b; }
+
+.forgot-pass { flex: 1; text-align: right; font-size: 13px; color: #2563eb; text-decoration: none; }
+.forgot-pass:hover { text-decoration: underline; }
+
+.divider { text-align: center; margin: 15px 0; border-bottom: 1px solid #e5e7eb; line-height: 0.1em; }
+.divider span { background:#fff; padding:0 10px; color: #9ca3af; font-size: 12px; }
+
+.register-link { font-size: 13px; color: #6b7280; }
+.register-link a { color: #2563eb; font-weight: 600; text-decoration: none; display: block; margin-top: 5px;}
+.register-link a:hover { text-decoration: underline; }
+
+/* Animación de latido para los enlaces inferiores */
+@keyframes latido {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); color: #2563eb; }
+    100% { transform: scale(1); }
+}
+
+.switch-mode { position: absolute; bottom: 30px; text-align: center; width: 100%; left: 0; }
+.switch-mode a { 
+    color: #111; 
+    font-size: 14px; 
+    font-weight: 600; 
+    text-decoration: none; 
+    display: inline-block;
+    animation: latido 2.5s infinite ease-in-out;
+}
+.switch-mode a:hover { text-decoration: underline; }
+
+.error-msg { 
+    background-color: #fee2e2; 
+    color: #b91c1c; 
+    padding: 10px; 
+    border-radius: 6px; 
+    font-size: 13px; 
+    margin-bottom: 15px; 
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
