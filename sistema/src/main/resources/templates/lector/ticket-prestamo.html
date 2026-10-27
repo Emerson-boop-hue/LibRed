@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #ticketContent}, 'prestamos')}">
+<head>
+  <title>Ticket de préstamo - LibRed</title>
+</head>
+<body>
+  <div id="ticketContent" class="page-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h2 fw-bold">Ticket de préstamo</h1>
+        <p class="text-muted mb-0">Resumen de tu operación.</p>
+      </div>
+      <button class="btn btn-outline-primary" type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
+    </div>
+    <div class="card ticket-paper">
+      <div class="card-body p-4 p-lg-5">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+          <div>
+            <div class="brand-name">📚 LibRed</div>
+            <p class="text-muted">Comprobante de solicitud de préstamo</p>
+          </div>
+          <div class="text-end">
+            <div class="small text-muted">Código de operación</div>
+            <div class="fs-4 fw-bold" th:text="${'PR-' + prestamo.id}">PR-000</div>
+          </div>
+        </div>
+        <hr>
+        <dl class="row">
+          <dt class="col-sm-4">Lector</dt>
+          <dd class="col-sm-8" th:text="${prestamo.lector.nombres + ' ' + prestamo.lector.apellidos}">Lector</dd>
+          <dt class="col-sm-4">Recurso</dt>
+          <dd class="col-sm-8" th:text="${prestamo.recurso.titulo}">Recurso</dd>
+          <dt class="col-sm-4">Tipo</dt>
+          <dd class="col-sm-8" th:text="${prestamo.recurso.tipoRecurso}">Tipo</dd>
+          <dt class="col-sm-4">Fecha de solicitud</dt>
+          <dd class="col-sm-8" th:text="${#temporals.format(prestamo.fechaPrestamo, 'dd/MM/yyyy HH:mm')}">Fecha</dd>
+          <dt class="col-sm-4">Fecha límite de devolución</dt>
+          <dd class="col-sm-8 fw-bold" th:text="${#temporals.format(prestamo.fechaDevolucionLimite, 'dd/MM/yyyy')}">Fecha límite</dd>
+          <dt class="col-sm-4">Estado</dt>
+          <dd class="col-sm-8" th:text="${prestamo.estadoPrestamo}">ACTIVO</dd>
+        </dl>
+        <div class="alert alert-info small">
+          Conserva este ticket como comprobante. La descarga PDF se realiza desde la opción Imprimir del navegador.
+        </div>
+        <a th:href="@{/lector/prestamos}" class="btn btn-primary no-print">Volver a mis préstamos</a>
+      </div>
+    </div>
+  </div>
+
+  <style>@media print { 
+    .sidebar-container, 
+    .no-print, button { 
+      display:none !important; 
+      } 
+    main-content { 
+      padding:0 !important; 
+      } 
+    body { 
+      background:#fff !important; 
+      } 
+      }
+  </style>
+</body>

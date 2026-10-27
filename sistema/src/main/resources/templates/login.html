@@ -104,7 +104,8 @@
                     ¿Tu librería aún no está en la red?<br><a href="#">Conoce nuestros planes</a>
                 </div>
                 <div class="register-link" th:unless="${isAdmin}">
-                    ¿No tienes una cuenta?<br><a href="#">Regístrate aquí</a>
+                ¿No tienes una cuenta?<br>
+                <a th:href="@{/registro}">Regístrate aquí</a>
                 </div>
             </div>
         </div>

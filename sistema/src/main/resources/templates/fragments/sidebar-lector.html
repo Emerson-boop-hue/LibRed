@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Menú del lector</title>
+</head>
+
+<body>
+
+<div th:fragment="sidebar(activePage)"
+     class="sidebar-content d-flex flex-column">
+
+    <!-- NAVEGACIÓN -->
+    <div class="sidebar-navigation">
+        <div class="brand-container">
+            <img th:src="@{/img/LogoSinFodo.png}" alt="Logo de LibRed" class="brand-logo">
+        </div>
+
+        <hr class="sidebar-divider">
+
+        <ul class="nav nav-pills flex-column sidebar-menu">
+
+            <li class="nav-item-header">Menú principal</li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/panel}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'panel'} ? ' active' : ''">
+                    <span>🏠</span> Vista General
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/catalogo}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'catalogo'} ? ' active' : ''">
+                    <span>📖</span> Catálogo
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/prestamos}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'prestamos'} ? ' active' : ''">
+                    <span>📥</span> Préstamos
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/historial}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'historial'} ? ' active' : ''">
+                    <span>🕒</span> Historial
+                </a>
+            </li>
+
+            <li class="nav-item-header section-spacer">Explorar</li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/red}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'red'} ? ' active' : ''">
+                    <span>🌐</span> Red Global
+                </a>
+            </li>
+
+            <li class="nav-item-header section-spacer">Configuración</li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/ajustes}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'ajustes'} ? ' active' : ''">
+                    <span>⚙️</span> Ajustes
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a th:href="@{/lector/ayuda}"
+                   class="nav-link"
+                   th:classappend="${activePage == 'ayuda'} ? ' active' : ''">
+                    <span>❓</span> Ayuda y Soporte
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+    <!-- PERFIL Y CIERRE DE SESIÓN -->
+    <div class="sidebar-footer">
+
+        <hr class="sidebar-divider">
+
+        <div class="user-profile">
+
+            <div class="user-avatar">N</div>
+
+            <div class="user-info">
+                <h6 class="user-name">Neicer Emerson</h6>
+                <span class="user-email">lector@libred.pe</span>
+            </div>
+
+        </div>
+
+        <button type="button"
+                class="btn btn-outline-danger logout-button"
+                data-bs-toggle="modal"
+                data-bs-target="#logoutModal">
+
+            🚪 <span>Cerrar Sesión</span>
+
+        </button>
+    </div>
+
+    <!-- MODAL DE CIERRE DE SESIÓN -->
+    <div class="modal fade"
+         id="logoutModal"
+         tabindex="-1"
+         aria-labelledby="logoutModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="logoutModalLabel">
+                        ¿Deseas salir?
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar">
+                    </button>
+                </div>
+
+                <div class="modal-body text-muted">
+                    Se cerrará tu sesión activa en LibRed.
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-danger">
+                            Cerrar Sesión
+                        </button>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

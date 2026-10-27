@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: baseLayout(~{:: #ayudaContent}, 'ayuda')}">
+
+<body>
+<div id="ayudaContent" class="container-fluid py-2">
+
+    <div class="mb-4">
+        <h1 class="h2 fw-bold text-dark">Ayuda y soporte</h1>
+        <p class="text-muted">
+            Encuentra respuestas a tus dudas o envía una consulta al equipo
+            de soporte de LibRed.
+        </p>
+    </div>
+
+    <div th:if="${mensajeSoporte}"
+         class="alert alert-success"
+         role="alert"
+         th:text="${mensajeSoporte}"></div>
+
+    <div th:if="${errorSoporte}"
+         class="alert alert-danger"
+         role="alert"
+         th:text="${errorSoporte}"></div>
+
+    <!-- PREGUNTAS FRECUENTES -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">Preguntas frecuentes</h5>
+            <p class="text-muted mb-4">
+                Selecciona una pregunta para consultar su respuesta.
+            </p>
+
+            <div class="accordion" id="faqAccordion">
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq1"
+                                aria-expanded="true">
+                            ¿Cómo solicito un préstamo?
+                        </button>
+                    </h2>
+                    <div id="faq1"
+                         class="accordion-collapse collapse show"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Ingresa al catálogo, busca el recurso que deseas
+                            y consulta su disponibilidad. Luego sigue las
+                            indicaciones del módulo de préstamos.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq2">
+                            ¿Cómo consulto la fecha de devolución?
+                        </button>
+                    </h2>
+                    <div id="faq2"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Revisa el módulo de préstamos para consultar
+                            los datos de tus solicitudes y las fechas
+                            registradas en cada operación.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq3">
+                            ¿Qué sucede si devuelvo un recurso fuera de plazo?
+                        </button>
+                    </h2>
+                    <div id="faq3"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Consulta las condiciones de préstamo de la sede
+                            correspondiente. Si se genera una multa, revisa
+                            su detalle en el módulo de historial.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq4">
+                            ¿Qué hago si un libro no está disponible?
+                        </button>
+                    </h2>
+                    <div id="faq4"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Comprueba la disponibilidad en otras sedes.
+                            Si LibRed tiene habilitada la lista de espera
+                            para ese recurso, sigue las instrucciones
+                            que aparezcan en su ficha.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#faq5">
+                            ¿Cómo puedo contactar con soporte?
+                        </button>
+                    </h2>
+                    <div id="faq5"
+                         class="accordion-collapse collapse"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Completa el formulario de esta página con el
+                            motivo de tu consulta y una descripción clara
+                            del inconveniente.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- GUÍA RÁPIDA -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">Guía rápida de LibRed</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-search me-2 text-primary"></i>
+                            Catálogo
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            Busca libros, cómics y mangas.
+                        </p>
+                        <a th:href="@{/lector/catalogo}"
+                           class="link-primary">Explorar catálogo</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-book me-2 text-primary"></i>
+                            Préstamos
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            Consulta tus solicitudes y préstamos.
+                        </p>
+                        <a th:href="@{/lector/prestamos}"
+                           class="link-primary">Ver mis préstamos</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-clock-history me-2 text-primary"></i>
+                            Historial
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            Revisa tus movimientos anteriores.
+                        </p>
+                        <a th:href="@{/lector/historial}"
+                           class="link-primary">Consultar historial</a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100">
+                        <h6 class="fw-bold">
+                            <i class="bi bi-gear me-2 text-primary"></i>
+                            Ajustes
+                        </h6>
+                        <p class="text-muted small mb-2">
+                            Actualiza tu correo y teléfono.
+                        </p>
+                        <a th:href="@{/lector/ajustes}"
+                           class="link-primary">Ir a ajustes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACTAR CON SOPORTE -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">Contactar con soporte</h5>
+            <p class="text-muted mb-4">
+                Describe tu consulta para que pueda ser revisada.
+            </p>
+
+            <form th:action="@{/lector/ayuda/enviar}" method="post">
+
+                <div class="mb-3">
+                    <label for="categoria" class="form-label">
+                        Motivo de consulta
+                    </label>
+                    <select id="categoria" name="categoria"
+                            class="form-select" required>
+                        <option value="">Selecciona un motivo</option>
+                        <option value="CUENTA">Problemas con mi cuenta</option>
+                        <option value="PRESTAMOS">Préstamos y devoluciones</option>
+                        <option value="CATALOGO">Catálogo y disponibilidad</option>
+                        <option value="MULTAS">Multas y pagos</option>
+                        <option value="TECNICO">Problema técnico</option>
+                        <option value="OTRO">Otro motivo</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="mensaje" class="form-label">
+                        Describe tu consulta
+                    </label>
+                    <textarea id="mensaje" name="mensaje"
+                              class="form-control" rows="5"
+                              maxlength="2000" required
+                              placeholder="Explica qué ocurrió y en qué sección de LibRed necesitas ayuda."></textarea>
+                    <div class="form-text">
+                        Máximo 2000 caracteres.
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-send me-2"></i>
+                        Enviar consulta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

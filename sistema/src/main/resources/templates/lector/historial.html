@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #historialContent}, 'historial')}">
+<head>
+  <title>Historial - LibRed</title>
+</head>
+<body>
+  <div id="historialContent" class="page-content">
+  <div class="mb-4">
+    <h1 class="h2 fw-bold">🕒 Historial de movimientos</h1>
+    <p class="text-muted">Consulta tus préstamos anteriores y sus estados.</p>
+  </div>
+  <form method="get" th:action="@{/lector/historial}" class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label" for="estado">Estado</label>
+          <select class="form-select" id="estado" name="estado">
+            <option value="">Todos</option>
+            <option value="ACTIVO" th:selected="${estado == 'ACTIVO'}">Activo</option>
+            <option value="DEVUELTO" th:selected="${estado == 'DEVUELTO'}">Devuelto</option>
+            <option value="VENCIDO" th:selected="${estado == 'VENCIDO'}">Vencido</option>
+            <option value="CANCELADO" th:selected="${estado == 'CANCELADO'}">Cancelado</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label" for="desde">Desde</label>
+          <input class="form-control" type="date" id="desde" name="desde" th:value="${desde}"></div>
+          <div class="col-12 col-md-3">
+            <label class="form-label" for="hasta">Hasta</label>
+            <input class="form-control" type="date" id="hasta" name="hasta" th:value="${hasta}">
+          </div>
+          <div class="col-12 col-md-2 d-grid">
+            <button class="btn btn-primary">Filtrar</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  <div class="card mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Historial de préstamos</h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Recurso</th>
+              <th>Tipo</th>
+              <th>Solicitud</th>
+              <th>Devolución límite</th>
+              <th>Devuelto el</th>
+              <th>Estado</th><th>Resumen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="p : ${movimientos}">
+              <td th:text="${p.recurso.titulo}">Recurso</td>
+              <td th:text="${p.recurso.tipoRecurso}">Tipo</td>
+              <td th:text="${p.fechaPrestamo != null ? #temporals.format(p.fechaPrestamo, 'dd/MM/yyyy') : '-'}">-</td>
+              <td th:text="${p.fechaDevolucionLimite != null ? #temporals.format(p.fechaDevolucionLimite, 'dd/MM/yyyy') : '-'}">-</td>
+              <td th:text="${p.fechaDevolucionReal != null ? #temporals.format(p.fechaDevolucionReal, 'dd/MM/yyyy HH:mm') : '-'}">-</td>
+              <td th:text="${p.estadoPrestamo}">Estado</td>
+              <td>
+                <a class="btn btn-sm btn-outline-secondary" th:href="@{/lector/ticket/{id}(id=${p.id})}">Ver</a>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(movimientos)}">
+              <td colspan="7" class="text-center text-muted py-4">No hay movimientos que coincidan con los filtros.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Multas y estado de pago</h5>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Motivo</th>
+              <th>Préstamo</th>
+              <th>Monto</th>
+              <th>Estado de pago</th>
+            </tr></thead><tbody>
+              <tr th:each="m : ${multas}">
+                <td th:text="${m.fechaEmision != null ? #temporals.format(m.fechaEmision, 'dd/MM/yyyy') : '-'}">-</td>
+                <td th:text="${m.motivo}">Motivo</td>
+                <td th:text="${m.prestamo != null ? m.prestamo.id : '-'}">-</td>
+                <td th:text="${m.monto}">0.00</td>
+                <td>
+                  <span class="badge" th:classappend="${m.estadoPago != null and #strings.toUpperCase(m.estadoPago) == 'PAGADA'} ? ' text-bg-success' : ' text-bg-warning'" th:text="${m.estadoPago}">PENDIENTE</span>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(multas)}">
+                <td colspan="5" class="text-center text-muted py-4">No tienes multas registradas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small text-muted mb-0">El modelo actual guarda el estado de pago de cada multa, pero no registra transacciones de pago en una entidad independiente.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

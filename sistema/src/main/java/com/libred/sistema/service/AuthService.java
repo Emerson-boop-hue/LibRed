@@ -20,12 +20,9 @@ public class AuthService {
     }
 
     // Lógica para validar el login del Lector (Ej: LEC-1001)
-    public boolean autenticarLector(String codigo, String password) {
-        Optional<Lector> lector = lectorRepository.findByCodigoLector(codigo);
-        if (lector.isPresent()) {
-            return lector.get().getPassword().equals(password);
-        }
-        return false;
+    public Optional<Lector> autenticarLector(String codigo, String password) {
+        return lectorRepository.findByCodigoLector(codigo)
+                .filter(l -> l.getPassword().equals(password));
     }
 
     // Lógica para validar el login del Administrador (Ej: ADM-001)
@@ -35,5 +32,11 @@ public class AuthService {
             return admin.get().getPassword().equals(password);
         }
         return false;
+    }
+
+    // Lógica para registrar un nuevo lector en el sistema (Módulo 1.2)
+    public Lector registrarLector(Lector nuevoLector) {
+        nuevoLector.setEstadoCuenta("HABILITADO"); // Sincronizado con tu esquema SQL
+        return lectorRepository.save(nuevoLector);
     }
 }

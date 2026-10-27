@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: baseLayout(~{:: #ajustesContent}, 'ajustes')}">
+
+<body>
+<div id="ajustesContent" class="container-fluid py-2">
+
+    <div class="mb-4">
+        <h1 class="h2 fw-bold text-dark">Ajustes de cuenta</h1>
+        <p class="text-muted">
+            Administra tus datos personales y preferencias de LibRed.
+        </p>
+    </div>
+
+    <div th:if="${mensaje}"
+         class="alert alert-success alert-dismissible fade show"
+         role="alert">
+        <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close"
+                data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+
+    <div th:if="${error}"
+         class="alert alert-danger"
+         role="alert"
+         th:text="${error}"></div>
+
+    <!-- PERFIL -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-primary-subtle text-primary
+                            p-3 me-3">
+                    <i class="bi bi-person fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Mi perfil</h5>
+                    <p class="text-muted mb-0 small">
+                        Actualiza tu información de contacto.
+                    </p>
+                </div>
+            </div>
+
+            <form th:action="@{/lector/ajustes/guardar}"
+                  th:object="${lector}"
+                  method="post">
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombres</label>
+                        <input type="text" class="form-control"
+                               th:value="*{nombres}" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Apellidos</label>
+                        <input type="text" class="form-control"
+                               th:value="*{apellidos}" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Código de lector</label>
+                        <input type="text" class="form-control"
+                               th:value="*{codigoLector}" readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="telefono" class="form-label">
+                            Teléfono
+                        </label>
+                        <input id="telefono" type="tel"
+                               class="form-control"
+                               th:field="*{telefono}"
+                               maxlength="20"
+                               required>
+                    </div>
+                </div>
+                <hr class="my-4">
+                <!-- NOTIFICACIONES -->
+                <h5 class="fw-bold mb-2">Notificaciones</h5>
+                <p class="text-muted small">
+                    Elige si deseas recibir avisos relacionados con tu cuenta.
+                </p>
+
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox"
+                           role="switch" id="notificaciones"
+                           th:field="*{recibirNotificaciones}">
+                    <label class="form-check-label"
+                           for="notificaciones">
+                        Recibir notificaciones de LibRed
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SEGURIDAD -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-warning-subtle text-warning
+                            p-3 me-3">
+                    <i class="bi bi-shield-lock fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-1">Seguridad y contraseña</h5>
+                    <p class="text-muted mb-0">
+                        Protege tu cuenta y no compartas tus credenciales.
+                    </p>
+                </div>
+            </div>
+
+            <div class="alert alert-light border mt-3 mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                La opción para cambiar la contraseña estará disponible
+                cuando se implemente su validación segura.
+            </div>
+        </div>
+    </div>
+
+    <!-- PREFERENCIAS -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-2">Preferencias</h5>
+            <p class="text-muted mb-3">
+                ¿Necesitas ayuda para utilizar tu cuenta?
+            </p>
+            <a th:href="@{/lector/ayuda}" class="btn btn-outline-primary">
+                Ir a ayuda y soporte
+            </a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

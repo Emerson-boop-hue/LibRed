@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibRed - Registro de Lector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+
+    <!-- LADO IZQUIERDO: Carrusel Sincronizado con login.css -->
+    <div class="left-side">
+        <!-- Imágenes mapeadas localmente (usando las mismas rutas que tu login) -->
+        <div class="slide-bg active" style="background-image: url('/img/bg1.jpg');"></div>
+        <div class="slide-bg" style="background-image: url('/img/bg2.jpg');"></div>
+        <div class="slide-bg" style="background-image: url('/img/bg3.jpg');"></div>
+        <div class="slide-overlay"></div>
+
+        <button class="slider-btn prev-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="slider-btn next-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <div class="left-bottom" id="sliderText">
+            <h1 id="sliderTitle">Únete a la red multi-inquilino LibRed</h1>
+            <p id="sliderDesc">Crea tu cuenta de socio local para reservar recursos, mangas y cómics en mostrador de forma inmediata.</p>
+        </div>
+    </div>
+
+    <!-- LADO DERECHO: Contenedor del Formulario Estilizado -->
+    <div class="right-side" style="overflow-y: auto;">
+        <div class="top-nav">
+            <span>Conócenos</span>
+            <span>Contáctenos</span>
+            <span>Ayuda</span>
+        </div>
+
+        <div class="login-card-container" style="margin-top: 60px; margin-bottom: 20px;">
+            <div class="login-card">
+                <div class="logo-area">
+                    <img th:src="@{/img/LogoSinFodo.png}" alt="LibRed Logo" class="custom-logo">
+                </div>
+                
+                <h2>Crear una cuenta</h2>
+                <p>Regístrate como lector y comienza a explorar LibRed.</p>
+
+                <!-- Alertas de excepción -->
+                <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+                <div th:if="${mensaje}" class="error-msg" style="background-color: #d1e7dd; color: #0f5132;" th:text="${mensaje}"></div>
+
+                <!-- Formulario de negocio de Lector -->
+                <form th:action="@{/registro}" method="post" th:object="${nuevoLector}">
+                    
+                    <div class="form-group">
+                        <label>LIBRERÍA AFILIADA</label>
+                        <div class="input-container">
+                            <select id="libreriaId" name="libreriaId" required>
+                                <option value="" disabled selected>Selecciona una librería</option>
+                                <option th:each="libreria : ${librerias}"
+                                        th:value="${libreria.id}"
+                                        th:text="${libreria.nombreComercial}"></option>
+                            </select>
+                            <i class="fa-regular fa-building field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>NOMBRES</label>
+                        <div class="input-container">
+                            <input type="text" th:field="*{nombres}" placeholder="Tus nombres completos" required autocomplete="given-name">
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>APELLIDOS</label>
+                        <div class="input-container">
+                            <input type="text" th:field="*{apellidos}" placeholder="Tus apellidos paterno y materno" required autocomplete="family-name">
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <div class="input-container">
+                            <input type="text" th:field="*{dni}" placeholder="Documento de identidad" required maxlength="20">
+                            <i class="fa-regular fa-id-card field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CÓDIGO LECTOR</label>
+                        <div class="input-container">
+                            <input type="text" th:field="*{codigoLector}" placeholder="Ejemplo: LEC-1002" required autocomplete="off">
+                            <i class="fa-solid fa-barcode field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>TELÉFONO</label>
+                        <div class="input-container">
+                            <input type="tel" th:field="*{telefono}" placeholder="Tu número de teléfono o celular" required autocomplete="tel" maxlength="20">
+                            <i class="fa-solid fa-phone field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CONTRASEÑA</label>
+                        <div class="input-container">
+                            <input type="password" th:field="*{password}" placeholder="Mínimo 8 caracteres" required minlength="8" maxlength="100" autocomplete="new-password">
+                            <i class="fa-solid fa-lock field-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 20px;">
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-user-plus"></i> Crear mi cuenta
+                        </button>
+                    </div>
+                </form>
+
+                <div class="divider"><span>o</span></div>
+                
+                <div class="register-link">
+                    ¿Ya tienes una cuenta?<br>
+                    <a th:href="@{/login}">Inicia sesión aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DEL CARRUSEL: Controla el movimiento dinámico sin recargar el DOM -->
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide-bg');
+
+        function showSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        // Intervalo automático de cambio cada 5 segundos
+        setInterval(nextSlide, 5000);
+    </script>
+</body>
+</html>

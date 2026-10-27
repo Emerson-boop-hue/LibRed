@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #prestamosContent}, 'prestamos')}">
+<head>
+  <title>Préstamos - LibRed</title>
+</head>
+<body>
+  <div id="prestamosContent" class="page-content">
+  <div class="mb-4">
+    <h1 class="h2 fw-bold">📥 Mis préstamos</h1>
+    <p class="text-muted">Solicita recursos y consulta tus préstamos vigentes.</p>
+  </div>
+  <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+  <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+  <div class="card mb-4">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Nueva solicitud</h5>
+    <form method="post" th:action="@{/lector/prestamos/solicitar}" class="row g-3 align-items-end">
+      <div class="col-12 col-lg-7">
+        <label for="recursoId" class="form-label">Recurso</label>
+        <select id="recursoId" name="recursoId" class="form-select" required>
+          <option value="">Selecciona un recurso</option>
+          <option th:each="r : ${recursos}" th:value="${r.id}" th:selected="${recursoSeleccionado != null and recursoSeleccionado.id == r.id}" th:text="${r.titulo + ' — ' + r.tipoRecurso + ' (stock: ' + r.stockDisponible + ')'}">Recurso</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-5 col-lg-3">
+        <label for="plazoDias" class="form-label">Plazo (días)</label>
+        <select id="plazoDias" name="plazoDias" class="form-select">
+          <option value="7" selected>7 días</option>
+          <option value="14">14 días</option>
+          <option value="21">21 días</option>
+          <option value="30">30 días</option>
+        </select>
+      </div>
+      <div class="col-12 col-lg-2 d-grid">
+        <button type="submit" class="btn btn-primary">Confirmar solicitud</button>
+      </div>
+    </form>
+    <p class="small text-muted mt-3 mb-0">El sistema verifica el estado de tu cuenta, las multas pendientes, el límite de préstamos y el stock disponible. Si no hay stock, te registrará en la cola de espera.</p>
+  </div>
+</div>
+  <div class="card">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3">Mis préstamos vigentes</h5>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Recurso</th>
+              <th>Fecha de solicitud</th>
+              <th>Devolución límite</th>
+              <th>Estado</th>
+              <th>Ticket</th>
+            </tr>
+          </thead>
+          <tbody>
+    <tr th:each="p : ${prestamosActivos}">
+      <td th:text="${p.recurso.titulo}">Recurso</td>
+      <td th:text="${p.fechaPrestamo != null ? #temporals.format(p.fechaPrestamo, 'dd/MM/yyyy') : '-'}">-</td>
+      <td th:text="${p.fechaDevolucionLimite != null ? #temporals.format(p.fechaDevolucionLimite, 'dd/MM/yyyy') : '-'}">-</td>
+      <td>
+        <span class="badge text-bg-success" th:text="${p.estadoPrestamo}">ACTIVO</span>
+      </td>
+      <td>
+        <a class="btn btn-sm btn-outline-primary" th:href="@{/lector/ticket/{id}(id=${p.id})}">Ver ticket</a>
+      </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(prestamosActivos)}">
+      <td colspan="5" class="text-center text-muted py-4">No tienes préstamos activos en este momento.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

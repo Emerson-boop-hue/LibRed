@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #catalogoContent}, 'catalogo')}">
+<head><title>Catálogo - LibRed</title></head><body>
+<div id="catalogoContent" class="page-content">
+  <div class="mb-4">
+    <h1 class="h2 fw-bold">📖 Catálogo de recursos</h1>
+    <p class="text-muted">Busca libros, cómics, mangas y otros recursos.</p>
+  </div>
+  <form method="get" th:action="@{/lector/catalogo}" class="card mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+    <div class="col-12 col-lg-4">
+      <label class="form-label" for="q">Título o código</label>
+      <input id="q" name="q" class="form-control" placeholder="Buscar recurso..." th:value="${q}">
+    </div>
+    <div class="col-12 col-md-4 col-lg-2">
+      <label class="form-label" for="tipo">Tipo</label>
+      <select id="tipo" name="tipo" class="form-select">
+        <option value="">Todos</option>
+        <option value="LIBRO" th:selected="${tipo == 'LIBRO'}">Libro</option>
+        <option value="COMIC" th:selected="${tipo == 'COMIC'}">Cómic</option>
+        <option value="MANGA" th:selected="${tipo == 'MANGA'}">Manga</option>
+        <option value="REVISTA" th:selected="${tipo == 'REVISTA'}">Revista</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-4 col-lg-3">
+      <label class="form-label" for="autor">Autor o creador</label>
+      <input id="autor" name="autor" class="form-control" th:value="${autor}" placeholder="Nombre del autor">
+    </div>
+    <div class="col-12 col-md-4 col-lg-2">
+      <label class="form-label" for="disponibilidad">Disponibilidad</label>
+      <select id="disponibilidad" name="disponibilidad" class="form-select">
+        <option value="">Todos</option>
+        <option value="si" th:selected="${disponibilidad == 'si'}">Disponibles</option>
+      </select></div>
+    <div class="col-12 col-lg-1 d-grid">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+  </div>
+</div>
+</form>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" th:each="recurso : ${recursos}">
+      <div class="card h-100 resource-card">
+        <div class="card-body d-flex flex-column">
+          <span class="badge text-bg-primary align-self-start mb-2" th:text="${recurso.tipoRecurso}">TIPO</span>
+          <h5 class="card-title fw-bold" th:text="${recurso.titulo}">Título</h5>
+          <p class="text-muted small mb-2" th:text="${recurso.autorOCreador != null ? 'Autor: ' + recurso.autorOCreador : 'Autor no registrado'}">Autor</p>
+          <p class="small text-muted" th:text="${recurso.libreria != null ? recurso.libreria.nombreComercial : 'Sede no indicada'}">Sede</p>
+          <div class="mt-auto d-flex justify-content-between align-items-center">
+            <span class="small fw-semibold" th:classappend="${recurso.stockDisponible != null and recurso.stockDisponible > 0} ? ' text-success' : ' text-danger'" th:text="${'Disponibles: ' + recurso.stockDisponible}">Disponibles</span>
+            <a class="btn btn-sm btn-outline-primary" th:href="@{/lector/recurso/{id}(id=${recurso.id})}">Ver ficha</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" th:if="${#lists.isEmpty(recursos)}">
+      <div class="alert alert-light border text-center py-5">No encontramos recursos con esos filtros. Prueba con otros criterios.</div>
+    </div>
+  </div>
+  <p class="small text-muted mt-3">Nota: el modelo actual no tiene un campo de categoría; el filtro por categoría requiere agregarlo a la entidad y a la base de datos.</p>
+</div>
+</body>
+</html>

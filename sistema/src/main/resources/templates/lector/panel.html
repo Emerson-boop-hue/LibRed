@@ -1,11 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #panelContent}, 'panel')}">
+<head><title>Vista general - LibRed</title></head>
 <body>
-    <h1>Aqui ira el contenido para el lector</h1>
+<div id="panelContent" class="page-content">
+  <div class="page-heading mb-4"><div><h1 class="h2 fw-bold mb-1">¡Bienvenido a LibRed!</h1>
+    <p class="text-muted mb-0">Este es el resumen de tu actividad como lector.</p></div></div>
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card dashboard-card h-100"><div class="card-body">
+        <div class="text-muted small">Préstamos activos</div>
+        <div class="display-5 fw-bold text-primary" th:text="${prestamosActivos}">0</div>
+        <a th:href="@{/lector/prestamos}" class="small">Ver mis préstamos →</a>
+      </div>
+    </div>
+  </div>
+    <div class="col-12 col-md-6 col-xl-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body"><div class="text-muted small">Estado de tu cuenta</div>
+        <div class="mt-2"><span class="badge fs-6" th:classappend="${estadoLector != null and #strings.toUpperCase(estadoLector) == 'SANCIONADO'} ? ' text-bg-danger' : ' text-bg-success'" th:text="${estadoLector != null ? estadoLector : 'SIN ESTADO'}">HABILITADO</span>
+        </div>
+        <p class="small text-muted mt-2 mb-0" th:text="${estadoLector != null and #strings.toUpperCase(estadoLector) == 'SANCIONADO'} ? 'Revisa tus multas pendientes o contacta con tu sede.' : 'Consulta el catálogo y solicita tus próximos recursos.'">Estado</p>
+      </div>
+    </div>
+  </div>
+    <div class="col-12 col-xl-4">
+      <div class="card dashboard-card h-100">
+        <div class="card-body"><div class="text-muted small">Tu sede</div>
+        <h5 class="fw-bold mt-2" th:text="${sede != null ? sede.nombreComercial : 'Sede no registrada'}">Nombre de sede</h5>
+        <p class="text-muted small mb-0" th:text="${sede != null and sede.direccion != null ? sede.direccion : 'No hay dirección registrada.'}">Dirección</p>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-12 col-xl-8">
+      <div class="card h-100"><div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Actividad reciente</h5>
+          <a th:href="@{/lector/historial}" class="small">Ver historial</a>
+        </div>
+      <div class="table-responsive"><table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Recurso</th>
+            <th>Fecha de solicitud</th>
+            <th>Devolución límite</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${actividadReciente}"><td>
+          <span class="fw-semibold" th:text="${p.recurso.titulo}">Título</span>
+          <div class="small text-muted" th:text="${p.recurso.tipoRecurso}">Tipo</div>
+        </td>
+        <td th:text="${p.fechaPrestamo != null ? #temporals.format(p.fechaPrestamo, 'dd/MM/yyyy') : '-'}">-</td>
+        <td th:text="${p.fechaDevolucionLimite != null ? #temporals.format(p.fechaDevolucionLimite, 'dd/MM/yyyy') : '-'}">-</td>
+        <td>
+          <span class="badge text-bg-light" th:text="${p.estadoPrestamo}">ACTIVO</span>
+        </td>
+      </tr>
+        <tr th:if="${#lists.isEmpty(actividadReciente)}">
+          <td colspan="4" class="text-center text-muted py-4">Todavía no tienes movimientos registrados.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+    <div class="col-12 col-xl-4">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <h5 class="fw-bold">Afluencia de la sede</h5>
+          <p class="text-muted small">La estimación de afluencia y los horarios estarán disponibles cuando se registren esos datos en el sistema.</p>
+          <div class="alert alert-info small mb-0">No hay información de horarios ni afluencia configurada para esta sede.</div>
+          <a th:href="@{/lector/red}" class="btn btn-outline-primary btn-sm mt-3">Consultar sedes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #detalleContent}, 'catalogo')}">
+<head>
+  <title>Ficha del recurso - LibRed</title>
+</head>
+<body>
+  <div id="detalleContent" class="page-content">
+  <a th:href="@{/lector/catalogo}" class="text-decoration-none">← Volver al catálogo</a>
+  <div class="card mt-3">
+    <div class="card-body p-4 p-lg-5">
+      <span class="badge text-bg-primary mb-3" th:text="${recurso.tipoRecurso}">TIPO</span>
+      <h1 class="h2 fw-bold" th:text="${recurso.titulo}">Título</h1>
+      <p class="text-muted" th:text="${recurso.autorOCreador != null ? 'Autor o creador: ' + recurso.autorOCreador : 'Autor no registrado'}">Autor</p>
+      <hr>
+    <dl class="row">
+      <dt class="col-sm-3">Código / ISBN</dt>
+      <dd class="col-sm-9" th:text="${recurso.isbnOCodigo != null ? recurso.isbnOCodigo : 'No registrado'}">-</dd>
+      <dt class="col-sm-3">Sede</dt>
+      <dd class="col-sm-9" th:text="${recurso.libreria != null ? recurso.libreria.nombreComercial : 'No registrada'}">-</dd>
+      <dt class="col-sm-3">Disponibilidad</dt><dd class="col-sm-9" th:text="${recurso.stockDisponible}">0</dd><dt class="col-sm-3">Estado</dt><dd class="col-sm-9" th:text="${recurso.estado}">-</dd></dl>
+    <a th:href="@{/lector/prestamos(recursoId=${recurso.id})}" class="btn btn-primary">Solicitar este recurso</a>
+  </div>
+</div>
+</div>
+</body>
+</html>

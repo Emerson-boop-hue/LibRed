@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: baseLayout(~{:: #redContent}, 'red')}">
+<head>
+  <title>Red Global - LibRed</title>
+</head>
+<body>
+  <div id="redContent" class="page-content">
+  <div class="mb-4">
+    <h1 class="h2 fw-bold">🌐 Red Global LibRed</h1>
+    <p class="text-muted">Explora las librerías afiliadas a la plataforma.</p>
+  </div>
+  <form method="get" th:action="@{/lector/red}" class="card mb-4">
+    <div class="card-body">
+      <label for="q" class="form-label">Buscar por nombre o dirección</label>
+      <div class="input-group">
+        <input class="form-control" id="q" name="q" th:value="${q}" placeholder="Nombre de librería o ubicación">
+        <button class="btn btn-primary">Buscar</button>
+      </div>
+    </div>
+  </form>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    <div class="col" th:each="l : ${librerias}">
+      <div class="card h-100">
+        <div class="card-body">
+        <div class="fs-3 mb-2">🏛️</div>
+        <h5 class="fw-bold" th:text="${l.nombreComercial}">Librería</h5>
+        <p class="text-muted small" th:text="${l.direccion != null and !l.direccion.isBlank() ? l.direccion : 'Dirección no registrada'}">Dirección</p>
+        <div class="small">
+          <strong>Recursos registrados:</strong>
+          <span th:text="${conteoRecursos[l.id] != null ? conteoRecursos[l.id] : 0}">0</span>
+        </div>
+        <p class="small text-muted mt-3 mb-0">Los horarios y datos de contacto no están incluidos en el modelo actual de Librería.</p>
+        <a class="btn btn-sm btn-outline-primary mt-3" th:href="@{/lector/catalogo}">Explorar catálogo general</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-12" th:if="${#lists.isEmpty(librerias)}">
+    <div class="alert alert-light border text-center">No se encontraron librerías con ese criterio.</div>
+  </div>
+</div>
+</div>
+</body>
+</html>
