@@ -1,0 +1,238 @@
+/* --- ESTILOS ESPECÍFICOS DEL MÓDULO DE MULTAS --- */
+.multas-container {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    padding: 24px 30px;
+    height: calc(100vh - 75px);
+    overflow-y: auto;
+}
+
+.multas-card-section, .form-card, .summary-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h2 {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+/* Tabla limpia de deudores */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.custom-table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--sidebar-border);
+}
+
+.custom-table td {
+    padding: 12px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    color: var(--text-dark);
+}
+
+.fila-multa {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.fila-multa:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+.user-info-cell, .article-info-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-main, .article-main {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.user-sub, .article-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 30px !important;
+}
+
+/* Columna Derecha & Formularios */
+.multas-sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-card h3, .summary-card h3 {
+    font-size: 1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: var(--active-bg);
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .half {
+    flex: 1;
+}
+
+.btn-primary, .btn-secondary, .btn-pagar {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-primary {
+    background-color: var(--active-bg);
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--sidebar-border);
+}
+
+/* Tarjeta Resumen */
+.summary-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin: 30px 0;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.summary-row strong {
+    color: var(--text-dark);
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px dashed var(--sidebar-border);
+    margin: 10px 0;
+}
+
+.summary-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.total-amount {
+    font-size: 1.2rem;
+    color: #16a34a;
+}
+
+.summary-action-container {
+    margin-top: 15px;
+}
+
+.btn-pagar {
+    width: 100%;
+    background-color: #16a34a;
+    color: #ffffff;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+.btn-pagar:hover {
+    background-color: #15803d;
+}
+
+/* Badge de estado y filas del formulario */
+.badge-estado-inline {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.form-footer-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}

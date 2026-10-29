@@ -1,0 +1,158 @@
+/* --- CONTENEDOR PRINCIPAL --- */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 75px);
+}
+
+/* --- PANEL INTEGRADO --- */
+.prestamo-panel {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    padding: 30px;
+    flex: 1; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.prestamo-form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.prestamo-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    flex: 1;
+}
+
+/* --- FORMULARIO IZQUIERDO --- */
+.form-group-pres {
+    margin-bottom: 18px;
+}
+
+.form-group-pres label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-muted);
+}
+
+.form-control-pres {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--sidebar-border);
+    background: var(--card-bg);
+    color: var(--text-dark);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-control-pres:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* --- BOTONES PEGADOS AL FORMULARIO --- */
+.botones-container {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+}
+
+.btn-limpiar {
+    padding: 11px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--sidebar-border);
+    background: var(--card-bg);
+    color: var(--text-dark);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+.btn-limpiar:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.btn-submit-prestamo {
+    padding: 11px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #059669;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex: 1; 
+    transition: opacity 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.btn-submit-prestamo:hover { opacity: 0.9; }
+.btn-submit-prestamo:disabled { background: #9ca3af; cursor: not-allowed; opacity: 0.7; }
+
+/* --- ALERTAS EN LA ZONA BAJA --- */
+.alertas-zona-baja {
+    margin-top: 15px;
+}
+
+.alerta-restriccion {
+    background-color: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: none;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.msg-alert {
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+.msg-success { background-color: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+.msg-error { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+
+/* --- TICKET DERECHO --- */
+.ticket-container {
+    background: #f8fafc;
+    border: 1px dashed var(--sidebar-border);
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ticket-header {
+    text-align: center;
+    border-bottom: 1px solid var(--sidebar-border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.ticket-header h4 { font-size: 1.1rem; color: var(--text-dark); font-weight: 700; margin-bottom: 4px;}
+.ticket-header span { font-size: 0.8rem; color: var(--text-muted); }
+
+.ticket-body { display: flex; flex-direction: column; gap: 16px; font-size: 0.9rem; flex: 1;}
+.ticket-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.ticket-row span:first-child { color: var(--text-muted); font-weight: 500; }
+.ticket-row span:last-child { color: var(--text-dark); font-weight: 600; text-align: right; }

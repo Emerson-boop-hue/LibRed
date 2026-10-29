@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- ASISTENTE DE REGISTRO Y SUSCRIPCIÓN (3 pasos). Se incluye desde login.html con th:replace -->
+<div th:fragment="wizard" id="susOverlay" class="sus-overlay" aria-hidden="true">
+
+    <!-- ===================== TARJETA PRINCIPAL ===================== -->
+    <div class="sus-modal" id="susModal" role="dialog" aria-modal="true" aria-labelledby="susTitulo">
+
+        <button type="button" class="sus-close" id="susCerrar" aria-label="Cerrar">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- Indicadores de progreso -->
+        <div class="sus-steps" id="susSteps">
+            <div class="sus-step active" data-step="1">
+                <span class="sus-step-dot">1</span>
+                <span class="sus-step-label">Plan</span>
+            </div>
+            <div class="sus-step-line"></div>
+            <div class="sus-step" data-step="2">
+                <span class="sus-step-dot">2</span>
+                <span class="sus-step-label">Pago</span>
+            </div>
+            <div class="sus-step-line"></div>
+            <div class="sus-step" data-step="3">
+                <span class="sus-step-dot">3</span>
+                <span class="sus-step-label">Librería</span>
+            </div>
+        </div>
+
+        <!-- ===================== PASO 1: SELECCIÓN DE PLAN ===================== -->
+        <section class="sus-panel active" data-panel="1">
+            <h2 id="susTitulo">Elige tu membresía ideal</h2>
+            <p class="sus-sub">Ambos planes incluyen acceso ilimitado a todas las herramientas de gestión de LibRed.</p>
+            <div class="sus-plans" id="susPlanes">Cargando planes...</div>
+        </section>
+
+        <!-- ===================== PASO 2: DATOS DE PAGO ===================== -->
+        <section class="sus-panel" data-panel="2">
+            <h2>Método de pago seguro</h2>
+            <p class="sus-sub">Ingresa los datos de tu tarjeta para procesar la suscripción.</p>
+
+            <div class="sus-resumen" id="susResumenPlan"></div>
+
+            <div class="sus-field">
+                <label for="susTarjeta">Número de tarjeta</label>
+                <div class="sus-input">
+                    <input type="text" id="susTarjeta" inputmode="numeric" autocomplete="off" maxlength="19" placeholder="1234 5678 9012 3456">
+                    <i class="fa-regular fa-credit-card"></i>
+                </div>
+                <small class="sus-field-error" id="susTarjetaErr"></small>
+            </div>
+
+            <div class="sus-field">
+                <label for="susTitular">Nombre del titular</label>
+                <div class="sus-input">
+                    <input type="text" id="susTitular" autocomplete="off" maxlength="60" placeholder="Como aparece en la tarjeta">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+                <small class="sus-field-error" id="susTitularErr"></small>
+            </div>
+
+            <div class="sus-row">
+                <div class="sus-field">
+                    <label for="susVence">Vencimiento</label>
+                    <div class="sus-input">
+                        <input type="text" id="susVence" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="MM/AA">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                    <small class="sus-field-error" id="susVenceErr"></small>
+                </div>
+                <div class="sus-field">
+                    <label for="susCvv">CVV</label>
+                    <div class="sus-input">
+                        <input type="password" id="susCvv" inputmode="numeric" autocomplete="off" maxlength="3" placeholder="123">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <small class="sus-field-error" id="susCvvErr"></small>
+                </div>
+            </div>
+
+            <p class="sus-nota"><i class="fa-solid fa-shield-halved"></i> Pago simulado: los datos de la tarjeta no se envían ni se guardan.</p>
+        </section>
+
+        <!-- ===================== PASO 3: CONFIGURACIÓN DE LA LIBRERÍA ===================== -->
+        <section class="sus-panel" data-panel="3">
+            <h2>Configura tu establecimiento</h2>
+            <p class="sus-sub">Registra los datos legales y de acceso para tu sede.</p>
+
+            <div class="sus-field">
+                <label for="susNombre">Nombre comercial</label>
+                <div class="sus-input">
+                    <input type="text" id="susNombre" autocomplete="off" maxlength="150" placeholder="Ej: Librería El Ateneo">
+                    <i class="fa-regular fa-building"></i>
+                </div>
+                <small class="sus-field-error" id="susNombreErr"></small>
+            </div>
+
+            <div class="sus-field">
+                <label for="susRuc">RUC</label>
+                <div class="sus-input">
+                    <input type="text" id="susRuc" inputmode="numeric" autocomplete="off" maxlength="11" placeholder="11 dígitos">
+                    <i class="fa-regular fa-id-card"></i>
+                </div>
+                <small class="sus-field-error" id="susRucErr"></small>
+            </div>
+
+            <div class="sus-field">
+                <label for="susDireccion">Dirección</label>
+                <div class="sus-input">
+                    <input type="text" id="susDireccion" autocomplete="off" maxlength="255" placeholder="Ej: Av. Próceres 123, San Juan de Lurigancho">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <small class="sus-field-error" id="susDireccionErr"></small>
+            </div>
+
+            <div class="sus-row">
+                <div class="sus-field">
+                    <label for="susCodigo">Código de administrador</label>
+                    <div class="sus-input readonly">
+                        <input type="text" id="susCodigo" readonly tabindex="-1" placeholder="ADM-000">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                <div class="sus-field">
+                    <label for="susPassword">Contraseña</label>
+                    <div class="sus-input">
+                        <input type="password" id="susPassword" autocomplete="new-password" maxlength="6" placeholder="4 a 6 caracteres">
+                        <i class="fa-regular fa-eye sus-eye" id="susOjo" title="Mostrar u ocultar"></i>
+                    </div>
+                    <small class="sus-field-error" id="susPasswordErr"></small>
+                </div>
+            </div>
+
+            <p class="sus-nota"><i class="fa-solid fa-circle-info"></i> Con este código y tu contraseña ingresarás al panel administrativo.</p>
+        </section>
+
+        <p class="sus-error-general" id="susErrorGeneral"></p>
+
+        <!-- Botones de navegación -->
+        <div class="sus-footer">
+            <button type="button" class="sus-btn sus-btn-sec" id="susAnterior">Anterior</button>
+            <button type="button" class="sus-btn sus-btn-pri" id="susSiguiente" disabled>Siguiente</button>
+        </div>
+    </div>
+
+    <!-- ===================== MENSAJE FINAL ===================== -->
+    <div class="sus-final" id="susFinal" hidden>
+        <div class="sus-final-icon"><i class="fa-solid fa-check"></i></div>
+        <h3>Tu librería ha sido dada de alta correctamente.</h3>
+        <p>Tu código de administrador es <strong id="susFinalCodigo">ADM-000</strong></p>
+        <small>Te llevaremos al inicio de sesión...</small>
+    </div>
+</div>
+
+</body>
+</html>

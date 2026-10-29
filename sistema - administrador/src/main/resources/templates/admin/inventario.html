@@ -1,0 +1,283 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: molde(
+          'Inventario de Artículos', 
+          'Gestión del catálogo general y stock físico', 
+          'inventario.css', 
+          'inventario.js', 
+          'inventario',
+          ~{:: .dashboard-container}
+      )}"
+>
+  <head>
+    <title>Inventario | LibRed</title>
+  </head>
+  <body>
+    <!-- Contenedor principal que se inyecta en el layout -->
+    <div class="dashboard-container" data-css="inventario.css">
+      
+      <!-- BARRA SUPERIOR DE ACCIONES Y FILTROS -->
+      <div class="inventario-toolbar">
+        <div class="search-box-inv">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="inputBuscar"
+            placeholder="Buscar por título o autor..."
+            th:value="${keyword}"
+          />
+        </div>
+
+        <div class="filter-actions-inv">
+          <select id="selectCategoria" class="select-categoria">
+            <option value="">Todas las categorías</option>
+            <option value="LIBROS" th:selected="${categoriaSeleccionada == 'LIBROS'}">Libros</option>
+            <option value="NOVELAS LIGERAS" th:selected="${categoriaSeleccionada == 'NOVELAS LIGERAS'}">Novelas Ligeras</option>
+            <option value="CUENTOS" th:selected="${categoriaSeleccionada == 'CUENTOS'}">Cuentos</option>
+            <option value="COMICS" th:selected="${categoriaSeleccionada == 'COMICS'}">Cómics</option>
+            <option value="MANGAS" th:selected="${categoriaSeleccionada == 'MANGAS'}">Mangas</option>
+            <option value="REVISTAS" th:selected="${categoriaSeleccionada == 'REVISTAS'}">Revistas</option>
+            <option value="OTROS" th:selected="${categoriaSeleccionada == 'OTROS'}">Otros</option>
+          </select>
+
+          <button class="btn-nuevo-articulo" onclick="abrirModalCrear()">
+            <i class="fa-solid fa-plus"></i> Registrar nuevo artículo
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIS DE INVENTARIO -->
+      <div class="inventario-kpis">
+        <div class="kpi-card">
+          <div
+            class="kpi-icon-box"
+            style="background-color: #dbeafe; color: #2563eb"
+          >
+            <i class="fa-solid fa-boxes-stacked"></i>
+          </div>
+          <div>
+            <span class="kpi-label">TOTAL ARTÍCULOS</span>
+            <h2 class="kpi-value" th:text="${totalArticulos}">0</h2>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div
+            class="kpi-icon-box"
+            style="background-color: #fef3c7; color: #d97706"
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <span class="kpi-label">STOCK CRÍTICO</span>
+            <h2 class="kpi-value text-warning" th:text="${stockCritico}">0</h2>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div
+            class="kpi-icon-box"
+            style="background-color: #fee2e2; color: #dc2626"
+          >
+            <i class="fa-solid fa-ban"></i>
+          </div>
+          <div>
+            <span class="kpi-label">ARTÍCULOS AGOTADOS</span>
+            <h2 class="kpi-value text-danger" th:text="${articulosAgotados}">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE CATÁLOGO CON SCROLL FIJO -->
+      <div class="tabla-contenedor-fijo" id="tablaContenedor">
+        <table class="tabla-inventario">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center">TIPO</th>
+              <th>TÍTULO Y AUTOR</th>
+              <th style="width: 140px">CÓDIGO</th>
+              <th style="width: 130px">CATEGORÍA</th>
+              <th style="width: 130px">STOCK FÍSICO</th>
+              <th style="width: 140px">ESTADO</th>
+              <th style="width: 100px; text-align: center">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Mensaje si la base de datos está vacía -->
+            <tr th:if="${#lists.isEmpty(recursos)}">
+              <td
+                colspan="7"
+                style="
+                  text-align: center;
+                  padding: 30px;
+                  color: var(--text-muted);
+                "
+              >
+                No hay artículos registrados en el inventario.
+              </td>
+            </tr>
+
+            <!-- Iteración sobre los recursos enviados por el controlador -->
+            <tr th:each="recurso : ${recursos}">
+              <td style="text-align: center">
+                <i
+                  th:if="${recurso.tipoRecurso == 'LIBROS'}"
+                  class="fa-solid fa-book"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'NOVELAS LIGERAS'}"
+                  class="fa-solid fa-feather"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'CUENTOS'}"
+                  class="fa-solid fa-star"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'COMICS'}"
+                  class="fa-solid fa-mask"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'MANGAS'}"
+                  class="fa-solid fa-book-open"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'REVISTAS'}"
+                  class="fa-solid fa-newspaper"
+                  style="color: var(--text-muted)"
+                ></i>
+                <i
+                  th:if="${recurso.tipoRecurso == 'OTROS'}"
+                  class="fa-solid fa-box"
+                  style="color: var(--text-muted)"
+                ></i>
+              </td>
+
+              <td>
+                <div class="item-titulo" th:text="${recurso.titulo}">
+                  Título
+                </div>
+                <div class="item-sub" th:text="${recurso.autorOCreador}">
+                  Autor
+                </div>
+              </td>
+              <td th:text="${recurso.codigo}">CÓDIGO</td>
+              <td th:text="${recurso.tipoRecurso}">Categoría</td>
+              <td
+                th:text="${recurso.stockDisponible + ' / ' + recurso.stockTotal + ' uds.'}"
+              >
+                0 / 0 uds.
+              </td>
+
+              <td>
+                <span
+                  th:class="'txt-estado ' + ${recurso.estado.toLowerCase()}"
+                  th:text="${recurso.estado}"
+                  >NORMAL</span
+                >
+              </td>
+
+              <td style="text-align: center">
+                <!-- Botón Modificar (Lápiz) que abre el modal con datos precargados -->
+                <button class="btn-accion" title="Modificar" 
+                        th:onclick="abrirModalEditar([[${recurso.id}]], [[${recurso.tipoRecurso}]], [[${recurso.codigo}]], [[${recurso.titulo}]], [[${recurso.autorOCreador}]], [[${recurso.stockTotal}]], [[${recurso.stockDisponible}]])">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <!-- Botón Eliminar (Papelera) que abre el modal de confirmación -->
+                <button class="btn-accion eliminar" title="Eliminar"
+                        th:onclick="abrirModalEliminar([[${recurso.id}]], [[${recurso.titulo}]], [[${recurso.codigo}]])">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MODAL UNIFICADO (REGISTRO Y EDICIÓN) -->
+      <div id="modalArticulo" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: var(--card-bg, #fff); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="modalTituloLabel" style="margin: 0; font-size: 1.25rem; color: var(--text-dark);">Registrar Nuevo Artículo</h3>
+            <span onclick="cerrarModalArticulo()" style="cursor: pointer; font-size: 1.2rem; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></span>
+          </div>
+
+          <form th:action="@{/admin/inventario/guardar}" method="post">
+            <!-- ID oculto para saber si es actualización -->
+            <input type="hidden" id="modalId" name="id" />
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Categoría / Tipo</label>
+              <select id="modalCategoria" name="tipoRecurso" class="select-categoria" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);">
+                <option value="LIBROS">Libros</option>
+                <option value="NOVELAS LIGERAS">Novelas Ligeras</option>
+                <option value="CUENTOS">Cuentos</option>
+                <option value="COMICS">Cómics</option>
+                <option value="MANGAS">Mangas</option>
+                <option value="REVISTAS">Revistas</option>
+                <option value="OTROS">Otros</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Código</label>
+              <input type="text" id="modalCodigo" name="codigo" readonly style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: rgba(0,0,0,0.04); color: var(--text-muted); font-weight: 600;" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Título del Artículo</label>
+              <input type="text" id="modalTitulo" name="titulo" placeholder="Ej. Clean Code" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Autor o Creador</label>
+              <input type="text" id="modalAutor" name="autorOCreador" placeholder="Ej. Robert C. Martin" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Stock Total</label>
+                <input type="number" id="modalStockTotal" name="stockTotal" min="0" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+              </div>
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Stock Disponible</label>
+                <input type="number" id="modalStockDisponible" name="stockDisponible" min="0" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button type="button" onclick="cerrarModalArticulo()" style="padding: 10px 18px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark); cursor: pointer; font-weight: 500;">Cancelar</button>
+              <button type="submit" style="padding: 10px 18px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+      <div id="modalEliminar" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: var(--card-bg, #fff); padding: 22px 25px; border-radius: 12px; width: 100%; max-width: 360px; height: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; box-sizing: border-box;">
+          <div style="width: 42px; height: 42px; background-color: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 1.1rem;">
+            <i class="fa-solid fa-trash-can"></i>
+          </div>
+          <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 6px;">¿Eliminar artículo?</h3>
+          <p style="color: var(--text-muted); font-size: 0.83rem; margin-bottom: 12px; line-height: 1.4;">Estás a punto de eliminar permanentemente del inventario:</p>
+          <div style="background: rgba(0,0,0,0.03); padding: 8px 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.88rem;">
+            <strong id="eliminarTitulo" style="color: var(--text-dark); display: block; margin-bottom: 2px;">Título</strong>
+            <span id="eliminarCodigo" style="color: var(--text-muted); font-size: 0.78rem;">CÓDIGO</span>
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" onclick="cerrarModalEliminar()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark); font-size: 0.88rem; font-weight: 500; cursor: pointer;">Cancelar</button>
+            <a id="btnConfirmarEliminar" href="#" style="padding: 8px 16px; border-radius: 8px; border: none; background: #dc2626; color: #ffffff; font-size: 0.88rem; font-weight: 600; text-decoration: none; display: inline-block;">Sí, eliminar</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

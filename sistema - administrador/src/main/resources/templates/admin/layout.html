@@ -1,0 +1,282 @@
+<!doctype html>
+<!-- Molde principal de administración -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:fragment="molde(titulo, descripcion, cssEspecifico, jsEspecifico, menuActivo, contenido)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo} + ' | LibRed'">
+      LibRed - Panel Administrativo
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" th:href="@{/css/layout_admin.css}" />
+    <link rel="stylesheet" th:href="@{/css/suscripcion_plan.css}" />
+    <link
+      id="dynamic-specific-css"
+      rel="stylesheet"
+      th:if="${cssEspecifico != ''}"
+      th:href="@{/css/{file}(file=${cssEspecifico})}"
+    />
+  </head>
+  <body>
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img
+          th:src="@{/img/LogoSinFodo.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo"
+        />
+        <i
+          class="fa-solid fa-outdent toggle-btn"
+          onclick="toggleSidebar()"
+          title="Contraer barra"
+        ></i>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">MENÚ PRINCIPAL</span>
+
+        <!-- Panel de Control -->
+        <a
+          href="/admin/panel"
+          th:class="${menuActivo == 'panel'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-table-columns"></i>
+          <span class="nav-text">Panel de Control</span>
+        </a>
+
+        <!-- Lectores -->
+        <a
+          href="/admin/lectores"
+          th:class="${menuActivo == 'lectores'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-users"></i>
+          <span class="nav-text">Lectores</span>
+        </a>
+
+        <!-- Inventario -->
+        <a
+          href="/admin/inventario"
+          th:class="${menuActivo == 'inventario'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span class="nav-text">Inventario</span>
+        </a>
+
+        <span class="nav-section-title">CIRCULACIÓN</span>
+
+        <!-- Préstamos -->
+        <a
+          href="/admin/prestamos"
+          th:class="${menuActivo == 'prestamos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span class="nav-text">Préstamos</span>
+        </a>
+
+        <!-- Devoluciones -->
+        <a
+          href="/admin/devoluciones"
+          th:class="${menuActivo == 'devoluciones'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-rotate-left"></i>
+          <span class="nav-text">Devoluciones</span>
+        </a>
+
+        <!-- Apartados (Movido a Circulación) -->
+        <a
+          href="/admin/apartados"
+          th:class="${menuActivo == 'apartados'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-bookmark"></i>
+          <span class="nav-text">Apartados</span>
+        </a>
+
+        <span class="nav-section-title">CONTROL Y MONITOREO</span>
+
+        <!-- Multas -->
+        <a
+          href="/admin/multas"
+          th:class="${menuActivo == 'multas'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span class="nav-text">Multas</span>
+        </a>
+
+        <!-- Ingresos -->
+        <a
+          href="/admin/ingresos"
+          th:class="${menuActivo == 'ingresos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-cash-register"></i>
+          <span class="nav-text">Ingresos</span>
+        </a>
+
+        <span class="nav-section-title">MÉTRICAS</span>
+
+        <!-- Reportes -->
+        <a
+          href="/admin/reportes"
+          th:class="${menuActivo == 'reportes'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-chart-line"></i>
+          <span class="nav-text">Reportes</span>
+        </a>
+
+        <!-- Estadísticas -->
+        <a
+          href="/admin/estadisticas"
+          th:class="${menuActivo == 'estadisticas'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-chart-pie"></i>
+          <span class="nav-text">Estadísticas</span>
+        </a>
+
+        <span class="nav-section-title">SISTEMA</span>
+        <a href="/admin/ajustes" th:class="${menuActivo == 'ajustes'} ? 'nav-item active' : 'nav-item'" onclick="setActive(this)">
+            <i class="fa-solid fa-gear"></i> <span class="nav-text">Ajustes</span>
+        </a>
+        <a href="/admin/ayuda" th:class="${menuActivo == 'ayuda'} ? 'nav-item active' : 'nav-item'" onclick="setActive(this)">
+            <i class="fa-solid fa-circle-question"></i> <span class="nav-text">Ayuda y Soporte</span>
+        </a>
+      </nav>
+
+      <!-- Parte Inferior -->
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar">A</div>
+          <div class="user-info nav-text">
+            <span class="user-name">Admin Central</span>
+            <span class="user-email">admin@libreria.pe</span>
+          </div>
+        </div>
+        <a href="#" class="nav-item logout-btn" onclick="abrirModalLogout(event)">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-text">Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL (Sin barra de búsqueda en topbar) -->
+    <main class="main-content" id="mainContent">
+      <header class="topbar">
+        <div class="topbar-title-area">
+          <h1 th:text="${titulo}">Título</h1>
+          <p th:text="${descripcion}">Descripción</p>
+        </div>
+
+        <div class="topbar-right-actions">
+          <div class="topbar-actions">
+            <button class="btn-plan" onclick="abrirModalPlan()">
+              <i class="fa-regular fa-user"></i> Ver plan actual
+            </button>
+            <div class="theme-toggle">
+              <i class="fa-regular fa-sun"></i>
+              <i class="fa-regular fa-moon"></i>
+            </div>
+            <i class="fa-regular fa-bell notification-icon"></i>
+            <button class="btn-invite">+ Invitar</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- AQUÍ SE INYECTARÁ EL CONTENIDO ESPECÍFICO -->
+      <th:block th:replace="${contenido}"></th:block>
+    </main>
+
+    <!-- MODAL DE SUSCRIPCIÓN: ESTADO DE LA MEMBRESÍA -->
+    <div id="modalSuscripcion" class="modal-overlay">
+        <div class="modal-content sus-plan-modal">
+            <span class="close-modal" onclick="cerrarModalSuscripcion()"><i class="fa-solid fa-xmark"></i></span>
+
+            <div class="sus-plan-head">
+                <div class="sus-plan-icon"><i class="fa-solid fa-crown"></i></div>
+                <h2>Estado de tu Membresía</h2>
+                <p id="susPlanDescripcion">Consultando el estado de tu sede...</p>
+            </div>
+
+            <div id="susPlanCargando" class="sus-plan-cargando">Consultando el estado de tu membresía...</div>
+
+            <div id="susPlanContenido" class="sus-plan-contenido" hidden>
+                <!-- Resumen -->
+                <div class="sus-plan-resumen">
+                    <div class="sus-plan-item">
+                        <span class="sus-lbl">Plan activo</span>
+                        <span class="sus-val" id="susPlanTipo">—</span>
+                    </div>
+                    <div class="sus-plan-item">
+                        <span class="sus-lbl">Estado de la cuenta</span>
+                        <span class="sus-estado ok" id="susPlanEstado">—</span>
+                    </div>
+                    <div class="sus-plan-item">
+                        <span class="sus-lbl">Renovación automática</span>
+                        <span class="sus-val" id="susPlanFecha">—</span>
+                    </div>
+                    <div class="sus-plan-dias">
+                        <strong id="susPlanDias">—</strong>
+                        <span>días restantes</span>
+                    </div>
+                </div>
+
+                <!-- Mejora: solo para planes mensuales -->
+                <div class="sus-plan-upgrade" id="susPlanMigrar" hidden>
+                    <h4><i class="fa-solid fa-arrow-trend-up"></i> Pásate al Plan Anual</h4>
+                    <p>Aprovecha el descuento corporativo: pagas <strong id="susPlanPrecioAnual">S/ 0.00</strong> al año y ahorras <strong id="susPlanAhorro">S/ 0.00</strong> frente al pago mensual.</p>
+                    <p class="sus-nota-migrar" id="susPlanMigrarNota"></p>
+                    <button type="button" class="sus-btn-migrar" id="susBtnMigrar" onclick="migrarPlanAnual()">Migrar al Plan Anual</button>
+                </div>
+
+                <p class="sus-plan-msg" id="susPlanMsg"></p>
+            </div>
+
+            <div class="sus-plan-footer">
+                <button type="button" class="sus-btn-cerrar" onclick="cerrarModalSuscripcion()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CIERRE DE SESIÓN -->
+    <div id="modalLogout" class="modal-overlay">
+        <div class="modal-content modal-sm">
+            <div style="text-align: center; padding: 10px;">
+                <div style="width: 55px; height: 55px; background-color: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 1.4rem;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </div>
+                <h3 style="font-size: 1.2rem; color: var(--text-dark); margin-bottom: 8px;">¿Deseas cerrar sesión?</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 25px;">Estás a punto de salir del panel administrativo de LibRed.</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button type="button" onclick="cerrarModalLogout()" style="padding: 9px 18px; border-radius: 8px; border: 1px solid var(--sidebar-border); background-color: var(--card-bg); color: var(--text-dark); font-weight: 500; cursor: pointer; font-size: 0.88rem;">Volver</button>
+                    <a href="/login-admin" style="padding: 9px 18px; border-radius: 8px; border: none; background-color: #dc2626; color: #ffffff; font-weight: 600; text-decoration: none; display: inline-block; font-size: 0.88rem;">Sí, confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+<script th:src="@{/js/layout_admin.js}"></script>
+<script th:src="@{/js/suscripcion_plan.js}"></script>
+<script id="dynamic-specific-js" th:if="${jsEspecifico != ''}" th:src="@{/js/__${jsEspecifico}__}"></script>
+  </body>
+</html>
