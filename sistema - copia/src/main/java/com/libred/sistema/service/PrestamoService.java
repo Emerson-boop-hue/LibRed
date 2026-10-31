@@ -9,7 +9,11 @@ import com.libred.sistema.repository.RecursoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -18,13 +22,16 @@ public class PrestamoService {
     private final PrestamoRepository prestamoRepository;
     private final RecursoRepository recursoRepository;
     private final LectorRepository lectorRepository;
+    private final PoliticaPrestamoService politicaService;
 
     public PrestamoService(PrestamoRepository prestamoRepository, 
                            RecursoRepository recursoRepository, 
-                           LectorRepository lectorRepository) {
+                           LectorRepository lectorRepository,
+                           PoliticaPrestamoService politicaService) {
         this.prestamoRepository = prestamoRepository;
         this.recursoRepository = recursoRepository;
         this.lectorRepository = lectorRepository;
+        this.politicaService = politicaService;
     }
 
     public List<Prestamo> listarPorLibreria(Integer libreriaId) {
@@ -37,7 +44,7 @@ public class PrestamoService {
     }
 
     @Transactional
-    public void registrarPrestamo(Integer libreriaId, Prestamo prestamo) throws Exception {
+    public Prestamo registrarPrestamo(Integer libreriaId, Prestamo prestamo) throws Exception {
         // 1. Validar que el lector exista, pertenezca a la librería y esté habilitado
         Lector lector = lectorRepository.findById(prestamo.getLector().getId())
                 .orElseThrow(() -> new Exception("El lector seleccionado no existe."));
@@ -51,7 +58,8 @@ public class PrestamoService {
         }
 
         // 2. Validar que el recurso exista, sea de esta librería y tenga stock disponible
-        Recurso recurso = recursoRepository.findById(prestamo.getRecurso().getId())
+        // (se bloquea la fila del artículo mientras se descuenta el stock)
+        Recurso recurso = recursoRepository.bloquearPorId(prestamo.getRecurso().getId())
                 .orElseThrow(() -> new Exception("El recurso seleccionado no existe en el inventario."));
 
         if (recurso.getLibreria() == null || !libreriaId.equals(recurso.getLibreria().getId())) {
@@ -62,11 +70,33 @@ public class PrestamoService {
             throw new Exception("No hay stock disponible de este artículo para préstamo.");
         }
 
-        // 3. Asignar metadatos y librería
+        // 3. Validar el plazo según la política de la librería y calcular el servicio (días x tarifa de la categoría)
+        LocalDate hoy = LocalDate.now();
+        LocalDate limite = prestamo.getFechaDevolucionLimite();
+        if (limite == null) {
+            throw new Exception("Indica la fecha límite de devolución.");
+        }
+        long dias = ChronoUnit.DAYS.between(hoy, limite);
+        int maxDias = politicaService.obtenerMaxDias(libreriaId);
+        if (dias < 1) {
+            throw new Exception("La fecha límite de devolución debe ser posterior a hoy.");
+        }
+        if (dias > maxDias) {
+            throw new Exception("El plazo máximo de préstamo en esta librería es de " + maxDias
+                    + (maxDias == 1 ? " día." : " días."));
+        }
+        BigDecimal tarifa = politicaService.tarifaDe(libreriaId, recurso.getTipoRecurso());
+
+        // 4. Asignar metadatos, librería y datos del servicio
+        prestamo.setLector(lector);
+        prestamo.setRecurso(recurso);
         prestamo.setLibreriaId(libreriaId);
         prestamo.setEstadoPrestamo("ACTIVO");
+        prestamo.setDiasPrestamo((int) dias);
+        prestamo.setTarifaDia(tarifa);
+        prestamo.setMontoServicio(tarifa.multiply(BigDecimal.valueOf(dias)).setScale(2, RoundingMode.HALF_UP));
 
-        // 4. Descontar stock disponible del recurso usando setters correctos
+        // 5. Descontar stock disponible del recurso usando setters correctos
         recurso.setStockDisponible(recurso.getStockDisponible() - 1);
         if (recurso.getStockDisponible() == 0) {
             recurso.setEstado("AGOTADO");
@@ -75,8 +105,8 @@ public class PrestamoService {
         }
         recursoRepository.save(recurso);
 
-        // 5. Guardar el préstamo
-        prestamoRepository.save(prestamo);
+        // 6. Guardar el préstamo
+        return prestamoRepository.save(prestamo);
     }
 
     @Transactional

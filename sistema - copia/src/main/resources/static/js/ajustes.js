@@ -8,7 +8,8 @@ function inicializarAjustes() {
   const formDatos = document.getElementById("formDatos");
   const formPassword = document.getElementById("formPassword");
   const formTarjeta = document.getElementById("formTarjeta");
-  if (!formDatos || !formPassword || !formTarjeta) return;
+  const formPolitica = document.getElementById("formPolitica");
+  if (!formDatos || !formPassword || !formTarjeta || !formPolitica) return;
 
   // El script puede ejecutarse dos veces sobre la misma pantalla (carga normal + navegación AJAX):
   // esta marca evita enganchar los eventos dos veces.
@@ -114,6 +115,58 @@ function inicializarAjustes() {
       const avatarBarra = document.querySelector(".sidebar .avatar");
       if (avatarBarra) avatarBarra.textContent = r.nombreComercial.charAt(0).toUpperCase();
     }
+  );
+
+  // ---------- POLÍTICA DE PRÉSTAMOS (máximo de días y tarifa por categoría) ----------
+  const inputMaxDias = document.getElementById("ajMaxDias");
+  inputMaxDias.addEventListener("input", () => (inputMaxDias.value = soloDigitos(inputMaxDias.value).slice(0, 2)));
+
+  // Límite de préstamos activos (opcional): el interruptor activa o desactiva el campo numérico
+  const chkLimitar = document.getElementById("ajLimitarActivos");
+  const inputMaxActivos = document.getElementById("ajMaxActivos");
+  const campoMaxActivos = document.getElementById("campoMaxActivos");
+  function sincronizarLimite() {
+    inputMaxActivos.disabled = !chkLimitar.checked;
+    campoMaxActivos.classList.toggle("apagado", !chkLimitar.checked);
+  }
+  chkLimitar.addEventListener("change", sincronizarLimite);
+  inputMaxActivos.addEventListener("input", () => (inputMaxActivos.value = soloDigitos(inputMaxActivos.value).slice(0, 2)));
+  sincronizarLimite();
+
+  const inputsTarifa = formPolitica.querySelectorAll(".aj-input-tarifa");
+  inputsTarifa.forEach((input) => {
+    // Solo dígitos y un separador decimal (máx. 2 decimales)
+    input.addEventListener("input", () => {
+      let v = input.value.replace(/[^\d.,]/g, "").replace(",", ".");
+      const partes = v.split(".");
+      if (partes.length > 2) v = partes[0] + "." + partes.slice(1).join("");
+      const [entero, decimal] = v.split(".");
+      input.value = decimal !== undefined ? entero.slice(0, 2) + "." + decimal.slice(0, 2) : entero.slice(0, 2);
+    });
+    // Al salir del campo se muestra con 2 decimales
+    input.addEventListener("blur", () => {
+      const n = parseFloat(input.value);
+      input.value = isNaN(n) ? "0.00" : n.toFixed(2);
+    });
+  });
+
+  conectar(
+    formPolitica,
+    "/admin/ajustes/politica",
+    "errorPolitica",
+    "okPolitica",
+    () => {
+      const datos = {
+        maxDias: inputMaxDias.value,
+        limitarActivos: chkLimitar.checked ? "true" : "false",
+        maxActivos: inputMaxActivos.value,
+      };
+      inputsTarifa.forEach((input) => {
+        datos["t_" + input.dataset.clave] = input.value;
+      });
+      return datos;
+    },
+    null
   );
 
   // ---------- CONTRASEÑA ----------

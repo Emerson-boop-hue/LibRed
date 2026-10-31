@@ -3,6 +3,7 @@ package com.libred.sistema.controller;
 import com.libred.sistema.model.Prestamo;
 import com.libred.sistema.repository.PrestamoRepository;
 import com.libred.sistema.service.LectorService;
+import com.libred.sistema.service.PoliticaPrestamoService;
 import com.libred.sistema.service.PrestamoService;
 import com.libred.sistema.service.RecursoService;
 import jakarta.servlet.http.HttpSession;
@@ -22,15 +23,18 @@ public class PrestamoController {
     private final PrestamoService prestamoService;
     private final LectorService lectorService;
     private final RecursoService recursoService;
+    private final PoliticaPrestamoService politicaService;
 
     public PrestamoController(PrestamoRepository prestamoRepository,
                               PrestamoService prestamoService,
                               LectorService lectorService,
-                              RecursoService recursoService) {
+                              RecursoService recursoService,
+                              PoliticaPrestamoService politicaService) {
         this.prestamoRepository = prestamoRepository;
         this.prestamoService = prestamoService;
         this.lectorService = lectorService;
         this.recursoService = recursoService;
+        this.politicaService = politicaService;
     }
 
     // Librería del admin que inició sesión (el interceptor WebConfig garantiza que existe)
@@ -61,6 +65,10 @@ public class PrestamoController {
         model.addAttribute("lectores", lectorService.listarPorLibreria(libreriaId, null));
         model.addAttribute("recursos", recursoService.listarPorLibreria(libreriaId));
 
+        // Política de la librería: tarifa por día de cada categoría y máximo de días de préstamo
+        model.addAttribute("tarifas", politicaService.tarifasPorValor(libreriaId));
+        model.addAttribute("maxDias", politicaService.obtenerMaxDias(libreriaId));
+
         return "admin/prestamos";
     }
 
@@ -85,9 +93,12 @@ public class PrestamoController {
             prestamo.setFechaDevolucionLimite(LocalDate.parse(fechaDevolucionLimite));
 
             // Ejecutar la lógica de negocio (validación de pertenencia, sanciones, stock y descuento)
-            prestamoService.registrarPrestamo(libreriaActual(session), prestamo);
+            prestamo.setOrigen("ADMIN");
+            Prestamo guardado = prestamoService.registrarPrestamo(libreriaActual(session), prestamo);
 
-            redirectAttributes.addFlashAttribute("exito", "¡Préstamo registrado correctamente y stock actualizado!");
+            redirectAttributes.addFlashAttribute("exito", "¡Préstamo registrado correctamente! Servicio: S/ "
+                    + guardado.getMontoServicio().toPlainString() + " (" + guardado.getDiasPrestamo()
+                    + (guardado.getDiasPrestamo() == 1 ? " día" : " días") + ").");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

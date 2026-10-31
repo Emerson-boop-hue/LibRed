@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PrestamoRepository extends JpaRepository<Prestamo, Integer> {
@@ -27,4 +28,16 @@ public interface PrestamoRepository extends JpaRepository<Prestamo, Integer> {
     long countByLibreriaId(Integer libreriaId);
     
     long countByLibreriaIdAndEstadoPrestamo(Integer libreriaId, String estadoPrestamo);
+
+    // ---- Módulo Préstamos del LECTOR ----
+
+    // Todos los préstamos de un lector (su registro en esa librería), del más reciente al más antiguo
+    List<Prestamo> findByLectorIdOrderByFechaPrestamoDesc(Integer lectorId);
+
+    long countByLectorIdAndEstadoPrestamoIn(Integer lectorId, List<String> estados);
+
+    boolean existsByLectorIdAndRecursoIdAndEstadoPrestamoIn(Integer lectorId, Integer recursoId, List<String> estados);
+
+    // Préstamos activos cuya fecha límite ya pasó (el lector no puede pedir otro hasta devolverlos)
+    long countByLectorIdAndEstadoPrestamoAndFechaDevolucionLimiteBefore(Integer lectorId, String estado, LocalDate fecha);
 }

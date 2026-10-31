@@ -225,3 +225,24 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* --- BOTÓN "SOLICITAR PRÉSTAMO" DE CADA TARJETA --- */
+.btn-solicitar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 16px 14px 16px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+.btn-solicitar:hover {
+    background: var(--primary);
+    color: #fff;
+}

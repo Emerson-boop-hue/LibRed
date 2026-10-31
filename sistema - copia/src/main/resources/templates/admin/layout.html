@@ -100,16 +100,6 @@
           <span class="nav-text">Devoluciones</span>
         </a>
 
-        <!-- Apartados (Movido a Circulación) -->
-        <a
-          href="/admin/apartados"
-          th:class="${menuActivo == 'apartados'} ? 'nav-item active' : 'nav-item'"
-          onclick="setActive(this)"
-        >
-          <i class="fa-solid fa-bookmark"></i>
-          <span class="nav-text">Apartados</span>
-        </a>
-
         <span class="nav-section-title">CONTROL Y MONITOREO</span>
 
         <!-- Multas -->
@@ -120,6 +110,16 @@
         >
           <i class="fa-solid fa-file-invoice-dollar"></i>
           <span class="nav-text">Multas</span>
+        </a>
+
+        <!-- Movimientos (historial de préstamos, devoluciones y multas) -->
+        <a
+          href="/admin/movimientos"
+          th:class="${menuActivo == 'movimientos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-timeline"></i>
+          <span class="nav-text">Movimientos</span>
         </a>
 
         <!-- Ingresos -->

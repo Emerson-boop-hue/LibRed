@@ -4,6 +4,7 @@ import com.libred.sistema.model.Libreria;
 import com.libred.sistema.model.TarjetaPago;
 import com.libred.sistema.service.AjustesAdminService;
 import com.libred.sistema.service.AjustesException;
+import com.libred.sistema.service.PoliticaPrestamoService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +29,11 @@ import java.util.Map;
 public class AjustesAdminController {
 
     private final AjustesAdminService ajustesService;
+    private final PoliticaPrestamoService politicaService;
 
-    public AjustesAdminController(AjustesAdminService ajustesService) {
+    public AjustesAdminController(AjustesAdminService ajustesService, PoliticaPrestamoService politicaService) {
         this.ajustesService = ajustesService;
+        this.politicaService = politicaService;
     }
 
     // Librería del admin que inició sesión
@@ -43,6 +46,10 @@ public class AjustesAdminController {
         Integer libreriaId = libreriaActual(session);
         model.addAttribute("libreria", ajustesService.obtenerLibreria(libreriaId));
         model.addAttribute("tarjeta", ajustesService.obtenerTarjeta(libreriaId).orElse(null));
+        // Política de préstamos (máximo de días y tarifa por categoría)
+        model.addAttribute("maxDias", politicaService.obtenerMaxDias(libreriaId));
+        model.addAttribute("maxActivos", politicaService.obtenerMaxActivos(libreriaId)); // null = sin límite
+        model.addAttribute("tarifas", politicaService.filasDeTarifas(libreriaId));
         return "admin/ajustes";
     }
 
@@ -60,6 +67,17 @@ public class AjustesAdminController {
         respuesta.put("ok", true);
         respuesta.put("mensaje", "Los datos de tu librería se actualizaron correctamente.");
         respuesta.put("nombreComercial", l.getNombreComercial());
+        return respuesta;
+    }
+
+    @PostMapping("/politica")
+    @ResponseBody
+    public Map<String, Object> guardarPolitica(@RequestBody Map<String, String> datos, HttpSession session) {
+        politicaService.guardar(libreriaActual(session), datos);
+
+        Map<String, Object> respuesta = new LinkedHashMap<>();
+        respuesta.put("ok", true);
+        respuesta.put("mensaje", "La política de préstamos se guardó correctamente.");
         return respuesta;
     }
 

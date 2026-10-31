@@ -333,3 +333,131 @@
     .aj-card { padding: 18px 16px; }
     .dashboard-container { padding: 16px; }
 }
+
+/* --- POLÍTICA DE PRÉSTAMOS: tarifa por categoría --- */
+.aj-tarifas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 14px;
+    margin-top: 6px;
+}
+
+.aj-tarifa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    background: var(--card-bg);
+}
+
+.aj-tarifa label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.aj-tarifa label i {
+    color: #2563eb;
+    width: 16px;
+    text-align: center;
+}
+
+.aj-moneda {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.aj-moneda input {
+    width: 72px;
+    padding: 7px 9px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--text-dark);
+    font-size: 0.85rem;
+    text-align: right;
+    outline: none;
+}
+
+.aj-moneda input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.aj-moneda input.con-error {
+    border-color: #dc2626;
+}
+
+@media (max-width: 700px) {
+    .aj-tarifas { grid-template-columns: 1fr; }
+}
+
+/* --- LÍMITE OPCIONAL DE PRÉSTAMOS ACTIVOS --- */
+.aj-limite {
+    margin: 4px 0 18px 0;
+    padding: 14px 16px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.aj-switch {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+.aj-switch input {
+    /* El input real se oculta DENTRO del interruptor (no en la esquina de la página):
+       si no, al hacer clic el navegador desplazaba toda la pantalla hacia arriba. */
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.aj-switch-pista {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    background: #cbd5e1;
+    transition: background 0.2s;
+}
+.aj-switch-pista::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+}
+.aj-switch input:checked + .aj-switch-pista { background: #2563eb; }
+.aj-switch input:checked + .aj-switch-pista::after { transform: translateX(18px); }
+.aj-switch input:focus-visible + .aj-switch-pista { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+
+.aj-campo-limite { margin-top: 12px; max-width: 260px; }
+.aj-campo-limite.apagado { opacity: 0.5; }
+.aj-campo-limite input:disabled { cursor: not-allowed; }
+.aj-ayuda-limite { margin-top: 10px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }

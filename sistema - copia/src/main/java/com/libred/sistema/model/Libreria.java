@@ -47,6 +47,14 @@ public class Libreria {
     @Column(name = "correo_contacto", length = 120)
     private String correoContacto;
 
+    // Política de préstamos: máximo de días que un lector puede llevarse un artículo (se edita en Ajustes del administrador)
+    @Column(name = "max_dias_prestamo", nullable = false, columnDefinition = "INT NOT NULL DEFAULT 7")
+    private Integer maxDiasPrestamo = 7;
+
+    // Máximo de préstamos activos por lector. NULL = sin límite (el admin decide en Ajustes si lo limita o no)
+    @Column(name = "max_prestamos_activos", columnDefinition = "INT NULL DEFAULT 3")
+    private Integer maxPrestamosActivos = 3;
+
     // Método que JPA ejecuta automáticamente antes de guardar el registro por primera vez
     @PrePersist
     protected void onCreate() {
@@ -153,5 +161,22 @@ public class Libreria {
 
     public void setCorreoContacto(String correoContacto) {
         this.correoContacto = correoContacto;
+    }
+
+    public Integer getMaxDiasPrestamo() {
+        return maxDiasPrestamo == null ? 7 : maxDiasPrestamo;
+    }
+
+    public void setMaxDiasPrestamo(Integer maxDiasPrestamo) {
+        this.maxDiasPrestamo = maxDiasPrestamo;
+    }
+
+    /** Máximo de préstamos activos por lector; null significa que no hay límite. */
+    public Integer getMaxPrestamosActivos() {
+        return maxPrestamosActivos;
+    }
+
+    public void setMaxPrestamosActivos(Integer maxPrestamosActivos) {
+        this.maxPrestamosActivos = maxPrestamosActivos;
     }
 }

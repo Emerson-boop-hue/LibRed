@@ -4,7 +4,10 @@ import com.libred.sistema.model.Recurso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import java.util.List;
+import java.util.Optional;
 
 public interface RecursoRepository extends JpaRepository<Recurso, Integer> {
     
@@ -27,4 +30,9 @@ public interface RecursoRepository extends JpaRepository<Recurso, Integer> {
     boolean existsByLibreriaIdAndCodigo(Integer libreriaId, String codigo);
 
     long countByLibreriaIdAndTipoRecurso(Integer libreriaId, String tipoRecurso);
+
+    // Bloquea la fila del artículo mientras se descuenta el stock (evita que dos préstamos simultáneos se lleven la última copia)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM Recurso r WHERE r.id = :id")
+    Optional<Recurso> bloquearPorId(@Param("id") Integer id);
 }

@@ -104,8 +104,8 @@ public class AuthController {
 
     // --- RUTAS ADMINISTRATIVAS ---
 
-    @GetMapping("/admin/apartados")
-    public String panelApartados() { return "admin/apartados"; }
+    @GetMapping("/admin/movimientos")
+    public String panelMovimientos() { return "admin/movimientos"; }
 
     // (Cola de espera eliminada definitivamente)
 

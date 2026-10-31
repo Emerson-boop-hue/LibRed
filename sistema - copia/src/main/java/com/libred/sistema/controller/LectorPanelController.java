@@ -55,16 +55,6 @@ public class LectorPanelController {
 
     // ---------- Módulos pendientes (páginas "próximamente") ----------
 
-    @GetMapping("/lector/prestamos")
-    public String prestamos(Model model) {
-        return proximamente(model, "Mis préstamos", "Solicita artículos y consulta tus préstamos vigentes", "prestamos");
-    }
-
-    @GetMapping("/lector/historial")
-    public String historial(Model model) {
-        return proximamente(model, "Historial de movimientos", "Consulta tus préstamos anteriores y tus multas", "historial");
-    }
-
     @GetMapping("/lector/red-global")
     public String redGlobal(Model model) {
         return proximamente(model, "Red Global LibRed", "Explora las librerías afiliadas a la plataforma", "red-global");

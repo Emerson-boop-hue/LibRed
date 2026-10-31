@@ -1,6 +1,7 @@
 package com.libred.sistema.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,6 +37,22 @@ public class Prestamo {
 
     @Column(name = "estado_prestamo", length = 50)
     private String estadoPrestamo = "ACTIVO"; // ACTIVO, DEVUELTO, VENCIDO
+
+    // Cuántos días se prestó el artículo (fecha límite - fecha de préstamo)
+    @Column(name = "dias_prestamo")
+    private Integer diasPrestamo;
+
+    // Tarifa de servicio por día de la categoría del artículo, vigente al momento del préstamo
+    @Column(name = "tarifa_dia", precision = 8, scale = 2)
+    private BigDecimal tarifaDia;
+
+    // Total del servicio = días x tarifa (se cobra en la librería al recoger el artículo)
+    @Column(name = "monto_servicio", precision = 10, scale = 2)
+    private BigDecimal montoServicio;
+
+    // Quién registró el préstamo: ADMIN (en mostrador) o LECTOR (lo solicitó él mismo)
+    @Column(name = "origen", length = 20)
+    private String origen = "ADMIN";
 
     @PrePersist
     public void prePersist() {
@@ -113,5 +130,37 @@ public class Prestamo {
 
     public void setEstadoPrestamo(String estadoPrestamo) {
         this.estadoPrestamo = estadoPrestamo;
+    }
+
+    public Integer getDiasPrestamo() {
+        return diasPrestamo;
+    }
+
+    public void setDiasPrestamo(Integer diasPrestamo) {
+        this.diasPrestamo = diasPrestamo;
+    }
+
+    public BigDecimal getTarifaDia() {
+        return tarifaDia == null ? BigDecimal.ZERO.setScale(2) : tarifaDia;
+    }
+
+    public void setTarifaDia(BigDecimal tarifaDia) {
+        this.tarifaDia = tarifaDia;
+    }
+
+    public BigDecimal getMontoServicio() {
+        return montoServicio == null ? BigDecimal.ZERO.setScale(2) : montoServicio;
+    }
+
+    public void setMontoServicio(BigDecimal montoServicio) {
+        this.montoServicio = montoServicio;
+    }
+
+    public String getOrigen() {
+        return origen;
+    }
+
+    public void setOrigen(String origen) {
+        this.origen = origen;
     }
 }

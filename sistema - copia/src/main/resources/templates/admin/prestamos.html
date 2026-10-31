@@ -48,6 +48,8 @@
                           th:data-titulo="${r.titulo}"
                           th:data-codigo="${r.codigo}"
                           th:data-stock="${r.stockDisponible}"
+                          th:data-categoria="${r.tipoRecurso}"
+                          th:data-tarifa="${tarifas[r.tipoRecurso] != null ? tarifas[r.tipoRecurso] : 0}"
                           th:text="${r.codigo + ' - ' + r.titulo + ' (Stock: ' + r.stockDisponible + ' disp.)'}">
                   </option>
                 </select>
@@ -55,7 +57,14 @@
 
               <div class="form-group-pres">
                 <label>3. Fecha Límite de Devolución</label>
-                <input type="date" id="inputFechaDevolucion" name="fechaDevolucionLimite" class="form-control-pres" onchange="actualizarFechaLimiteTicket(this)" required />
+                <input type="date" id="inputFechaDevolucion" name="fechaDevolucionLimite" class="form-control-pres"
+                       th:attr="data-max-dias=${maxDias}" onchange="actualizarFechaLimiteTicket(this)" required />
+                <small class="hint-plazo">
+                  <i class="fa-regular fa-calendar-check"></i>
+                  Plazo máximo establecido: <strong th:text="${maxDias + (maxDias == 1 ? ' día' : ' días')}">7 días</strong>.
+                  Puedes cambiarlo cuando quieras en <a href="/admin/ajustes">Ajustes &rsaquo; Política de préstamos</a>,
+                  donde también defines la tarifa de servicio por categoría.
+                </small>
               </div>
 
               <!-- BOTONES PEGADOS AL FORMULARIO COMO ANTES -->
@@ -102,6 +111,10 @@
                     <span id="resumenArticuloCodigo">--</span>
                   </div>
                   <div class="ticket-row">
+                    <span>Categoría:</span>
+                    <span id="resumenCategoria">--</span>
+                  </div>
+                  <div class="ticket-row">
                     <span>F. Préstamo:</span>
                     <span id="resumenFechaPrestamo">--</span>
                   </div>
@@ -109,6 +122,19 @@
                     <span>F. Devolución Límite:</span>
                     <span id="resumenFechaLimite" style="color: #2563eb;">--</span>
                   </div>
+                  <div class="ticket-row">
+                    <span>Días de préstamo:</span>
+                    <span id="resumenDias">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>Tarifa por día:</span>
+                    <span id="resumenTarifa">--</span>
+                  </div>
+                  <div class="ticket-row ticket-total">
+                    <span>Servicio a cobrar:</span>
+                    <span id="resumenTotal">--</span>
+                  </div>
+                  <p class="ticket-nota">El servicio se cancela en la librería al entregar el artículo.</p>
                 </div>
               </div>
             </div>
