@@ -1,0 +1,208 @@
+/* =====================================================================
+   ASISTENTE DE REGISTRO Y SUSCRIPCIÓN (login) - prefijo "sus-"
+   ===================================================================== */
+
+.sus-overlay[hidden], .sus-final[hidden], .sus-field-error:empty { display: none; }
+
+.sus-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.sus-overlay.active { opacity: 1; visibility: visible; }
+.sus-overlay.sus-fade { opacity: 0; transition: opacity 0.55s ease; }
+
+/* ---------- Tarjeta ---------- */
+.sus-modal {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 94vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 34px 26px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.35s ease;
+}
+.sus-overlay.active .sus-modal { transform: none; }
+
+.sus-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    border: none;
+    background: transparent;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.sus-close:hover { color: #dc2626; }
+
+/* ---------- Indicadores de progreso ---------- */
+.sus-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+.sus-step { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px; }
+.sus-step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    background: #e5e7eb; color: #6b7280;
+    transition: background 0.3s, color 0.3s;
+}
+.sus-step-label { font-size: 11px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; }
+.sus-step.active .sus-step-dot { background: #2563eb; color: #fff; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15); }
+.sus-step.active .sus-step-label { color: #111; }
+.sus-step.done .sus-step-dot { background: #2563eb; color: #fff; }
+.sus-step.done .sus-step-label { color: #2563eb; }
+.sus-step-line { flex: 1; max-width: 70px; height: 2px; background: #e5e7eb; margin-bottom: 20px; transition: background 0.3s; }
+.sus-step-line.done { background: #2563eb; }
+
+/* ---------- Paneles ---------- */
+.sus-panel { display: none; }
+.sus-panel.active { display: block; animation: susEntrar 0.3s ease; }
+@keyframes susEntrar { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+
+.sus-panel h2 { font-size: 21px; font-weight: 700; color: #111; margin-bottom: 6px; text-align: center; }
+.sus-sub { font-size: 13px; color: #6b7280; text-align: center; margin-bottom: 20px; line-height: 1.5; }
+
+/* ---------- Paso 1: tarjetas de plan ---------- */
+.sus-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px; color: #6b7280; }
+.sus-plan {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 22px 18px 18px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    color: #111;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.sus-plan:hover { border-color: #93c5fd; transform: translateY(-2px); }
+.sus-plan.selected { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); background: #f8fbff; }
+.sus-plan h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.sus-plan-precio { font-size: 28px; font-weight: 700; color: #111; line-height: 1; }
+.sus-plan-precio small { font-size: 12px; font-weight: 500; color: #6b7280; margin-left: 4px; }
+.sus-plan-detalle { font-size: 12px; color: #6b7280; margin-top: 10px; line-height: 1.5; }
+.sus-plan-badge {
+    position: absolute;
+    top: -10px; right: 12px;
+    background: #16a34a; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+.sus-plan-check {
+    position: absolute; top: 14px; right: 14px;
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid #d1d5db;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: transparent;
+}
+.sus-plan.selected .sus-plan-check { background: #2563eb; border-color: #2563eb; color: #fff; }
+.sus-plan-badge + .sus-plan-check { top: 18px; }
+
+/* ---------- Resumen del plan (paso 2) ---------- */
+.sus-resumen {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #f1f5f9; border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 16px;
+    font-size: 13px; color: #475569;
+}
+.sus-resumen strong { color: #111; font-size: 14px; }
+
+/* ---------- Campos ---------- */
+.sus-field { margin-bottom: 12px; text-align: left; flex: 1; }
+.sus-field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #111; margin-bottom: 6px; letter-spacing: 0.5px; }
+.sus-row { display: flex; gap: 14px; }
+
+.sus-input { position: relative; display: flex; align-items: center; }
+.sus-input input {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f9fafb;
+    transition: all 0.25s ease;
+}
+.sus-input input:focus { outline: none; border-color: #2563eb; background: #fff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+.sus-input > i { position: absolute; right: 14px; color: #9ca3af; font-size: 15px; }
+.sus-input .sus-eye { cursor: pointer; transition: color 0.2s; }
+.sus-input .sus-eye:hover { color: #111; }
+.sus-input.invalid input { border-color: #dc2626; background: #fff7f7; }
+.sus-input.readonly input { background: #eef2f7; color: #475569; font-weight: 700; letter-spacing: 0.5px; cursor: not-allowed; }
+
+.sus-field-error { display: block; margin-top: 4px; font-size: 11.5px; color: #dc2626; }
+.sus-error-general { min-height: 0; font-size: 12.5px; color: #b91c1c; text-align: center; margin-top: 8px; }
+.sus-error-general:empty { display: none; }
+.sus-nota { font-size: 12px; color: #6b7280; margin-top: 6px; display: flex; gap: 6px; align-items: flex-start; line-height: 1.4; }
+.sus-nota i { margin-top: 2px; color: #2563eb; }
+
+/* ---------- Botones ---------- */
+.sus-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 22px; }
+.sus-btn {
+    padding: 12px 26px;
+    border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.2s, opacity 0.2s, transform 0.1s;
+}
+.sus-btn:active:not(:disabled) { transform: scale(0.98); }
+.sus-btn-sec { background: #f3f4f6; color: #111; border-color: #e5e7eb; }
+.sus-btn-sec:hover:not(:disabled) { background: #e5e7eb; }
+.sus-btn-pri { background: #2563eb; color: #fff; margin-left: auto; }
+.sus-btn-pri:hover:not(:disabled) { background: #1d4ed8; }
+/* Estado opaco / bloqueado */
+.sus-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Mensaje final ---------- */
+.sus-final {
+    background: #fff;
+    border-radius: 16px;
+    padding: 38px 40px;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    animation: susEntrar 0.4s ease;
+}
+.sus-final-icon {
+    width: 64px; height: 64px; margin: 0 auto 18px;
+    border-radius: 50%;
+    background: #dcfce7; color: #16a34a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+}
+.sus-final h3 { font-size: 19px; color: #111; margin-bottom: 10px; line-height: 1.3; }
+.sus-final p { font-size: 14px; color: #475569; margin-bottom: 8px; }
+.sus-final strong { color: #111; letter-spacing: 0.5px; }
+.sus-final small { color: #9ca3af; font-size: 12px; }
+
+@media (max-width: 560px) {
+    .sus-modal { padding: 26px 20px 20px; }
+    .sus-plans { grid-template-columns: 1fr; }
+    .sus-row { flex-direction: column; gap: 0; }
+}

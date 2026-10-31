@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- Módulo CATÁLOGO del lector -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{lector/layout_lector :: molde(
+          'Catálogo de artículos',
+          'Busca libros, cómics, mangas y otros artículos de la librería que elegiste',
+          'lector_catalogo.css',
+          'lector_catalogo.js',
+          'catalogo',
+          ~{:: .lector-container}
+      )}"
+>
+  <head>
+    <title>Catálogo | LibRed</title>
+  </head>
+  <body>
+    <div class="lector-container">
+
+      <!-- FILTROS (funciona también sin JavaScript: es un formulario GET normal) -->
+      <form class="filtros-card" id="formFiltros" method="get" action="/lector/catalogo">
+        <div class="campo campo-grande">
+          <label for="filtroTexto">Título o código</label>
+          <div class="input-icono">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="filtroTexto" name="texto" placeholder="Ej: Clean Code o LIB-001"
+                   th:value="${texto}" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="filtroCategoria">Categoría</label>
+          <select id="filtroCategoria" name="categoria">
+            <option value="">Todas</option>
+            <option th:each="c : ${categorias}"
+                    th:value="${c.valor}"
+                    th:text="${c.etiqueta}"
+                    th:selected="${c.valor == categoriaSeleccionada}">Libros</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="filtroAutor">Autor o creador</label>
+          <input type="text" id="filtroAutor" name="autor" placeholder="Nombre del autor"
+                 th:value="${autor}" autocomplete="off" />
+        </div>
+
+        <div class="campo">
+          <label for="filtroDisponibilidad">Disponibilidad</label>
+          <select id="filtroDisponibilidad" name="disponibilidad">
+            <option value="">Todos</option>
+            <option value="DISPONIBLE" th:selected="${disponibilidadSeleccionada == 'DISPONIBLE'}">Con stock disponible</option>
+            <option value="AGOTADO" th:selected="${disponibilidadSeleccionada == 'AGOTADO'}">Agotados</option>
+          </select>
+        </div>
+
+        <div class="campo campo-botones">
+          <button type="button" class="btn-primario" id="btnLimpiar" title="Limpiar todos los filtros">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+        </div>
+      </form>
+
+      <!-- RESULTADOS (esta zona es la que se refresca al filtrar) -->
+      <section id="catalogoResultados">
+        <p class="resumen-resultados" th:unless="${sinSede}">
+          <strong th:text="${#lists.size(articulos)}">0</strong>
+          <span th:text="${#lists.size(articulos) == 1} ? 'artículo encontrado' : 'artículos encontrados'">artículos encontrados</span>
+        </p>
+
+        <!-- Lector sin librería asignada -->
+        <div class="estado-vacio" th:if="${sinSede}">
+          <i class="fa-solid fa-store-slash"></i>
+          <p>Tu registro en esta librería ya no existe. Cierra sesión y vuelve a ingresar para registrarte de nuevo.</p>
+        </div>
+
+        <!-- Sin resultados -->
+        <div class="estado-vacio" th:if="${!sinSede and #lists.isEmpty(articulos)}">
+          <i class="fa-solid fa-book-skull"></i>
+          <p>No encontramos artículos con esos filtros. Prueba con otros criterios.</p>
+        </div>
+
+        <!-- Tarjetas -->
+        <div class="catalogo-grid" th:if="${!#lists.isEmpty(articulos)}">
+          <article class="articulo-card" th:each="a : ${articulos}" th:classappend="${a.nivel == 'agotado'} ? 'sin-stock'">
+            <div class="articulo-portada">
+              <i class="fa-solid" th:classappend="${a.icono}"></i>
+              <span class="articulo-categoria" th:text="${a.categoria}">Libros</span>
+            </div>
+            <div class="articulo-cuerpo">
+              <h3 class="articulo-titulo" th:text="${a.titulo}" th:title="${a.titulo}">Título</h3>
+              <p class="articulo-autor"><i class="fa-regular fa-user"></i> <span th:text="${a.autor}">Autor</span></p>
+              <p class="articulo-codigo">Código: <strong th:text="${a.codigo}">LIB-001</strong></p>
+            </div>
+            <div class="articulo-pie">
+              <span class="badge-disp" th:classappend="${a.nivel}" th:text="${a.textoDisponibilidad}">Disponible</span>
+              <span class="articulo-stock"><strong th:text="${a.stockDisponible}">3</strong> de <span th:text="${a.stockTotal}">5</span></span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+    </div>
+  </body>
+</html>

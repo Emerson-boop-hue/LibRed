@@ -1,0 +1,140 @@
+<!doctype html>
+<!-- Molde principal del panel del LECTOR (equivalente a admin/layout.html) -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:fragment="molde(titulo, descripcion, cssEspecifico, jsEspecifico, menuActivo, contenido)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo} + ' | LibRed'">LibRed - Panel del Lector</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/layout_lector.css}" />
+    <link
+      id="dynamic-specific-css"
+      rel="stylesheet"
+      th:if="${cssEspecifico != ''}"
+      th:href="@{/css/{file}(file=${cssEspecifico})}"
+    />
+  </head>
+  <body>
+    <!-- BARRA LATERAL -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img
+          th:src="@{/img/LogoSinFodo.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo"
+          width="109"
+          height="48"
+        />
+        <i
+          class="fa-solid fa-outdent toggle-btn"
+          onclick="toggleSidebar()"
+          title="Contraer barra"
+        ></i>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">MENÚ PRINCIPAL</span>
+
+        <a href="/lector/panel" th:classappend="${menuActivo == 'panel'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-house"></i>
+          <span class="nav-text">Vista General</span>
+        </a>
+
+        <a href="/lector/catalogo" th:classappend="${menuActivo == 'catalogo'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-book-open"></i>
+          <span class="nav-text">Catálogo</span>
+        </a>
+
+        <a href="/lector/prestamos" th:classappend="${menuActivo == 'prestamos'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span class="nav-text">Préstamos</span>
+        </a>
+
+        <a href="/lector/historial" th:classappend="${menuActivo == 'historial'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span class="nav-text">Historial</span>
+        </a>
+
+        <span class="nav-section-title">EXPLORAR</span>
+
+        <a href="/lector/red-global" th:classappend="${menuActivo == 'red-global'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-globe"></i>
+          <span class="nav-text">Red Global</span>
+        </a>
+
+        <span class="nav-section-title">CONFIGURACIÓN</span>
+
+        <a href="/lector/ajustes" th:classappend="${menuActivo == 'ajustes'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span class="nav-text">Ajustes</span>
+        </a>
+
+        <a href="/lector/ayuda" th:classappend="${menuActivo == 'ayuda'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span class="nav-text">Ayuda y Soporte</span>
+        </a>
+      </nav>
+
+      <!-- Parte inferior: datos del lector que inició sesión (vienen de la sesión) -->
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div
+            class="avatar"
+            th:text="${session.lectorNombre != null ? #strings.toUpperCase(#strings.substring(session.lectorNombre, 0, 1)) : 'L'}"
+          >L</div>
+          <div class="user-info nav-text">
+            <span class="user-name" th:text="${session.lectorNombre}">Nombre del lector</span>
+            <span class="user-email" th:text="${session.lectorCodigo}">LEC-0000</span>
+          </div>
+        </div>
+        <a href="#" class="nav-item logout-btn" onclick="abrirModalLogout(event)">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-text">Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content" id="mainContent">
+      <header class="topbar">
+        <div class="topbar-title-area">
+          <h1 th:text="${titulo}">Título</h1>
+          <p th:text="${descripcion}">Descripción</p>
+        </div>
+      </header>
+
+      <!-- AQUÍ SE INYECTA EL CONTENIDO ESPECÍFICO DE CADA MÓDULO -->
+      <th:block th:replace="${contenido}"></th:block>
+    </main>
+
+    <!-- MODAL DE CIERRE DE SESIÓN -->
+    <div id="modalLogout" class="modal-overlay">
+      <div class="modal-content modal-sm">
+        <div class="logout-box">
+          <div class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+          <h3>¿Deseas cerrar sesión?</h3>
+          <p>Estás a punto de salir de tu panel de lector de LibRed.</p>
+          <div class="logout-actions">
+            <button type="button" class="btn-volver" onclick="cerrarModalLogout()">Volver</button>
+            <a href="/lector/logout" class="btn-confirmar-salir">Sí, cerrar sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script th:src="@{/js/layout_lector.js}"></script>
+    <script id="dynamic-specific-js" th:if="${jsEspecifico != ''}" th:src="@{/js/__${jsEspecifico}__}"></script>
+  </body>
+</html>

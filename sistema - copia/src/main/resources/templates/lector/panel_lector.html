@@ -1,0 +1,55 @@
+<!doctype html>
+<!-- Vista General del lector (versión inicial: datos de su cuenta y su sede) -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{lector/layout_lector :: molde(
+          'Vista General',
+          'Resumen de tu actividad como lector',
+          'lector_panel.css',
+          '',
+          'panel',
+          ~{:: .lector-container}
+      )}"
+>
+  <head>
+    <title>Vista General | LibRed</title>
+  </head>
+  <body>
+    <div class="lector-container">
+      <h2 class="bienvenida">¡Bienvenido, <span th:text="${lector.nombres}">Lector</span>!</h2>
+
+      <div class="panel-tarjetas">
+        <!-- Estado de la cuenta -->
+        <div class="panel-card">
+          <span class="panel-card-label">Estado de tu cuenta</span>
+          <span
+            class="badge-estado"
+            th:classappend="${lector.estadoCuenta == 'HABILITADO'} ? 'ok' : 'alerta'"
+            th:text="${lector.estadoCuenta}"
+          >HABILITADO</span>
+          <p class="panel-card-nota"
+             th:text="${lector.estadoCuenta == 'HABILITADO'}
+                      ? 'Consulta el catálogo y solicita tus próximos artículos.'
+                      : 'Tu cuenta tiene restricciones. Acércate a tu librería para regularizarla.'">
+            Consulta el catálogo.
+          </p>
+        </div>
+
+        <!-- Sede -->
+        <div class="panel-card">
+          <span class="panel-card-label">Librería actual</span>
+          <span class="panel-card-valor texto" th:text="${sede != null} ? ${sede.nombreComercial} : 'Sin librería'">Librería</span>
+          <p class="panel-card-nota" th:if="${sede != null}" th:text="${sede.direccion}">Dirección</p>
+        </div>
+
+        <!-- Artículos de la sede -->
+        <div class="panel-card">
+          <span class="panel-card-label">Artículos en esta librería</span>
+          <span class="panel-card-valor" th:text="${totalArticulos}">0</span>
+          <a href="/lector/catalogo" class="panel-card-link">Explorar catálogo →</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

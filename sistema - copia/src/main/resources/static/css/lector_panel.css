@@ -1,0 +1,67 @@
+/* Vista General del lector */
+.bienvenida {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.panel-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.panel-card {
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+}
+
+.panel-card-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.panel-card-valor {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.1;
+}
+
+.panel-card-valor.texto {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+}
+
+.panel-card-nota {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.panel-card-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-decoration: none;
+}
+.panel-card-link:hover {
+    text-decoration: underline;
+}
+
+.badge-estado {
+    align-self: flex-start;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+.badge-estado.ok { background: #dcfce7; color: #166534; }
+.badge-estado.alerta { background: #fee2e2; color: #b91c1c; }

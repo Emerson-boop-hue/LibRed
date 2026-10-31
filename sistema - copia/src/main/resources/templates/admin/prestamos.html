@@ -1,0 +1,122 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: molde(
+        'Módulo de Préstamos', 
+        'Gestión de circulación y entrega de material bibliográfico', 
+        'prestamos.css', 
+        'prestamos.js', 
+        'prestamos',
+        ~{:: .dashboard-container}
+    )}"
+>
+  <head>
+    <title>Préstamos | LibRed</title>
+  </head>
+  <body>
+    <div class="dashboard-container" data-css="prestamos.css">
+      
+      <!-- PANEL INTEGRADO ÚNICO -->
+      <div class="prestamo-panel">
+        <form th:action="@{/admin/prestamos/guardar}" method="post" class="prestamo-form-container">
+          <div class="prestamo-grid">
+            
+            <!-- COLUMNA IZQUIERDA: FORMULARIO DIRECTO -->
+            <div style="display: flex; flex-direction: column;">
+              
+              <div class="form-group-pres">
+                <label>1. Seleccionar Lector</label>
+                <select id="selectLector" name="lectorId" class="form-control-pres" onchange="validarYActualizarTicket()" required>
+                  <option value="" disabled selected>-- Buscar por nombre o código --</option>
+                  <option th:each="l : ${lectores}" 
+                          th:value="${l.id}" 
+                          th:data-nombre="${l.nombres + ' ' + l.apellidos}"
+                          th:data-codigo="${l.codigoLector}"
+                          th:data-estado="${l.estadoCuenta}"
+                          th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + ' (' + l.estadoCuenta + ')'}">
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group-pres">
+                <label>2. Seleccionar Artículo / Recurso</label>
+                <select id="selectRecurso" name="recursoId" class="form-control-pres" onchange="validarYActualizarTicket()" required>
+                  <option value="" disabled selected>-- Buscar título o código --</option>
+                  <option th:each="r : ${recursos}" 
+                          th:value="${r.id}" 
+                          th:data-titulo="${r.titulo}"
+                          th:data-codigo="${r.codigo}"
+                          th:data-stock="${r.stockDisponible}"
+                          th:text="${r.codigo + ' - ' + r.titulo + ' (Stock: ' + r.stockDisponible + ' disp.)'}">
+                  </option>
+                </select>
+              </div>
+
+              <div class="form-group-pres">
+                <label>3. Fecha Límite de Devolución</label>
+                <input type="date" id="inputFechaDevolucion" name="fechaDevolucionLimite" class="form-control-pres" onchange="actualizarFechaLimiteTicket(this)" required />
+              </div>
+
+              <!-- BOTONES PEGADOS AL FORMULARIO COMO ANTES -->
+              <div class="botones-container">
+                <button type="button" class="btn-limpiar" onclick="limpiarFormulario()">
+                  <i class="fa-solid fa-eraser"></i> Limpiar
+                </button>
+                <button type="submit" id="btnSubmitPrestamo" class="btn-submit-prestamo" disabled>
+                  <i class="fa-solid fa-check"></i> Confirmar y Registrar Préstamo
+                </button>
+              </div>
+
+              <!-- ZONA DE ALERTAS ABAJO -->
+              <div class="alertas-zona-baja">
+                <div id="alertaValidacion" class="alerta-restriccion"></div>
+                <div th:if="${exito}" class="msg-alert msg-success" th:text="${exito}"></div>
+                <div th:if="${error}" class="msg-alert msg-error" th:text="${error}"></div>
+              </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA: TICKET EN TIEMPO REAL -->
+            <div>
+              <div class="ticket-container">
+                <div class="ticket-header">
+                  <h4>Comprobante de Préstamo</h4>
+                  <span>Se actualizará al seleccionar los datos</span>
+                </div>
+                <div class="ticket-body">
+                  <div class="ticket-row">
+                    <span>Lector:</span>
+                    <span id="resumenLectorNombre">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>Código Lector:</span>
+                    <span id="resumenLectorCodigo">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>Artículo:</span>
+                    <span id="resumenArticuloTitulo">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>Código Artículo:</span>
+                    <span id="resumenArticuloCodigo">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>F. Préstamo:</span>
+                    <span id="resumenFechaPrestamo">--</span>
+                  </div>
+                  <div class="ticket-row">
+                    <span>F. Devolución Límite:</span>
+                    <span id="resumenFechaLimite" style="color: #2563eb;">--</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </body>
+</html>
