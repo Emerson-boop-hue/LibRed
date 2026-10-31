@@ -1,0 +1,335 @@
+/* =====================================================================
+   MÓDULO AJUSTES DEL ADMINISTRADOR (tema oscuro)
+   Se apoya en las variables de layout_admin.css
+   ===================================================================== */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: calc(100vh - 75px);
+}
+
+.aj-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 18px;
+    align-items: start;
+}
+
+.aj-main,
+.aj-side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.aj-card {
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.aj-card-head {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+}
+.aj-card-head h3 {
+    font-size: 1.02rem;
+    color: var(--text-dark);
+}
+.aj-card-head p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    line-height: 1.4;
+}
+.aj-icono {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--active-bg);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* --- Campos --- */
+.aj-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.aj-grid.una-columna {
+    grid-template-columns: minmax(0, 1fr);
+}
+.aj-grid.compacto {
+    gap: 12px;
+}
+#formPassword .aj-grid.una-columna {
+    max-width: 420px;
+}
+.aj-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+.aj-campo.completo {
+    grid-column: 1 / -1;
+}
+.aj-doble {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.aj-campo label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+.aj-campo label small {
+    font-weight: 400;
+}
+.aj-campo input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    background: var(--card-bg);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.aj-campo input:focus {
+    border-color: var(--active-bg);
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+.aj-campo input[readonly] {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: not-allowed;
+}
+.aj-campo input.con-error {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.aj-password {
+    position: relative;
+}
+.aj-password input {
+    padding-right: 40px;
+}
+.aj-ojo {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 10px;
+    cursor: pointer;
+}
+.aj-ojo:hover {
+    color: var(--text-dark);
+}
+
+/* --- Mensajes --- */
+.aj-error-campo,
+.aj-ok {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 500;
+}
+.aj-error-campo { background: #fee2e2; color: #b91c1c; }
+.aj-ok { background: #dcfce7; color: #166534; }
+.aj-error-campo[hidden],
+.aj-ok[hidden] { display: none; }
+
+/* --- Botones --- */
+.aj-acciones {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.aj-acciones.dos {
+    justify-content: space-between;
+}
+.aj-btn,
+.aj-btn-claro,
+.aj-btn-peligro,
+.aj-btn-rojo {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: opacity 0.2s, background 0.2s;
+}
+.aj-btn {
+    background: var(--active-bg);
+    color: #fff;
+    border: none;
+}
+.aj-btn:hover { opacity: 0.9; }
+.aj-btn:disabled,
+.aj-btn-rojo:disabled { opacity: 0.6; cursor: wait; }
+.aj-btn-claro {
+    background: var(--card-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--sidebar-border);
+    margin-top: 16px;
+    width: 100%;
+}
+.aj-btn-claro:hover { background: var(--sidebar-hover-bg); }
+.aj-btn-peligro {
+    background: transparent;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+.aj-btn-peligro:hover { background: #fee2e2; }
+.aj-btn-peligro[hidden] { display: none; }
+.aj-btn-rojo {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+}
+
+/* --- Lista de datos (membresía) --- */
+.aj-datos {
+    list-style: none;
+    border-top: 1px solid var(--sidebar-border);
+}
+.aj-datos li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--sidebar-border);
+    font-size: 0.84rem;
+}
+.aj-datos li span { color: var(--text-muted); }
+.aj-datos li strong { color: var(--text-dark); }
+
+/* --- Tarjeta de pago --- */
+.aj-tarjeta-vacia {
+    border: 1px dashed var(--sidebar-border);
+    border-radius: 12px;
+    padding: 22px 16px;
+    text-align: center;
+    color: var(--text-muted);
+}
+.aj-tarjeta-vacia i { font-size: 1.8rem; opacity: 0.6; margin-bottom: 8px; }
+.aj-tarjeta-vacia p { font-size: 0.84rem; }
+.aj-tarjeta-vacia[hidden],
+.aj-tarjeta[hidden] { display: none; }
+
+.aj-tarjeta {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.3);
+}
+.aj-tarjeta-fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.aj-tarjeta-fila.abajo { align-items: flex-end; }
+.aj-chip { font-size: 1.5rem; color: #fbbf24; }
+.aj-marca {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    font-style: italic;
+}
+.aj-tarjeta-numero {
+    font-size: 1.15rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+.aj-tarjeta small {
+    display: block;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    opacity: 0.65;
+    margin-bottom: 2px;
+}
+.aj-tarjeta span {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+#formTarjeta {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--sidebar-border);
+}
+.aj-subtitulo {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+}
+.aj-nota-seg {
+    margin-top: 12px;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.aj-nota-seg i { margin-right: 4px; }
+
+/* --- Modal de confirmación --- */
+.aj-modal-box { text-align: center; padding: 10px; }
+.aj-modal-icono {
+    width: 55px;
+    height: 55px;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px auto;
+    font-size: 1.4rem;
+}
+.aj-modal-box h3 { font-size: 1.15rem; color: var(--text-dark); margin-bottom: 8px; }
+.aj-modal-box p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 22px; line-height: 1.5; }
+.aj-modal-acciones { display: flex; gap: 10px; justify-content: center; }
+.aj-modal-acciones .aj-btn-claro { margin-top: 0; width: auto; }
+
+/* --- Pantallas medianas y pequeñas --- */
+@media (max-width: 1150px) {
+    .aj-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .aj-grid { grid-template-columns: 1fr; }
+    .aj-card { padding: 18px 16px; }
+    .dashboard-container { padding: 16px; }
+}

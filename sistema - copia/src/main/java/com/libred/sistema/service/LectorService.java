@@ -58,8 +58,9 @@ public class LectorService {
     // Guarda (o modifica) un lector SIEMPRE dentro de la librería indicada
     public void guardar(Integer libreriaId, Lector lector) {
         // Si se está modificando un lector existente, debe ser de esta librería
+        Lector existente = null;
         if (lector.getId() != null) {
-            Lector existente = lectorRepository.findById(lector.getId()).orElse(null);
+            existente = lectorRepository.findById(lector.getId()).orElse(null);
             if (existente == null || !libreriaId.equals(existente.getLibreriaId())) {
                 throw new IllegalArgumentException("El lector no existe o no pertenece a tu librería.");
             }
@@ -74,7 +75,13 @@ public class LectorService {
         }
         
         if (lector.getPassword() == null || lector.getPassword().isEmpty()) {
-            lector.setPassword(lector.getTelefono() != null ? lector.getTelefono().replaceAll("\\s+", "") : "123456");
+            if (existente != null) {
+                // Al editar, se conserva la contraseña que ya tenía (el lector pudo cambiarla desde sus Ajustes)
+                lector.setPassword(existente.getPassword());
+            } else {
+                // Lector nuevo: contraseña inicial = su teléfono
+                lector.setPassword(lector.getTelefono() != null ? lector.getTelefono().replaceAll("\\s+", "") : "123456");
+            }
         }
 
         lectorRepository.save(lector);

@@ -121,9 +121,6 @@ public class AuthController {
         return "admin/estadisticas";
     }
 
-    @GetMapping("/admin/ajustes")
-    public String panelAjustes() { return "admin/ajustes"; }
-
     @GetMapping("/admin/ayuda")
     public String panelAyuda() { return "admin/ayuda"; }
 

@@ -40,6 +40,13 @@ public class Libreria {
     @Column(name = "fecha_registro", updatable = false)
     private LocalDateTime fechaRegistro;
 
+    // Datos de contacto editables desde Ajustes del administrador (opcionales)
+    @Column(name = "telefono_contacto", length = 20)
+    private String telefonoContacto;
+
+    @Column(name = "correo_contacto", length = 120)
+    private String correoContacto;
+
     // Método que JPA ejecuta automáticamente antes de guardar el registro por primera vez
     @PrePersist
     protected void onCreate() {
@@ -132,7 +139,19 @@ public class Libreria {
         this.fechaRegistro = fechaRegistro;
     }
 
-    
-    
-    
+    public String getTelefonoContacto() {
+        return telefonoContacto;
+    }
+
+    public void setTelefonoContacto(String telefonoContacto) {
+        this.telefonoContacto = telefonoContacto;
+    }
+
+    public String getCorreoContacto() {
+        return correoContacto;
+    }
+
+    public void setCorreoContacto(String correoContacto) {
+        this.correoContacto = correoContacto;
+    }
 }

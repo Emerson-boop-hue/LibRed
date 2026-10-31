@@ -1,14 +1,239 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{admin/layout :: molde('Ajustes del Sistema', 'Configuración general de la librería', '', '', 'ajustes', ~{:: .dashboard-container})}">
-<head><title>Ajustes | LibRed</title></head>
-<body>
+<!-- Módulo AJUSTES del administrador: datos de la librería, contraseña y método de pago -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: molde(
+          'Ajustes del Sistema',
+          'Datos de tu librería, seguridad y método de pago',
+          'ajustes.css',
+          'ajustes.js',
+          'ajustes',
+          ~{:: .dashboard-container}
+      )}"
+>
+  <head>
+    <title>Ajustes | LibRed</title>
+  </head>
+  <body>
     <div class="dashboard-container">
-        <div class="content-card" style="padding: 40px; text-align: center;">
-            <i class="fa-solid fa-gear" style="font-size: 3rem; color: #2563eb; margin-bottom: 20px;"></i>
-            <h2 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 10px;">Módulo de Ajustes en Construcción</h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Configuraciones de la cuenta, notificaciones y preferencias de la biblioteca.</p>
+      <div class="aj-layout">
+
+        <!-- ===================== COLUMNA PRINCIPAL ===================== -->
+        <div class="aj-main">
+
+          <!-- DATOS DE LA LIBRERÍA -->
+          <form class="aj-card" id="formDatos" novalidate>
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-solid fa-store"></i></div>
+              <div>
+                <h3>Datos de la librería</h3>
+                <p>Esta información identifica a tu librería en la red LibRed.</p>
+              </div>
+            </div>
+
+            <div class="aj-grid">
+              <div class="aj-campo">
+                <label for="ajCodigo">Código de administrador</label>
+                <input type="text" id="ajCodigo" th:value="${libreria.codigoAdmin}" readonly />
+              </div>
+              <div class="aj-campo">
+                <label for="ajRuc">RUC</label>
+                <input type="text" id="ajRuc" name="ruc" data-campo="ruc" th:value="${libreria.ruc}"
+                       maxlength="11" inputmode="numeric" autocomplete="off" />
+              </div>
+              <div class="aj-campo completo">
+                <label for="ajNombre">Nombre comercial</label>
+                <input type="text" id="ajNombre" name="nombreComercial" data-campo="nombreComercial"
+                       th:value="${libreria.nombreComercial}" maxlength="150" autocomplete="off" />
+              </div>
+              <div class="aj-campo completo">
+                <label for="ajDireccion">Dirección</label>
+                <input type="text" id="ajDireccion" name="direccion" data-campo="direccion"
+                       th:value="${libreria.direccion}" maxlength="255" autocomplete="off" />
+              </div>
+              <div class="aj-campo">
+                <label for="ajTelefono">Teléfono de contacto <small>(opcional)</small></label>
+                <input type="text" id="ajTelefono" name="telefonoContacto" data-campo="telefonoContacto"
+                       th:value="${libreria.telefonoContacto}" maxlength="11" inputmode="numeric" placeholder="Ej. 987 654 321" autocomplete="off" />
+              </div>
+              <div class="aj-campo">
+                <label for="ajCorreo">Correo de contacto <small>(opcional)</small></label>
+                <input type="email" id="ajCorreo" name="correoContacto" data-campo="correoContacto"
+                       th:value="${libreria.correoContacto}" maxlength="120" placeholder="contacto@tulibreria.pe" autocomplete="off" />
+              </div>
+            </div>
+
+            <p class="aj-error-campo" id="errorDatos" hidden></p>
+            <p class="aj-ok" id="okDatos" hidden></p>
+
+            <div class="aj-acciones">
+              <button type="submit" class="aj-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+            </div>
+          </form>
+
+          <!-- CONTRASEÑA -->
+          <form class="aj-card" id="formPassword" novalidate>
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-solid fa-lock"></i></div>
+              <div>
+                <h3>Cambiar contraseña</h3>
+                <p>Es la contraseña con la que ingresas al panel administrativo (entre 4 y 6 caracteres, sin espacios).</p>
+              </div>
+            </div>
+
+            <div class="aj-grid una-columna">
+              <div class="aj-campo">
+                <label for="ajPassActual">Contraseña actual</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassActual" name="passwordActual" data-campo="passwordActual" autocomplete="current-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+              <div class="aj-campo">
+                <label for="ajPassNueva">Nueva contraseña</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassNueva" name="passwordNueva" data-campo="passwordNueva" maxlength="6" autocomplete="new-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+              <div class="aj-campo">
+                <label for="ajPassConfirmar">Confirmar nueva contraseña</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassConfirmar" name="passwordConfirmar" data-campo="passwordConfirmar" maxlength="6" autocomplete="new-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <p class="aj-error-campo" id="errorPassword" hidden></p>
+            <p class="aj-ok" id="okPassword" hidden></p>
+
+            <div class="aj-acciones">
+              <button type="submit" class="aj-btn"><i class="fa-solid fa-key"></i> Cambiar contraseña</button>
+            </div>
+          </form>
         </div>
+
+        <!-- ===================== COLUMNA LATERAL ===================== -->
+        <aside class="aj-side">
+
+          <!-- PLAN -->
+          <div class="aj-card">
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-solid fa-crown"></i></div>
+              <div>
+                <h3>Tu membresía</h3>
+                <p>Plan contratado y fecha de renovación.</p>
+              </div>
+            </div>
+            <ul class="aj-datos">
+              <li>
+                <span>Plan</span>
+                <strong th:text="${libreria.tipoPlan == 'ANUAL'} ? 'Plan Anual' : 'Plan Mensual'">Plan Mensual</strong>
+              </li>
+              <li>
+                <span>Renovación</span>
+                <strong th:text="${libreria.fechaVencimiento != null ? #temporals.format(libreria.fechaVencimiento, 'dd/MM/yyyy') : '—'}">01/01/2027</strong>
+              </li>
+            </ul>
+            <button type="button" class="aj-btn-claro" onclick="abrirModalPlan()">
+              <i class="fa-regular fa-eye"></i> Ver plan actual
+            </button>
+          </div>
+
+          <!-- MÉTODO DE PAGO -->
+          <div class="aj-card" id="cardPago">
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-regular fa-credit-card"></i></div>
+              <div>
+                <h3>Método de pago</h3>
+                <p>Tarjeta para el cobro de tu membresía.</p>
+              </div>
+            </div>
+
+            <!-- Sin tarjeta -->
+            <div class="aj-tarjeta-vacia" id="tarjetaVacia" th:hidden="${tarjeta != null}">
+              <i class="fa-regular fa-credit-card"></i>
+              <p>Todavía no tienes una tarjeta registrada.</p>
+            </div>
+
+            <!-- Tarjeta guardada -->
+            <div class="aj-tarjeta" id="tarjetaVista" th:hidden="${tarjeta == null}">
+              <div class="aj-tarjeta-fila">
+                <i class="fa-solid fa-microchip aj-chip"></i>
+                <span class="aj-marca" id="tMarca" th:text="${tarjeta != null ? tarjeta.marca : ''}">VISA</span>
+              </div>
+              <div class="aj-tarjeta-numero" id="tNumero"
+                   th:text="${tarjeta != null ? '•••• •••• •••• ' + tarjeta.ultimosDigitos : ''}">•••• •••• •••• 1234</div>
+              <div class="aj-tarjeta-fila abajo">
+                <div>
+                  <small>TITULAR</small>
+                  <span id="tTitular" th:text="${tarjeta != null ? tarjeta.titular : ''}">NOMBRE APELLIDO</span>
+                </div>
+                <div>
+                  <small>VENCE</small>
+                  <span id="tVence" th:text="${tarjeta != null ? tarjeta.vencimientoTexto : ''}">12/28</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Formulario para agregar / cambiar la tarjeta -->
+            <form id="formTarjeta" novalidate>
+              <p class="aj-subtitulo" id="tituloFormTarjeta" th:text="${tarjeta != null} ? 'Cambiar tarjeta' : 'Agregar tarjeta'">Agregar tarjeta</p>
+
+              <div class="aj-grid una-columna compacto">
+                <div class="aj-campo">
+                  <label for="ajNumero">Número de tarjeta</label>
+                  <input type="text" id="ajNumero" data-campo="numero" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="off" />
+                </div>
+                <div class="aj-campo">
+                  <label for="ajTitular">Titular</label>
+                  <input type="text" id="ajTitular" data-campo="titular" placeholder="Como aparece en la tarjeta" maxlength="100" autocomplete="off" />
+                </div>
+                <div class="aj-doble">
+                  <div class="aj-campo">
+                    <label for="ajVence">Vence (MM/AA)</label>
+                    <input type="text" id="ajVence" data-campo="vence" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="off" />
+                  </div>
+                  <div class="aj-campo">
+                    <label for="ajCvv">CVV</label>
+                    <input type="password" id="ajCvv" data-campo="cvv" inputmode="numeric" placeholder="•••" maxlength="3" autocomplete="off" />
+                  </div>
+                </div>
+              </div>
+
+              <p class="aj-nota-seg"><i class="fa-solid fa-shield-halved"></i> Por seguridad no guardamos el número completo ni el CVV: solo la marca, los últimos 4 dígitos, el titular y el vencimiento.</p>
+
+              <p class="aj-error-campo" id="errorTarjeta" hidden></p>
+              <p class="aj-ok" id="okTarjeta" hidden></p>
+
+              <div class="aj-acciones dos">
+                <button type="button" class="aj-btn-peligro" id="btnQuitarTarjeta" th:hidden="${tarjeta == null}">
+                  <i class="fa-regular fa-trash-can"></i> Quitar
+                </button>
+                <button type="submit" class="aj-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar tarjeta</button>
+              </div>
+            </form>
+          </div>
+        </aside>
+      </div>
+
+      <!-- MODAL: CONFIRMAR QUITAR TARJETA -->
+      <div id="modalQuitarTarjeta" class="modal-overlay">
+        <div class="modal-content modal-sm">
+          <div class="aj-modal-box">
+            <div class="aj-modal-icono"><i class="fa-regular fa-trash-can"></i></div>
+            <h3>¿Quitar la tarjeta?</h3>
+            <p>Se eliminará tu método de pago guardado. Podrás agregar otro cuando quieras.</p>
+            <div class="aj-modal-acciones">
+              <button type="button" class="aj-btn-claro" id="btnCancelarQuitar">Cancelar</button>
+              <button type="button" class="aj-btn-rojo" id="btnConfirmarQuitar">Sí, quitar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-</body>
+  </body>
 </html>

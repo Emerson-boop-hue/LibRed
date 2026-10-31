@@ -70,11 +70,6 @@ public class LectorPanelController {
         return proximamente(model, "Red Global LibRed", "Explora las librerías afiliadas a la plataforma", "red-global");
     }
 
-    @GetMapping("/lector/ajustes")
-    public String ajustes(Model model) {
-        return proximamente(model, "Ajustes", "Administra los datos de tu cuenta", "ajustes");
-    }
-
     @GetMapping("/lector/ayuda")
     public String ayuda(Model model) {
         return proximamente(model, "Ayuda y Soporte", "Resuelve tus dudas sobre LibRed", "ayuda");
