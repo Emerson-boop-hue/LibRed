@@ -1,0 +1,197 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: molde(
+          'Gestión de Lectores', 
+          'Directorio activo y control de membresías de la comunidad', 
+          'lectores.css', 
+          'lectores.js', 
+          'lectores',
+          ~{:: .dashboard-container}
+      )}"
+>
+  <head>
+    <title>Lectores | LibRed</title>
+  </head>
+  <body>
+    <!-- Contenedor principal con data-css para que el layout gestione dinámicamente -->
+    <div class="dashboard-container" data-css="lectores.css">
+      
+      <!-- BARRA SUPERIOR DE ACCIONES Y FILTROS -->
+      <div class="lectores-toolbar">
+        <div class="search-box-lectores">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="inputBuscarLector"
+            placeholder="Buscar por nombre, apellido o código..."
+            th:value="${keyword}"
+          />
+        </div>
+
+        <button class="btn-nuevo-lector" onclick="abrirModalCrearLector()">
+          <i class="fa-solid fa-plus"></i> Registrar nuevo lector
+        </button>
+      </div>
+
+      <!-- KPIS DE LECTORES (2 EN FILA) -->
+      <div class="lectores-kpis">
+        <div class="kpi-card-lec">
+          <div
+            class="kpi-icon-box-lec"
+            style="background-color: #dbeafe; color: #2563eb"
+          >
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <span class="kpi-label-lec">LECTORES REGISTRADOS</span>
+            <h2 class="kpi-value-lec" th:text="${totalLectores}">0</h2>
+          </div>
+        </div>
+
+        <div class="kpi-card-lec">
+          <div
+            class="kpi-icon-box-lec"
+            style="background-color: #fee2e2; color: #dc2626"
+          >
+            <i class="fa-solid fa-user-slash"></i>
+          </div>
+          <div>
+            <span class="kpi-label-lec">LECTORES SANCIONADOS</span>
+            <h2 class="kpi-value-lec text-danger-lec" th:text="${totalSancionados}">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE LECTORES CON SCROLL FIJO -->
+      <div class="tabla-contenedor-fijo-lec" id="tablaLectoresContenedor">
+        <table class="tabla-lectores">
+          <thead>
+            <tr>
+              <th style="width: 60px; text-align: center">AVATAR</th>
+              <th>LECTOR</th>
+              <th style="width: 150px">CÓDIGO</th>
+              <th style="width: 160px">ESTADO</th>
+              <th style="width: 180px">FECHA DE REGISTRO</th>
+              <th style="width: 110px; text-align: center">ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Mensaje si la tabla está vacía -->
+            <tr th:if="${#lists.isEmpty(lectores)}">
+              <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">
+                No se encontraron lectores registrados.
+              </td>
+            </tr>
+
+            <!-- Iteración de lectores -->
+            <tr th:each="lector : ${lectores}">
+              <td style="text-align: center">
+                <div class="lector-avatar" style="margin: 0 auto;">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+              </td>
+              <td>
+                <div class="lector-nombre" th:text="${lector.nombres + ' ' + lector.apellidos}">Nombre y Apellidos</div>
+                <div class="lector-sub" style="font-size: 0.78rem; color: var(--text-muted);" th:text="${lector.telefono != null ? 'Tel: ' + lector.telefono : 'Sin teléfono'}">Teléfono</div>
+              </td>
+              <td th:text="${lector.codigoLector}">LEC-1001</td>
+              <td>
+                <span
+                  th:class="'txt-estado-cuenta ' + ${lector.estadoCuenta.toLowerCase()}"
+                  th:text="${lector.estadoCuenta}"
+                >HABILITADO</span>
+              </td>
+              <td style="color: var(--text-muted); font-size: 0.82rem;" th:text="${lector.fechaRegistro != null ? #temporals.format(lector.fechaRegistro, 'dd/MM/yyyy HH:mm') : '-'}">
+                27/10/2026
+              </td>
+              <td style="text-align: center">
+                <!-- Botón Modificar -->
+                <button class="btn-accion-lec" title="Modificar"
+                        th:onclick="abrirModalEditarLector([[${lector.id}]], [[${lector.codigoLector}]], [[${lector.nombres}]], [[${lector.apellidos}]], [[${lector.telefono}]], [[${lector.estadoCuenta}]])">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <!-- Botón Eliminar -->
+                <button class="btn-accion-lec eliminar" title="Eliminar"
+                        th:onclick="abrirModalEliminarLector([[${lector.id}]], [[${lector.nombres + ' ' + lector.apellidos}]], [[${lector.codigoLector}]])">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MODAL UNIFICADO (REGISTRO Y EDICIÓN DE LECTOR) -->
+      <div id="modalLector" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #fff); padding: 30px; border-radius: 12px; width: 100%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="modalLectorTituloLabel" style="margin: 0; font-size: 1.25rem; color: var(--text-dark);">Registrar Nuevo Lector</h3>
+            <span onclick="cerrarModalLector()" style="cursor: pointer; font-size: 1.2rem; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></span>
+          </div>
+
+          <form th:action="@{/admin/lectores/guardar}" method="post">
+            <input type="hidden" id="modalLectorId" name="id" />
+            <input type="hidden" name="libreriaId" value="1" />
+
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Código de Lector</label>
+              <input type="text" id="modalLectorCodigo" name="codigoLector" readonly style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: rgba(0,0,0,0.04); color: var(--text-muted); font-weight: 600;" />
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Nombres</label>
+                <input type="text" id="modalLectorNombres" name="nombres" placeholder="Ej. Juan Carlos" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+              </div>
+              <div style="flex: 1;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Apellidos</label>
+                <input type="text" id="modalLectorApellidos" name="apellidos" placeholder="Ej. Pérez Gómez" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+              </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+  <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Teléfono (Dato Privado)</label>
+  <input type="text" id="modalLectorTelefono" name="telefono" placeholder="Ej. 987 654 321" maxlength="11" autocomplete="off" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">Ingrese un número de 9 dígitos. Se formateará automáticamente.</div>
+</div>
+
+            <div style="margin-bottom: 25px;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Estado de Cuenta</label>
+              <select id="modalLectorEstado" name="estadoCuenta" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);">
+                <option value="HABILITADO">Habilitado</option>
+                <option value="SANCIONADO">Sancionado</option>
+              </select>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button type="button" onclick="cerrarModalLector()" style="padding: 10px 18px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark); cursor: pointer; font-weight: 500;">Cancelar</button>
+              <button type="submit" style="padding: 10px 18px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+      <div id="modalEliminarLector" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: var(--card-bg, #fff); padding: 22px 25px; border-radius: 12px; width: 100%; max-width: 360px; text-align: center; box-sizing: border-box;">
+          <div style="width: 42px; height: 42px; background-color: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 1.1rem;">
+            <i class="fa-solid fa-trash-can"></i>
+          </div>
+          <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 6px;">¿Eliminar lector?</h3>
+          <p style="color: var(--text-muted); font-size: 0.83rem; margin-bottom: 12px;">Estás a punto de eliminar permanentemente a:</p>
+          <div style="background: rgba(0,0,0,0.03); padding: 8px 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.88rem;">
+            <strong id="eliminarLectorNombre" style="color: var(--text-dark); display: block; margin-bottom: 2px;">Nombre</strong>
+            <span id="eliminarLectorCodigo" style="color: var(--text-muted); font-size: 0.78rem;">CÓDIGO</span>
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" onclick="cerrarModalEliminarLector()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark); font-size: 0.88rem; font-weight: 500; cursor: pointer;">Cancelar</button>
+            <a id="btnConfirmarEliminarLector" href="#" style="padding: 8px 16px; border-radius: 8px; border: none; background: #dc2626; color: #ffffff; font-size: 0.88rem; font-weight: 600; text-decoration: none; display: inline-block;">Sí, eliminar</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

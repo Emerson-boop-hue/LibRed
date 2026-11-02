@@ -1,0 +1,443 @@
+/* --- CONTENEDOR PRINCIPAL IDÉNTICO AL INVENTARIO --- */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 75px);
+}
+
+/* --- TOOLBAR DE LECTORES --- */
+.lectores-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 15px;
+    width: 100%;
+}
+
+.search-box-lectores {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 420px;
+}
+
+.search-box-lectores i {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.search-box-lectores input {
+    border: none;
+    background: transparent;
+    margin-left: 10px;
+    outline: none;
+    width: 100%;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.btn-nuevo-lector {
+    background-color: var(--active-bg);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.btn-nuevo-lector:hover {
+    opacity: 0.9;
+    color: #ffffff;
+}
+
+/* --- KPIS DE LECTORES (2 EN FILA) --- */
+.lectores-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.kpi-card-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.kpi-icon-box-lec {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.kpi-label-lec {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value-lec {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 2px;
+}
+.text-danger-lec { color: #dc2626; }
+
+/* --- TABLA DE LECTORES CON SCROLL FIJO --- */
+.tabla-contenedor-fijo-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.tabla-contenedor-fijo-lec::-webkit-scrollbar {
+    width: 5px;
+}
+.tabla-contenedor-fijo-lec::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.tabla-lectores {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.tabla-lectores th {
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.tabla-lectores td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.lector-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--sidebar-hover-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.lector-nombre {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.lector-codigo {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ESTADOS DE CUENTA */
+.txt-estado-cuenta {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+.txt-estado-cuenta.habilitado { color: #059669; }
+.txt-estado-cuenta.sancionado { color: #dc2626; }
+
+/* BOTONES DE ACCIÓN */
+.btn-accion-lec {
+    background: transparent;
+    border: 1px solid var(--sidebar-border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+}
+.btn-accion-lec:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+}
+.btn-accion-lec.eliminar:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+/* --- CONTENEDOR PRINCIPAL IDÉNTICO AL INVENTARIO --- */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 75px);
+}
+
+/* --- TOOLBAR DE LECTORES --- */
+.lectores-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 15px;
+    width: 100%;
+}
+
+.search-box-lectores {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 420px;
+}
+
+.search-box-lectores i {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.search-box-lectores input {
+    border: none;
+    background: transparent;
+    margin-left: 10px;
+    outline: none;
+    width: 100%;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+.btn-nuevo-lector {
+    background-color: var(--active-bg);
+    color: #ffffff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.btn-nuevo-lector:hover {
+    opacity: 0.9;
+    color: #ffffff;
+}
+
+/* --- KPIS DE LECTORES (2 EN FILA) --- */
+.lectores-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.kpi-card-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.kpi-icon-box-lec {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.kpi-label-lec {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value-lec {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-top: 2px;
+}
+.text-danger-lec { color: #dc2626; }
+
+/* --- TABLA DE LECTORES CON SCROLL FIJO --- */
+.tabla-contenedor-fijo-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.tabla-contenedor-fijo-lec::-webkit-scrollbar {
+    width: 5px;
+}
+.tabla-contenedor-fijo-lec::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.tabla-lectores {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.tabla-lectores th {
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.tabla-lectores td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.lector-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--sidebar-hover-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.lector-nombre {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.lector-codigo {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ESTADOS DE CUENTA */
+.txt-estado-cuenta {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+.txt-estado-cuenta.habilitado { color: #059669; }
+.txt-estado-cuenta.sancionado { color: #dc2626; }
+
+/* BOTONES DE ACCIÓN */
+.btn-accion-lec {
+    background: transparent;
+    border: 1px solid var(--sidebar-border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+}
+.btn-accion-lec:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+}
+.btn-accion-lec.eliminar:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+/* --- EFECTO DE FONDO PARA MODALES (IDÉNTICO A INVENTARIO) --- */
+#modalLector, #modalEliminarLector {
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* --- ESTILO DE LA TARJETA DEL MODAL --- */
+#modalLector > div, #modalEliminarLector > div {
+    background-color: var(--card-bg, #ffffff) !important;
+    border: 1px solid var(--sidebar-border, #e2e8f0);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}

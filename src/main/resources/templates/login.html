@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibRed - Acceso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/suscripcion_registro.css}">
+</head>
+<body>
+
+    <!-- Lado Izquierdo: Carrusel Intacto (Nunca se recarga) -->
+    <div class="left-side">
+        <div class="slide-bg active" style="background-image: url('/img/bg1.jpg');"></div>
+        <div class="slide-bg" style="background-image: url('/img/bg2.jpg');"></div>
+        <div class="slide-bg" style="background-image: url('/img/bg3.jpg');"></div>
+        <div class="slide-overlay"></div>
+
+        <button class="slider-btn prev-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="slider-btn next-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right"></i></button>
+
+        <div class="left-bottom" id="sliderText">
+            <h1 id="sliderTitle">Conectando el inventario de librerías locales</h1>
+            <p id="sliderDesc">Una sola plataforma para consultar libros físicos, tesis y espacios académicos en tu distrito.</p>
+        </div>
+    </div>
+
+    <!-- Lado Derecho: Contenedor que cambia dinámicamente sin pantallazos -->
+    <div class="right-side" id="cardContent">
+        <div class="top-nav">
+            <span>Conócenos</span>
+            <span>Contáctenos</span>
+            <span>Ayuda</span>
+        </div>
+
+        <div class="login-card-container">
+            <div class="login-card">
+                <div class="logo-area">
+                    <img th:src="@{/img/LogoSinFodo.png}" alt="LibRed Logo" class="custom-logo">
+                </div>
+                
+                <h2 th:text="${isAdmin} ? 'Panel Administrativo' : 'Bienvenido de nuevo'">Título</h2>
+                <p th:text="${isAdmin} ? 'Gestión exclusiva para sedes y librerías.' : 'Ingresa tus credenciales para iniciar sesión.'">Subtítulo</p>
+
+                <!-- FORMULARIO ADMIN -->
+                <form th:if="${isAdmin}" action="/login-admin" method="post" target="_blank" onsubmit="submitForm(event, '/login-admin') ">
+                    <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+                    <div class="form-group">
+                        <label>CÓDIGO</label>
+                        <div class="input-container">
+                            <input type="text" name="codigo" required placeholder="Ej: ADM-001" autocomplete="off">
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>CONTRASEÑA</label>
+                        <div class="input-container">
+                            <input type="password" name="password" id="passwordAdmin" required placeholder="••••••">
+                            <i class="fa-regular fa-eye toggle-password" id="togglePasswordAdmin" onclick="togglePass('passwordAdmin', 'togglePasswordAdmin')"></i>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit-admin">Acceder al Sistema</button>
+                        <a href="#" class="forgot-pass">Recuperar acceso</a>
+                    </div>
+                </form>
+
+                <!-- FORMULARIO LECTOR -->
+                <form th:unless="${isAdmin}" action="/login" method="post" target="_blank" onsubmit="submitForm(event, '/login')">
+                    <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+                    <div class="form-group">
+                        <label>CÓDIGO</label>
+                        <div class="input-container">
+                            <input type="text" name="codigo" required placeholder="Ej: LEC-1001" autocomplete="off">
+                            <i class="fa-regular fa-user field-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>LIBRERÍA</label>
+                        <div class="input-container">
+                            <select name="libreriaId" required>
+                                <option value="" disabled th:selected="${libreriaIdSeleccionada == null}">Selecciona tu librería</option>
+                                <option th:each="lib : ${librerias}"
+                                        th:value="${lib.id}"
+                                        th:text="${lib.nombreComercial}"
+                                        th:selected="${lib.id == libreriaIdSeleccionada}">Librería</option>
+                            </select>
+                            <i class="fa-regular fa-building field-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>CONTRASEÑA</label>
+                        <div class="input-container">
+                            <input type="password" name="password" id="passwordLector" required placeholder="••••••">
+                            <i class="fa-regular fa-eye toggle-password" id="togglePasswordLector" onclick="togglePass('passwordLector', 'togglePasswordLector')"></i>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">Iniciar sesión</button>
+                        <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </form>
+
+                <div class="divider"><span>o</span></div>
+                
+                <div class="register-link" th:if="${isAdmin}">
+                    ¿Tu librería aún no está en la red?<br><a href="#" onclick="abrirRegistroSuscripcion(event)">Conoce nuestros planes</a>
+                </div>
+                <div class="register-link" th:unless="${isAdmin}">
+                    ¿No tienes una cuenta?<br><a href="#">Regístrate aquí</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="switch-mode">
+            <a th:if="${isAdmin}" href="/login" onclick="switchForm(event, '/login')">← Volver al acceso para lectores</a>
+            <a th:unless="${isAdmin}" href="/login-admin" onclick="switchForm(event, '/login-admin')">¿Eres administrador de librería? Ingresa aquí</a>
+        </div>
+    </div>
+
+    <!-- Asistente de registro y suscripción (fuera de #cardContent para que no se reemplace al cambiar de formulario) -->
+    <div th:replace="~{admin/registro_wizard :: wizard}"></div>
+
+    <script th:src="@{/js/login.js}"></script>
+    <script th:src="@{/js/suscripcion_registro.js}"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{admin/layout :: molde('Gestión de Devoluciones', 'Recepción de artículos, devolución a inventario y liquidación de mora', 'devoluciones.css', 'devoluciones.js', 'devoluciones', ~{:: .dashboard-container})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Devoluciones | LibRed</title>
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <!-- DATOS DE MULTAS PENDIENTES (dentro del contenedor para que viaje con el fragmento) -->
+        <div id="multasPendientesData" hidden>
+          <span th:each="m : ${multasPendientes}"
+                th:if="${m.prestamo != null}"
+                th:data-prestamoid="${m.prestamo.id}"
+                th:data-monto="${m.monto}"
+                th:data-motivo="${m.motivo}"></span>
+        </div>
+
+        <div class="multas-container">
+          
+          <!-- COLUMNA IZQUIERDA: TABLA DE PRÉSTAMOS ACTIVOS -->
+          <div class="multas-card-section">
+            <div class="section-header">
+              <h2>Préstamos Activos en Circulación</h2>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Lector</th>
+                    <th>Artículo Prestado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:if="${prestamosActivos.isEmpty()}">
+                    <td colspan="2" class="text-center empty-row">No hay préstamos activos pendientes de devolución.</td>
+                  </tr>
+                  <tr th:each="p : ${prestamosActivos}" 
+                      th:data-id="${p.id}"
+                      th:data-lectorid="${p.lector != null ? p.lector.id : ''}"
+                      th:data-lector="${p.lector != null ? p.lector.nombres + ' ' + p.lector.apellidos : 'Sin Lector'}"
+                      th:data-codlector="${p.lector != null ? p.lector.codigoLector : ''}"
+                      th:data-articulo="${p.recurso != null ? p.recurso.titulo : 'Sin Artículo'}"
+                      th:data-codarticulo="${p.recurso != null ? p.recurso.codigo : ''}"
+                      th:data-fechaprestamo="${#temporals.format(p.fechaPrestamo, 'yyyy-MM-dd')}"
+                      th:data-fechalimite="${p.fechaDevolucionLimite}"
+                      class="fila-multa"
+                      onclick="seleccionarPrestamoFila(this)">
+                    <td>
+                      <div class="user-info-cell">
+                        <span class="user-main" th:text="${p.lector != null ? p.lector.nombres + ' ' + p.lector.apellidos : 'Sin Lector'}">Nombre Lector</span>
+                        <span class="user-sub" th:text="${p.lector != null ? p.lector.codigoLector : ''}">LEC-1001</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="article-info-cell" th:if="${p.recurso != null}">
+                        <span class="article-main" th:text="${p.recurso.titulo}">Título del Libro</span>
+                        <span class="article-sub" th:text="${p.recurso.codigo}">INV-001</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- COLUMNA DERECHA: FORMULARIO Y COMPROBANTE -->
+          <div class="multas-sidebar-section">
+            
+            <!-- Formulario Superior (Con Tarifa en 0.00, badge, oninput activo y botón Limpiar) -->
+            <div class="form-card">
+              <h3>Procesar Devolución</h3>
+              <form id="formDevoluciones" th:action="@{/admin/devoluciones/procesar}" method="post">
+                <input type="hidden" id="prestamoIdHidden" name="prestamoId" required />
+
+                <div class="form-group">
+                  <label for="lectorSelect">Seleccionar Lector</label>
+                  <select id="lectorSelect" class="form-control" onchange="filtrarPrestamosPorLector(true)">
+                    <option value="">-- Buscar por nombre o código --</option>
+                    <option th:each="l : ${lectores}" th:value="${l.id}" th:text="${l.nombres + ' ' + l.apellidos + ' (' + l.codigoLector + ')'}"></option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="prestamoSelect">Seleccionar Préstamo / Artículo</label>
+                  <select id="prestamoSelect" class="form-control" onchange="sincronizarPrestamoSeleccionado()">
+                    <option value="">-- Seleccione un lector primero --</option>
+                    <option th:each="p : ${prestamosActivos}" 
+                            th:if="${p.lector != null and p.recurso != null}"
+                            th:value="${p.id}" 
+                            th:data-prestamoid="${p.id}"
+                            th:data-lectorid="${p.lector.id}"
+                            th:data-lector="${p.lector.nombres + ' ' + p.lector.apellidos}"
+                            th:data-codlector="${p.lector.codigoLector}"
+                            th:data-articulo="${p.recurso.titulo}"
+                            th:data-codarticulo="${p.recurso.codigo}"
+                            th:data-fechaprestamo="${#temporals.format(p.fechaPrestamo, 'yyyy-MM-dd')}"
+                            th:data-fechalimite="${p.fechaDevolucionLimite}"
+                            th:text="${p.recurso.titulo + ' (F. Límite: ' + p.fechaDevolucionLimite + ')'}">
+                    </option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="tarifaDiariaInput">Tarifa Mora Diaria (S/.)</label>
+                  <input type="number" step="0.50" min="0.00" id="tarifaDiariaInput" name="tarifaDiaria" class="form-control" value="0.00" oninput="actualizarCalculoMora()" required />
+                </div>
+
+                <div class="form-footer-actions-row">
+                  <span id="badgeEstadoDevolucion" class="badge-estado-inline" style="display: none;"></span>
+                  <div style="margin-left: auto;">
+                    <button type="button" class="btn-secondary" onclick="resetearFormularioDevoluciones()">Limpiar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Tarjeta Inferior: Comprobante Read-Only con el botón Procesar Devolución -->
+            <div class="summary-card" id="tarjetaResumen">
+              <h3>Comprobante de Devolución y Cierre</h3>
+              <p class="summary-subtitle" id="subtituloComprobante">Selecciona un préstamo activo para liquidar la devolución</p>
+
+              <div class="summary-details" style="display: none;" id="detalleResumen">
+                <div class="summary-row">
+                  <span>Lector:</span>
+                  <strong id="sumLector">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Código Lector:</span>
+                  <strong id="sumCodLector">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Artículo:</span>
+                  <strong id="sumArticulo">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Código Artículo:</span>
+                  <strong id="sumCodArticulo">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Fecha Emisión:</span>
+                  <strong id="sumFechaPrestamo">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Fecha Límite:</span>
+                  <strong id="sumFechaLimite">--</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Días Excedidos:</span>
+                  <strong id="sumDiasExcedidos">0 días</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Mora por Retraso:</span>
+                  <strong id="sumMora">S/. 0.00</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Sanción Previa (Daño/Pérdida):</span>
+                  <strong id="sumSancion">NINGUNA</strong>
+                </div>
+                
+                <hr class="summary-divider" />
+
+                <div class="summary-total-row">
+                  <span>Valor Total a Pagar:</span>
+                  <span class="total-amount" id="sumMontoTotal">S/. 0.00</span>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; justify-content: flex-end;">
+                  <button type="button" class="btn-primary" style="background-color: #16a34a; width: 100%;" onclick="enviarDevolucionForm()">Procesar Devolución</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+    </div>
+</body>
+</html>

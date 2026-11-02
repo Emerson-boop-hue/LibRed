@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- Página temporal para los módulos del lector que todavía no se desarrollan.
+     El título, la descripción y el menú activo los envía LectorPanelController. -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{lector/layout_lector :: molde(
+          ${titulo},
+          ${descripcion},
+          '',
+          '',
+          ${menuActivo},
+          ~{:: .lector-container}
+      )}"
+>
+  <head>
+    <title>Próximamente | LibRed</title>
+  </head>
+  <body>
+    <div class="lector-container">
+      <div class="proximamente-card">
+        <div class="proximamente-icono"><i class="fa-solid fa-person-digging"></i></div>
+        <h2>Módulo en construcción</h2>
+        <p>Esta sección estará disponible muy pronto.</p>
+        <a href="/lector/catalogo" class="btn-primario"><i class="fa-solid fa-book-open"></i> Ir al catálogo</a>
+      </div>
+    </div>
+  </body>
+</html>

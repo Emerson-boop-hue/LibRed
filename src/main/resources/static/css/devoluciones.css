@@ -1,0 +1,290 @@
+/* --- ESTILOS ESPECÍFICOS DEL MÓDULO DE DEVOLUCIONES --- */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 75px);
+}
+
+.multas-container,
+.devoluciones-container {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    height: 100%;
+    overflow: hidden; /* Evita el scroll general de toda la pantalla */
+    box-sizing: border-box;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .multas-container,
+    .devoluciones-container {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow-y: auto;
+    }
+}
+
+/* Columna Izquierda: Tarjeta y Tabla con scroll interno */
+/* Columna Izquierda: Tarjeta */
+.multas-card-section, 
+.devoluciones-card-section {
+    background-color: var(--card-bg, #ffffff);
+    border: 1px solid var(--sidebar-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 24px; /* <--- Añadimos este respiro inferior igual que a la derecha */
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.section-header h2 {
+    font-size: 1.1rem;
+    color: var(--text-dark, #1f2937);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Tabla limpia con scroll vertical independiente */
+.table-responsive {
+    overflow-y: auto; 
+    overflow-x: auto;
+    flex: 1;
+    border-radius: 8px;
+    max-height: calc(100vh - 180px);
+    padding-bottom: 12px; /* <--- Evita que la última fila pegue contra el borde de la tarjeta */
+    box-sizing: border-box;
+}
+
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.custom-table th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    color: var(--text-muted, #6b7280);
+    font-weight: 600;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--sidebar-border, #e5e7eb);
+    background-color: var(--table-header-bg, #f9fafb);
+}
+
+.custom-table td {
+    padding: 12px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--sidebar-border, #f3f4f6);
+    color: var(--text-dark, #1f2937);
+    vertical-align: middle;
+}
+
+.fila-multa {
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.fila-multa:hover {
+    background-color: var(--sidebar-hover-bg, #f3f4f6);
+}
+
+.user-info-cell, 
+.article-info-cell {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-main, 
+.article-main {
+    font-weight: 600;
+    color: var(--text-dark, #111827);
+}
+
+.user-sub, 
+.article-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted, #6b7280);
+    margin-top: 2px;
+}
+
+.empty-row {
+    text-align: center;
+    color: var(--text-muted, #9ca3af);
+    padding: 30px !important;
+}
+
+/* Columna Derecha: Contenedor general con scroll vertical propio para formulario + comprobante */
+.multas-sidebar-section,
+.devoluciones-sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    overflow-y: auto; /* Permite bajar por el formulario y comprobante sin salirse de la pantalla */
+    padding-right: 6px;
+    padding-bottom: 24px; /* <--- Margen inferior holgado para que nunca se corte el borde del botón */
+    box-sizing: border-box;
+}
+
+.form-card, 
+.summary-card {
+    background-color: var(--card-bg, #ffffff);
+    border: 1px solid var(--sidebar-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    flex-shrink: 0;
+    margin-bottom: 4px;
+}
+
+.form-card h3, 
+.summary-card h3 {
+    font-size: 1rem;
+    color: var(--text-dark, #111827);
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted, #4b5563);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--sidebar-border, #d1d5db);
+    border-radius: 8px;
+    background-color: var(--bg-main, #ffffff);
+    color: var(--text-dark, #1f2937);
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn-primary, 
+.btn-secondary {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-primary {
+    background-color: var(--button-primary-bg, #0f172a);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #1e293b;
+}
+
+.btn-secondary {
+    background-color: var(--sidebar-hover-bg, #f3f4f6);
+    color: var(--text-dark, #374151);
+    border: 1px solid var(--sidebar-border, #d1d5db);
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+/* Tarjeta Resumen */
+.summary-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-muted, #6b7280);
+    text-align: center;
+    margin: 20px 0;
+}
+
+.summary-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted, #4b5563);
+}
+
+.summary-row strong {
+    color: var(--text-dark, #111827);
+    font-weight: 600;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px dashed var(--sidebar-border, #e5e7eb);
+    margin: 10px 0;
+}
+
+.summary-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark, #111827);
+}
+
+.total-amount {
+    font-size: 1.2rem;
+    color: #16a34a;
+}
+
+/* Badge de estado y footer del comprobante con el botón integrado */
+.badge-estado-inline {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.form-footer-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 10px;
+}
