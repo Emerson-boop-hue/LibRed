@@ -24,11 +24,12 @@ public class HistorialLectorVista {
         private final String estado;          // ACTIVO, VENCIDO, DEVUELTO
         private final String estadoTexto;
         private final String detalleEstado;
+        private final int calificacion;      // 0 = todavía sin calificar
 
         public FilaPrestamo(Integer id, String titulo, String codigo, String categoria, String fechaPrestamo,
                             String fechaLimite, String fechaDevuelto, int dias, BigDecimal servicio,
                             BigDecimal cargos, String detalleCargos, String estado, String estadoTexto,
-                            String detalleEstado) {
+                            String detalleEstado, int calificacion) {
             this.id = id;
             this.titulo = titulo;
             this.codigo = codigo;
@@ -43,6 +44,7 @@ public class HistorialLectorVista {
             this.estado = estado;
             this.estadoTexto = estadoTexto;
             this.detalleEstado = detalleEstado;
+            this.calificacion = calificacion;
         }
 
         public Integer getId() { return id; }
@@ -59,6 +61,42 @@ public class HistorialLectorVista {
         public String getEstado() { return estado; }
         public String getEstadoTexto() { return estadoTexto; }
         public String getDetalleEstado() { return detalleEstado; }
+        public int getCalificacion() { return calificacion; }
+        /** Solo los préstamos ya devueltos se pueden calificar. */
+        public boolean isCalificable() { return "DEVUELTO".equals(estado); }
+    }
+
+    /** Una fila de la pestaña "Calificaciones" (lo que el lector ya calificó). */
+    public static class FilaCalificacion {
+        private final Integer prestamoId;
+        private final String titulo;
+        private final String codigo;
+        private final String categoria;
+        private final int estrellas;
+        private final String etiqueta;
+        private final String fecha;
+        private final boolean modificada;
+
+        public FilaCalificacion(Integer prestamoId, String titulo, String codigo, String categoria, int estrellas,
+                                String etiqueta, String fecha, boolean modificada) {
+            this.prestamoId = prestamoId;
+            this.titulo = titulo;
+            this.codigo = codigo;
+            this.categoria = categoria;
+            this.estrellas = estrellas;
+            this.etiqueta = etiqueta;
+            this.fecha = fecha;
+            this.modificada = modificada;
+        }
+
+        public Integer getPrestamoId() { return prestamoId; }
+        public String getTitulo() { return titulo; }
+        public String getCodigo() { return codigo; }
+        public String getCategoria() { return categoria; }
+        public int getEstrellas() { return estrellas; }
+        public String getEtiqueta() { return etiqueta; }
+        public String getFecha() { return fecha; }
+        public boolean isModificada() { return modificada; }
     }
 
     /** Una fila de la pestaña "Multas". */
@@ -105,10 +143,13 @@ public class HistorialLectorVista {
         private final List<FilaPrestamo> prestamos;
         private final List<FilaMulta> multas;
         private final List<String> categorias;
+        private final int porCalificar;
+        private final List<FilaCalificacion> calificaciones;
 
         public Pantalla(String sedeNombre, int total, int enCurso, int devueltos, int multasPendientes,
                         BigDecimal montoMultasPendientes, List<FilaPrestamo> prestamos, List<FilaMulta> multas,
-                        List<String> categorias) {
+                        List<String> categorias, int porCalificar,
+                        List<FilaCalificacion> calificaciones) {
             this.sedeNombre = sedeNombre;
             this.total = total;
             this.enCurso = enCurso;
@@ -118,6 +159,8 @@ public class HistorialLectorVista {
             this.prestamos = prestamos;
             this.multas = multas;
             this.categorias = categorias;
+            this.porCalificar = porCalificar;
+            this.calificaciones = calificaciones;
         }
 
         public String getSedeNombre() { return sedeNombre; }
@@ -129,5 +172,8 @@ public class HistorialLectorVista {
         public List<FilaPrestamo> getPrestamos() { return prestamos; }
         public List<FilaMulta> getMultas() { return multas; }
         public List<String> getCategorias() { return categorias; }
+        public int getPorCalificar() { return porCalificar; }
+        public List<FilaCalificacion> getCalificaciones() { return calificaciones; }
+        public int getTotalCalificadas() { return calificaciones.size(); }
     }
 }

@@ -57,33 +57,29 @@ public class LectorService {
 
     // Guarda (o modifica) un lector SIEMPRE dentro de la librería indicada
     public void guardar(Integer libreriaId, Lector lector) {
-        // Si se está modificando un lector existente, debe ser de esta librería
-        Lector existente = null;
+        // MODIFICAR: solo cambian nombres, apellidos y teléfono. La contraseña, el estado y la fecha de
+        // registro se conservan: el administrador no puede ver ni cambiar la contraseña de un lector.
         if (lector.getId() != null) {
-            existente = lectorRepository.findById(lector.getId()).orElse(null);
+            Lector existente = lectorRepository.findById(lector.getId()).orElse(null);
             if (existente == null || !libreriaId.equals(existente.getLibreriaId())) {
                 throw new IllegalArgumentException("El lector no existe o no pertenece a tu librería.");
             }
-            // El código nunca se cambia al modificar (así no se puede suplantar el código de otra persona)
-            lector.setCodigoLector(existente.getCodigoLector());
+            existente.setNombres(lector.getNombres());
+            existente.setApellidos(lector.getApellidos());
+            existente.setTelefono(lector.getTelefono());
+            lectorRepository.save(existente);
+            return;
+        }
+
+        // REGISTRAR: la contraseña inicial la escribe el administrador (el lector la podrá cambiar en Ajustes)
+        String password = lector.getPassword() == null ? "" : lector.getPassword();
+        if (password.length() < 6 || password.length() > 20 || password.matches(".*\\s.*")) {
+            throw new IllegalArgumentException("La contraseña debe tener entre 6 y 20 caracteres, sin espacios.");
         }
 
         lector.setLibreriaId(libreriaId);
-
-        if (lector.getId() == null || lector.getCodigoLector() == null || lector.getCodigoLector().isEmpty()) {
-            lector.setCodigoLector(generarSiguienteCodigo());
-        }
-        
-        if (lector.getPassword() == null || lector.getPassword().isEmpty()) {
-            if (existente != null) {
-                // Al editar, se conserva la contraseña que ya tenía (el lector pudo cambiarla desde sus Ajustes)
-                lector.setPassword(existente.getPassword());
-            } else {
-                // Lector nuevo: contraseña inicial = su teléfono
-                lector.setPassword(lector.getTelefono() != null ? lector.getTelefono().replaceAll("\\s+", "") : "123456");
-            }
-        }
-
+        lector.setCodigoLector(generarSiguienteCodigo());
+        lector.setEstadoCuenta("HABILITADO"); // todo lector nuevo entra habilitado
         lectorRepository.save(lector);
     }
 
@@ -105,9 +101,9 @@ public class LectorService {
         lectorRepository.deleteById(id);
     }
 
-    // El código identifica a la PERSONA en toda la red (puede aparecer en varias librerías, una fila por librería).
-    // Por eso un código nuevo continúa desde el último existente, sin importar la librería,
-    // y se verifica que no lo tenga ya otra persona en ninguna librería.
+    // El código de lector es único en TODA la base (así el login de lectores sigue funcionando
+    // con solo el código). Por eso el correlativo continúa desde el último código existente,
+    // sin importar la librería, y se verifica que no choque con ninguno.
     public String generarSiguienteCodigo() {
         int numero = 1000;
         String ultimoCodigo = lectorRepository.findLastCodigo();

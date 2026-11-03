@@ -7,6 +7,7 @@ import com.libred.sistema.model.RedGlobalVista;
 import com.libred.sistema.model.RedGlobalVista.CategoriaChip;
 import com.libred.sistema.model.RedGlobalVista.TarjetaLibreria;
 import com.libred.sistema.model.Recurso;
+import com.libred.sistema.repository.CalificacionRepository;
 import com.libred.sistema.repository.LectorRepository;
 import com.libred.sistema.repository.LibreriaRepository;
 import com.libred.sistema.repository.RecursoRepository;
@@ -41,13 +42,16 @@ public class RedGlobalService {
     private final LectorRepository lectorRepository;
     private final RecursoRepository recursoRepository;
     private final PoliticaPrestamoService politicaService;
+    private final CalificacionRepository calificacionRepository;
 
     public RedGlobalService(LibreriaRepository libreriaRepository, LectorRepository lectorRepository,
-                            RecursoRepository recursoRepository, PoliticaPrestamoService politicaService) {
+                            RecursoRepository recursoRepository, PoliticaPrestamoService politicaService,
+                            CalificacionRepository calificacionRepository) {
         this.libreriaRepository = libreriaRepository;
         this.lectorRepository = lectorRepository;
         this.recursoRepository = recursoRepository;
         this.politicaService = politicaService;
+        this.calificacionRepository = calificacionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +66,17 @@ public class RedGlobalService {
         Set<Integer> miembroEn = lectorRepository.findAllByCodigoLector(yo.get().getCodigoLector()).stream()
                 .map(Lector::getLibreriaId)
                 .collect(Collectors.toSet());
+
+        // Votos de cada librería por puntaje: libreriaId -> [votos de 1★, 2★, 3★, 4★, 5★]
+        Map<Integer, long[]> votos = new java.util.HashMap<>();
+        for (Object[] fila : calificacionRepository.distribucionPorLibreria()) {
+            Integer libId = ((Number) fila[0]).intValue();
+            int estrellas = ((Number) fila[1]).intValue();
+            long cantidad = ((Number) fila[2]).longValue();
+            if (estrellas >= 1 && estrellas <= 5) {
+                votos.computeIfAbsent(libId, k -> new long[5])[estrellas - 1] = cantidad;
+            }
+        }
 
         List<TarjetaLibreria> tarjetas = new ArrayList<>();
         Map<String, CategoriaChip> categoriasRed = new LinkedHashMap<>();
@@ -114,7 +129,8 @@ public class RedGlobalService {
                     desde.setScale(2, java.math.RoundingMode.HALF_UP),
                     chips,
                     id.equals(sede),
-                    miembroEn.contains(id)));
+                    miembroEn.contains(id),
+                    votos.getOrDefault(id, new long[5])));
         }
 
         // La librería donde estoy va primero; el resto por nombre

@@ -17,6 +17,7 @@
 
   const comparadores = {
     nombre: porNombre,
+    puntaje: (a, b) => num(b, "puntaje") - num(a, "puntaje") || porNombre(a, b),
     articulos: (a, b) => num(b, "articulos") - num(a, "articulos") || porNombre(a, b),
     tarifa: (a, b) => num(a, "tarifa") - num(b, "tarifa") || porNombre(a, b),
     dias: (a, b) => num(b, "dias") - num(a, "dias") || porNombre(a, b),
@@ -74,9 +75,67 @@
   }
   function cerrar() { modal.hidden = true; modalContenido.innerHTML = ""; }
 
+
+  // ---- Cambio de librería (botón "Ingresar") ----
+  const carga = $("rgCarga"), cargaTexto = $("rgCargaTexto");
+  let entrando = false;
+
+  const pausa = (ms) => new Promise((r) => setTimeout(r, ms));
+  const MIN_ETAPA1 = 1600, MIN_ETAPA2 = 1400; // tiempos mínimos para que se alcance a leer cada etapa
+
+  // Cambia el texto con un pequeño fundido; "ok" agrega el ✓ de etapa completada
+  function textoCarga(t, ok) {
+    cargaTexto.classList.remove("rg-fade");
+    void cargaTexto.offsetWidth; // reinicia la animación
+    cargaTexto.textContent = (ok ? "✓ " : "") + t;
+    cargaTexto.classList.toggle("rg-ok", !!ok);
+    cargaTexto.classList.add("rg-fade");
+  }
+
+  async function entrar(boton) {
+    if (entrando) return;
+    const libId = boton.dataset.libId;
+    const nombre = boton.dataset.libNombre || "la librería";
+    const primeraVez = boton.dataset.libMiembro === "0";
+    entrando = true;
+    modal.hidden = true;
+    carga.hidden = false;
+    const etapa1 = primeraVez ? "Creando tu cuenta en " + nombre + "…" : "Verificando tu cuenta…";
+    textoCarga(etapa1);
+
+    const fallo = (msg) => {
+      entrando = false;
+      carga.hidden = true;
+      mostrarAviso(msg);
+    };
+    try {
+      // El mínimo corre en paralelo: si el servidor tarda más, se espera al servidor (no se suman tiempos)
+      const [resp] = await Promise.all([
+        fetch("/lector/cambiar-sede", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" },
+          body: JSON.stringify({ libreriaId: libId })
+        }),
+        pausa(MIN_ETAPA1)
+      ]);
+      const tipo = resp.headers.get("content-type") || "";
+      if (!tipo.includes("application/json")) { window.location.href = "/login"; return; }
+      const datos = await resp.json();
+      if (!datos.ok) { fallo(datos.error || "No se pudo cambiar de librería."); return; }
+      textoCarga(primeraVez ? "Cuenta creada" : "Cuenta verificada", true);
+      await pausa(700);
+      textoCarga("Cargando el panel de " + (datos.libreria || nombre) + "…");
+      await pausa(MIN_ETAPA2 - 700);
+      window.location.href = datos.destino || "/lector/panel";
+    } catch (err) {
+      fallo("No se pudo conectar con el servidor. Inténtalo otra vez.");
+    }
+  }
+
   grid.addEventListener("click", (e) => {
     const ingresar = e.target.closest("[data-ingresar]");
-    if (ingresar) { e.stopPropagation(); mostrarAviso("Pronto podrás entrar al catálogo de esta librería."); return; }
+    if (ingresar) { e.stopPropagation(); entrar(ingresar); return; }
     if (e.target.closest("a")) return; // "Ir al catálogo" navega normalmente
     const t = e.target.closest(".rg-card");
     if (t) abrir(t);
@@ -90,7 +149,8 @@
 
   modal.addEventListener("click", (e) => {
     if (e.target === modal || e.target.closest("#rgModalCerrar")) { cerrar(); return; }
-    if (e.target.closest("[data-ingresar]")) mostrarAviso("Pronto podrás entrar al catálogo de esta librería.");
+    const ing = e.target.closest("[data-ingresar]");
+    if (ing) entrar(ing);
   });
 
   // Esc cierra la ventana (se reemplaza el manejador anterior para no acumularlos al navegar)

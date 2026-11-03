@@ -1,7 +1,6 @@
 package com.libred.sistema.controller;
 
-import com.libred.sistema.service.CatalogoService;
-import com.libred.sistema.service.LectorPanelService;
+import com.libred.sistema.service.PanelLectorService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,37 +10,33 @@ import org.springframework.web.bind.annotation.GetMapping;
  * Pantallas generales del panel del lector:
  *  - Vista General (/lector/panel)
  *  - Cerrar sesión (/lector/logout)
- *  - Páginas "próximamente" de los módulos que todavía no se desarrollan.
- *    A medida que se creen los módulos (Préstamos, Historial, Red Global...), se borra su método de aquí
- *    y se crea su propio controller.
  */
 @Controller
 public class LectorPanelController {
 
-    private final LectorPanelService lectorPanelService;
-    private final CatalogoService catalogoService;
+    private final PanelLectorService panelService;
 
-    public LectorPanelController(LectorPanelService lectorPanelService, CatalogoService catalogoService) {
-        this.lectorPanelService = lectorPanelService;
-        this.catalogoService = catalogoService;
+    public LectorPanelController(PanelLectorService panelService) {
+        this.panelService = panelService;
     }
 
     @GetMapping("/lector/panel")
     public String panelLector(Model model, HttpSession session) {
         Integer lectorId = (Integer) session.getAttribute("lectorId");
 
-        // Librería a la que entró el lector (la que eligió al iniciar sesión)
-        Integer libreriaId = catalogoService.sedeDelLector(lectorId);
-
-        var resumen = lectorPanelService.obtenerResumen(lectorId);
-        if (resumen.isEmpty()) {
+        var vista = panelService.armar(lectorId);
+        if (vista.isEmpty()) {
             // El lector ya no existe en la BD: se cierra la sesión
             session.invalidate();
             return "redirect:/login";
         }
-        model.addAttribute("lector", resumen.get().lector());
-        model.addAttribute("sede", resumen.get().sede());
-        model.addAttribute("totalArticulos", catalogoService.contarArticulos(libreriaId));
+        model.addAttribute("p", vista.get());
+        // Aviso de "Ahora estás en ..." tras cambiar de librería desde Red Global (se muestra una sola vez)
+        Object avisoSede = session.getAttribute("avisoSede");
+        if (avisoSede != null) {
+            model.addAttribute("avisoSede", avisoSede);
+            session.removeAttribute("avisoSede");
+        }
         return "lector/panel_lector";
     }
 
@@ -51,19 +46,5 @@ public class LectorPanelController {
         session.removeAttribute("lectorNombre");
         session.removeAttribute("lectorCodigo");
         return "redirect:/login";
-    }
-
-    // ---------- Módulos pendientes (páginas "próximamente") ----------
-
-    @GetMapping("/lector/ayuda")
-    public String ayuda(Model model) {
-        return proximamente(model, "Ayuda y Soporte", "Resuelve tus dudas sobre LibRed", "ayuda");
-    }
-
-    private String proximamente(Model model, String titulo, String descripcion, String menuActivo) {
-        model.addAttribute("titulo", titulo);
-        model.addAttribute("descripcion", descripcion);
-        model.addAttribute("menuActivo", menuActivo);
-        return "lector/proximamente";
     }
 }

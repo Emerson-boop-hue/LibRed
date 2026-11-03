@@ -75,14 +75,14 @@ window.abrirModalCrearLector = function() {
         document.getElementById("modalLectorNombres").value = "";
         document.getElementById("modalLectorApellidos").value = "";
         document.getElementById("modalLectorTelefono").value = "";
-        document.getElementById("modalLectorEstado").value = "HABILITADO";
+        configurarPasswordLector(true);
 
         cargarCodigoSugeridoLector();
         modal.style.display = "flex";
     }
 };
 
-window.abrirModalEditarLector = function(id, codigo, nombres, apellidos, telefono, estado) {
+window.abrirModalEditarLector = function(id, codigo, nombres, apellidos, telefono) {
     const modal = document.getElementById("modalLector");
     if (modal) {
         document.getElementById("modalLectorId").value = id;
@@ -99,9 +99,42 @@ window.abrirModalEditarLector = function(id, codigo, nombres, apellidos, telefon
             document.getElementById("modalLectorTelefono").value = telefono || "";
         }
 
-        document.getElementById("modalLectorEstado").value = estado;
+        configurarPasswordLector(false);
         modal.style.display = "flex";
     }
+};
+
+// Contraseña: se escribe (y se puede ver con el ojito) solo al registrar. Al modificar queda bloqueada con puntos.
+function configurarPasswordLector(esNuevo) {
+    const input = document.getElementById("modalLectorPassword");
+    const ojo = document.getElementById("modalLectorOjo");
+    const ayuda = document.getElementById("modalLectorPasswordAyuda");
+    if (!input) return;
+    input.type = "password";
+    document.getElementById("modalLectorOjoIcono").className = "fa-regular fa-eye";
+    if (esNuevo) {
+        input.disabled = false;
+        input.required = true;
+        input.value = "";
+        input.style.opacity = "";
+        ojo.style.display = "";
+        ayuda.textContent = "Sin espacios. El lector podrá cambiarla luego desde Ajustes.";
+    } else {
+        input.disabled = true; // un campo deshabilitado no se envía: la contraseña existente no se toca
+        input.required = false;
+        input.value = "••••••••";
+        input.style.opacity = "0.6";
+        ojo.style.display = "none";
+        ayuda.textContent = "Por seguridad, la contraseña no se puede ver ni modificar. El lector la cambia desde Ajustes.";
+    }
+}
+
+window.alternarPasswordLector = function() {
+    const input = document.getElementById("modalLectorPassword");
+    if (!input || input.disabled) return;
+    const mostrar = input.type === "password";
+    input.type = mostrar ? "text" : "password";
+    document.getElementById("modalLectorOjoIcono").className = mostrar ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
 };
 
 window.cerrarModalLector = function() {

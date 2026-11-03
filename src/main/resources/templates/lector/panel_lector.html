@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Vista General del lector (versión inicial: datos de su cuenta y su sede) -->
+<!-- Vista General del lector: alertas, resumen en números, préstamos en curso, su red y novedades del catálogo -->
 <html
   lang="es"
   xmlns:th="http://www.thymeleaf.org"
@@ -7,7 +7,7 @@
           'Vista General',
           'Resumen de tu actividad como lector',
           'lector_panel.css',
-          '',
+          'lector_panel.js',
           'panel',
           ~{:: .lector-container}
       )}"
@@ -17,39 +17,148 @@
   </head>
   <body>
     <div class="lector-container">
-      <h2 class="bienvenida">¡Bienvenido, <span th:text="${lector.nombres}">Lector</span>!</h2>
 
-      <div class="panel-tarjetas">
-        <!-- Estado de la cuenta -->
-        <div class="panel-card">
-          <span class="panel-card-label">Estado de tu cuenta</span>
-          <span
-            class="badge-estado"
-            th:classappend="${lector.estadoCuenta == 'HABILITADO'} ? 'ok' : 'alerta'"
-            th:text="${lector.estadoCuenta}"
-          >HABILITADO</span>
-          <p class="panel-card-nota"
-             th:text="${lector.estadoCuenta == 'HABILITADO'}
-                      ? 'Consulta el catálogo y solicita tus próximos artículos.'
-                      : 'Tu cuenta tiene restricciones. Acércate a tu librería para regularizarla.'">
-            Consulta el catálogo.
-          </p>
+      <!-- Aviso de una sola vez tras cambiar de librería desde Red Global -->
+      <div class="aviso-sede" th:if="${avisoSede != null}" id="avisoSede">
+        <i class="fa-solid fa-circle-check"></i>
+        <span th:text="${avisoSede}">Ahora estás en la librería.</span>
+        <button type="button" class="aviso-sede-x" aria-label="Cerrar" onclick="this.parentNode.remove()">&times;</button>
+      </div>
+
+      <!-- CABECERA -->
+      <div class="pn-cab" id="pnRaiz">
+        <div>
+          <h2 class="bienvenida"><span th:text="${p.saludo}">Buenos días</span>, <span th:text="${p.nombre}">Lector</span></h2>
+          <p class="pn-fecha" th:text="${p.fechaHoy}">Lunes, 2 de noviembre</p>
         </div>
+        <span class="badge-estado" th:classappend="${p.sancionado} ? 'alerta' : 'ok'"
+              th:text="${p.sancionado} ? 'Cuenta sancionada' : 'Cuenta habilitada'">Cuenta habilitada</span>
+      </div>
 
-        <!-- Sede -->
-        <div class="panel-card">
-          <span class="panel-card-label">Librería actual</span>
-          <span class="panel-card-valor texto" th:text="${sede != null} ? ${sede.nombreComercial} : 'Sin librería'">Librería</span>
-          <p class="panel-card-nota" th:if="${sede != null}" th:text="${sede.direccion}">Dirección</p>
+      <!-- ALERTAS (lo más urgente primero; si no hay nada, un mensaje amable) -->
+      <div class="pn-alertas">
+        <a class="pn-alerta" th:each="a : ${p.alertas}" th:classappend="${a.nivel}" th:href="${a.enlace}">
+          <span class="pn-alerta-ico"><i class="fa-solid" th:classappend="${a.icono}"></i></span>
+          <span class="pn-alerta-texto">
+            <strong th:text="${a.titulo}">Título</strong>
+            <small th:text="${a.detalle}">Detalle</small>
+          </span>
+          <span class="pn-alerta-cta"><span th:text="${a.boton}">Ver</span> <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+      </div>
+
+      <!-- NÚMEROS -->
+      <div class="pn-kpis">
+        <div class="pn-kpi">
+          <span class="pn-kpi-label">Préstamos activos</span>
+          <span class="pn-kpi-valor"><span th:text="${p.activos}">0</span><small th:if="${p.limitado}" th:text="${' de ' + p.maxActivos}"> de 3</small><small th:unless="${p.limitado}"> · sin límite</small></span>
+          <a class="pn-kpi-link" th:href="@{/lector/prestamos}">Pedir un préstamo <i class="fa-solid fa-arrow-right"></i></a>
         </div>
-
-        <!-- Artículos de la sede -->
-        <div class="panel-card">
-          <span class="panel-card-label">Artículos en esta librería</span>
-          <span class="panel-card-valor" th:text="${totalArticulos}">0</span>
-          <a href="/lector/catalogo" class="panel-card-link">Explorar catálogo →</a>
+        <div class="pn-kpi" th:classappend="'nivel-' + ${p.proximaNivel}">
+          <span class="pn-kpi-label">Próxima devolución</span>
+          <span class="pn-kpi-valor" th:text="${p.proximaValor}">3 días</span>
+          <span class="pn-kpi-nota" th:text="${p.proximaDetalle}">Título · 05/11/2026</span>
+        </div>
+        <div class="pn-kpi" th:classappend="${p.multasPendientes > 0} ? 'nivel-vencido'">
+          <span class="pn-kpi-label">Multas pendientes</span>
+          <span class="pn-kpi-valor" th:text="${p.multasPendientes}">0</span>
+          <span class="pn-kpi-nota" th:text="${p.multasPendientes > 0 ? 'S/ ' + #numbers.formatDecimal(p.montoPendiente, 1, 'POINT', 2, 'POINT') + ' por pagar' : 'Sin multas, ¡bien hecho!'}">Sin multas</span>
+        </div>
+        <div class="pn-kpi">
+          <span class="pn-kpi-label">Artículos devueltos</span>
+          <span class="pn-kpi-valor" th:text="${p.devueltos}">0</span>
+          <span class="pn-kpi-nota" th:text="${p.calificadas > 0 ? 'Calificaste ' + p.calificadas + ' · Promedio ' + p.promedioCalif + ' ★' : 'Aún sin calificaciones'}">Aún sin calificaciones</span>
         </div>
       </div>
+
+      <!-- CENTRO: préstamos en curso + tu red -->
+      <div class="pn-medio">
+        <section class="pn-card pn-curso">
+          <div class="pn-card-cab">
+            <h3><i class="fa-solid fa-book-open-reader"></i> Tus préstamos en curso</h3>
+            <a th:href="@{/lector/prestamos}">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+          <div class="pn-lista" th:if="${!#lists.isEmpty(p.enCurso)}">
+            <div class="pn-fila" th:each="c : ${p.enCurso}" th:classappend="'nivel-' + ${c.nivel}">
+              <span class="pn-fila-ico"><i class="fa-solid" th:classappend="${c.icono}"></i></span>
+              <div class="pn-fila-cuerpo">
+                <div class="pn-fila-top">
+                  <strong th:text="${c.titulo}">Título</strong>
+                  <span class="pn-fila-rest" th:text="${c.restante}">Vence en 3 días</span>
+                </div>
+                <div class="pn-fila-sub"><span th:text="${c.categoria}">Libros</span> · Límite <span th:text="${c.fechaLimite}">05/11/2026</span></div>
+                <div class="pn-barra"><span th:style="'width:' + ${c.porcentaje} + '%'"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="pn-vacio" th:if="${#lists.isEmpty(p.enCurso)}">
+            <span class="pn-vacio-ico"><i class="fa-solid fa-book-open"></i></span>
+            <strong>No tienes préstamos en curso</strong>
+            <small>Cuando pidas un artículo, aquí verás cuánto tiempo te queda para devolverlo.</small>
+            <a class="btn-primario" th:href="@{/lector/prestamos}"><i class="fa-solid fa-file-circle-plus"></i> Pedir un préstamo</a>
+          </div>
+        </section>
+
+        <section class="pn-card pn-red">
+          <div class="pn-card-cab">
+            <h3><i class="fa-solid fa-globe"></i> Tu librería y tu red</h3>
+          </div>
+          <div class="pn-sede">
+            <span class="pn-avatar" th:text="${p.sedeIniciales}">LN</span>
+            <div class="pn-sede-datos">
+              <strong th:text="${p.sedeNombre}">Librería</strong>
+              <small th:if="${!#strings.isEmpty(p.sedeDireccion)}"><i class="fa-solid fa-location-dot"></i> <span th:text="${p.sedeDireccion}">Dirección</span></small>
+              <small th:if="${!#strings.isEmpty(p.sedeHorario)}"><i class="fa-regular fa-clock"></i> <span th:text="${p.sedeHorario}">Horario</span></small>
+            </div>
+            <span class="pn-sede-actual">Estás aquí</span>
+          </div>
+
+          <div class="pn-otras" th:if="${!#lists.isEmpty(p.otrasSedes)}">
+            <p class="pn-otras-titulo">También estás registrado en</p>
+            <button type="button" class="pn-sede-chip" th:each="s : ${p.otrasSedes}"
+                    th:attr="data-lib-id=${s.id},data-lib-nombre=${s.nombre}">
+              <span class="pn-avatar mini" th:classappend="'tono-' + ${s.tono}" th:text="${s.iniciales}">LC</span>
+              <span class="pn-chip-nombre" th:text="${s.nombre}">Librería</span>
+              <span class="pn-chip-ir">Ingresar <i class="fa-solid fa-right-to-bracket"></i></span>
+            </button>
+          </div>
+          <p class="pn-otras-vacio" th:if="${#lists.isEmpty(p.otrasSedes)}">
+            Aún solo usas esta librería. Descubre otras de la red y entra a ellas sin cerrar sesión.
+          </p>
+          <a class="pn-red-link" th:href="@{/lector/red-global}">Explorar Red Global <i class="fa-solid fa-arrow-right"></i></a>
+        </section>
+      </div>
+
+      <!-- NOVEDADES DEL CATÁLOGO -->
+      <section class="pn-card pn-novedades" th:if="${!#lists.isEmpty(p.novedades)}">
+        <div class="pn-card-cab">
+          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Novedades en tu librería</h3>
+          <a th:href="@{/lector/catalogo}">Ver catálogo <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="pn-novedades-fila">
+          <a class="pn-nov" th:each="n : ${p.novedades}" th:href="@{/lector/prestamos(recursoId=${n.id})}">
+            <span class="pn-nov-ico"><i class="fa-solid" th:classappend="${n.icono}"></i></span>
+            <strong th:text="${n.titulo}">Título</strong>
+            <small th:text="${n.autor}">Autor</small>
+            <span class="pn-nov-pie">
+              <span th:text="${n.categoria}">Libros</span>
+              <em th:text="${n.disponibles + (n.disponibles == 1 ? ' disponible' : ' disponibles')}">3 disponibles</em>
+            </span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Pantalla de carga al saltar a otra librería (mismo flujo que Red Global) -->
+      <div class="pn-carga" id="pnCarga" hidden role="status" aria-live="polite">
+        <div class="pn-carga-caja">
+          <img th:src="@{/img/LogoSinFodo.png}" alt="LibRed" class="pn-carga-logo">
+          <div class="pn-carga-spinner"></div>
+          <p class="pn-carga-texto" id="pnCargaTexto">Verificando tu cuenta…</p>
+          <small class="pn-carga-sub">Un momento, por favor</small>
+        </div>
+      </div>
+      <div class="pn-toast" id="pnToast" hidden></div>
+
     </div>
   </body>
 </html>

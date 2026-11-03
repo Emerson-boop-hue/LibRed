@@ -52,6 +52,10 @@
             <i class="fa-solid fa-file-invoice-dollar"></i> Multas
             <span class="hs-tab-num" th:text="${#lists.size(h.multas)}">0</span>
           </button>
+          <button type="button" class="hs-tab" data-tab="calificaciones" role="tab">
+            <i class="fa-solid fa-star"></i> Calificaciones
+            <span class="hs-tab-num" id="hcTabNum" th:text="${h.totalCalificadas}">0</span>
+          </button>
           <span class="hs-sede"><i class="fa-solid fa-store"></i> <span th:text="${h.sedeNombre}">Librería</span></span>
         </div>
 
@@ -135,6 +139,16 @@
                   <td>
                     <span class="hs-estado" th:classappend="${'e-' + #strings.toLowerCase(f.estado)}" th:text="${f.estadoTexto}">Activo</span>
                     <div class="hs-sub" th:text="${f.detalleEstado}">Vence en 3 días</div>
+                    <!-- Calificación: solo en préstamos devueltos -->
+                    <div class="hs-calif" th:if="${f.calificable}"
+                         th:attr="data-prestamo=${f.id}, data-titulo=${f.titulo}, data-codigo=${f.codigo}, data-categoria=${f.categoria}, data-estrellas=${f.calificacion}">
+                      <button type="button" class="hs-btn-calificar" th:if="${f.calificacion == 0}">
+                        <i class="fa-solid fa-star"></i> Calificar
+                      </button>
+                      <span class="hs-calif-hecha" th:unless="${f.calificacion == 0}" title="Ya calificaste este préstamo">
+                        <span class="hs-estrellas" th:style="${'--p:' + (f.calificacion * 20) + '%'}">★★★★★</span>
+                      </span>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -219,7 +233,130 @@
             </div>
           </th:block>
         </div>
+
+        <!-- ============ PESTAÑA CALIFICACIONES (lo que ya calificaste) ============ -->
+        <div class="hs-panel" id="panelCalificaciones" hidden>
+          <div class="hs-filtros hs-filtros-calif" id="hcFiltros" th:classappend="${h.totalCalificadas == 0} ? 'oculto'">
+            <div class="hs-campo hs-campo-grande">
+              <label for="hcTexto">Título o código</label>
+              <div class="hs-input-icono">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="hcTexto" placeholder="Ej: Clean Code o LIB-001" autocomplete="off" />
+              </div>
+            </div>
+            <div class="hs-campo">
+              <label for="hcPuntaje">Puntaje</label>
+              <select id="hcPuntaje">
+                <option value="">Todos</option>
+                <option value="5">5 estrellas · Excelente</option>
+                <option value="4">4 estrellas · Bueno</option>
+                <option value="3">3 estrellas · Regular</option>
+                <option value="2">2 estrellas · Malo</option>
+                <option value="1">1 estrella · Muy malo</option>
+              </select>
+            </div>
+            <div class="hs-campo">
+              <label for="hcCategoria">Categoría</label>
+              <select id="hcCategoria">
+                <option value="">Todas</option>
+                <option th:each="c : ${h.categorias}" th:value="${c}" th:text="${c}">Libros</option>
+              </select>
+            </div>
+            <div class="hs-campo hs-campo-boton">
+              <button type="button" class="btn-primario" id="hcLimpiar" title="Limpiar filtros">
+                <i class="fa-solid fa-eraser"></i> Limpiar
+              </button>
+            </div>
+          </div>
+
+          <p class="hs-resumen" id="hcResumen" th:classappend="${h.totalCalificadas == 0} ? 'oculto'">
+            <strong id="hcContador" th:text="${h.totalCalificadas}">0</strong> <span id="hcContadorTexto">calificaciones</span>
+          </p>
+
+          <div class="hs-vacio" id="hcVacio" th:classappend="${h.totalCalificadas > 0} ? 'oculto'">
+            <i class="fa-regular fa-star"></i>
+            <p>Todavía no has calificado ningún préstamo. Cuando devuelvas un artículo, podrás calificarlo desde la pestaña Préstamos.</p>
+          </div>
+
+          <div class="hs-tabla-wrap" id="hcTablaWrap" th:classappend="${h.totalCalificadas == 0} ? 'oculto'">
+            <table class="hs-tabla">
+              <thead>
+                <tr>
+                  <th>Préstamo</th>
+                  <th>Artículo</th>
+                  <th>Categoría</th>
+                  <th>Mi calificación</th>
+                  <th>Fecha</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="hcCuerpo">
+                <tr th:each="c : ${h.calificaciones}"
+                    th:attr="data-texto=${#strings.toLowerCase(c.titulo + ' ' + c.codigo)}, data-puntaje=${c.estrellas}, data-categoria=${c.categoria}, data-prestamo=${c.prestamoId}">
+                  <td th:text="${'#' + c.prestamoId}">#1</td>
+                  <td>
+                    <div class="hs-art-titulo" th:text="${c.titulo}" th:title="${c.titulo}">Título</div>
+                    <div class="hs-art-codigo" th:text="${c.codigo}">LIB-001</div>
+                  </td>
+                  <td th:text="${c.categoria}">Libros</td>
+                  <td class="hc-nota">
+                    <span class="hs-estrellas" th:style="${'--p:' + (c.estrellas * 20) + '%'}">★★★★★</span>
+                    <span class="hc-palabra" th:text="${c.etiqueta}">Excelente</span>
+                  </td>
+                  <td>
+                    <div th:text="${c.fecha}">01/01/2027</div>
+                    <div class="hs-sub hc-modificada" th:if="${c.modificada}">Modificada</div>
+                  </td>
+                  <td class="hc-accion">
+                    <button type="button" class="hs-btn-cambiar" th:unless="${c.modificada}"
+                            th:attr="data-prestamo=${c.prestamoId}, data-titulo=${c.titulo}, data-estrellas=${c.estrellas}">
+                      <i class="fa-solid fa-pen"></i> Cambiar
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="hs-vacio hs-sin-coincidencias" id="hcSinResultados" hidden>
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <p>No encontramos calificaciones con esos filtros.</p>
+            </div>
+          </div>
+        </div>
       </section>
+
+
+      <!-- VENTANA PARA CALIFICAR UN PRÉSTAMO -->
+      <div class="hs-modal" id="hsModalCalif" hidden>
+        <div class="hs-modal-caja" role="dialog" aria-modal="true" aria-labelledby="hsCalifTitulo">
+          <button type="button" class="hs-modal-cerrar" id="hsCalifCerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+          <h3 id="hsCalifTitulo">¿Cómo fue tu experiencia?</h3>
+          <p class="hs-modal-sub">Estás calificando el préstamo de <strong id="hsCalifArticulo">—</strong></p>
+
+          <div class="hs-cara" id="hsCalifCara" data-nivel="0"><i class="fa-regular fa-face-meh-blank"></i></div>
+          <div class="hs-estrellas-input" id="hsCalifEstrellas" role="radiogroup" aria-label="Calificación">
+            <button type="button" class="hs-estrella" data-valor="1" role="radio" aria-label="1 estrella"><i class="fa-solid fa-star"></i></button>
+            <button type="button" class="hs-estrella" data-valor="2" role="radio" aria-label="2 estrellas"><i class="fa-solid fa-star"></i></button>
+            <button type="button" class="hs-estrella" data-valor="3" role="radio" aria-label="3 estrellas"><i class="fa-solid fa-star"></i></button>
+            <button type="button" class="hs-estrella" data-valor="4" role="radio" aria-label="4 estrellas"><i class="fa-solid fa-star"></i></button>
+            <button type="button" class="hs-estrella" data-valor="5" role="radio" aria-label="5 estrellas"><i class="fa-solid fa-star"></i></button>
+          </div>
+          <p class="hs-etiqueta" id="hsCalifEtiqueta">Elige de 1 a 5 estrellas</p>
+
+          <p class="hs-calif-aviso" id="hsCalifAviso" hidden>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Solo puedes cambiar tu calificación <strong>una vez</strong>. Después quedará fija.
+          </p>
+          <p class="hs-calif-error" id="hsCalifError" hidden></p>
+          <div class="hs-modal-acciones">
+            <button type="button" class="hs-btn-sec" id="hsCalifCancelar">Cancelar</button>
+            <button type="button" class="btn-primario" id="hsCalifGuardar" disabled>
+              <i class="fa-solid fa-paper-plane"></i> Enviar calificación
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hs-toast" id="hsToast" hidden></div>
 
     </div>
   </body>

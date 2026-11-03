@@ -46,6 +46,7 @@
           <label for="rgOrden">Ordenar por</label>
           <select id="rgOrden">
             <option value="nombre">Nombre (A-Z)</option>
+            <option value="puntaje">Mejor calificadas</option>
             <option value="articulos">Más artículos</option>
             <option value="tarifa">Tarifa más baja</option>
             <option value="dias">Mayor plazo de préstamo</option>
@@ -80,9 +81,13 @@
                             data-miembro=${t.miembro ? '1' : '0'},
                             data-articulos=${t.articulos},
                             data-tarifa=${t.tarifaDesde},
-                            data-dias=${t.maxDias}">
+                            data-dias=${t.maxDias},
+                            data-puntaje=${t.promedio}">
 
-            <div class="rg-cinta" th:if="${t.sedeActual}"><i class="fa-solid fa-location-crosshairs"></i> Estás aquí</div>
+            <div class="rg-cinta" th:if="${t.sedeActual}">
+              <span><i class="fa-solid fa-location-crosshairs"></i> Estás aquí</span>
+              <span class="rg-cinta-miembro"><i class="fa-solid fa-circle-check"></i> Eres miembro</span>
+            </div>
 
             <header class="rg-card-head">
               <div class="rg-avatar" th:classappend="${'tono-' + t.tono}" th:text="${t.iniciales}">LC</div>
@@ -95,10 +100,31 @@
               </div>
             </header>
 
+            <!-- Puntaje + etiqueta de miembro -->
+            <div class="rg-puntaje-fila">
+              <div class="rg-puntaje" th:if="${t.conVotos}" th:title="${t.promedioTexto + ' de 5 · ' + t.votos + ' votos'}">
+                <span class="rg-estrellas" th:style="${'--p:' + t.porcentajeEstrellas + '%'}">★★★★★</span>
+                <strong th:text="${t.promedioTexto}">4.6</strong>
+                <small th:text="${'(' + t.votos + (t.votos == 1 ? ' voto)' : ' votos)')}">(12 votos)</small>
+              </div>
+              <div class="rg-puntaje sin" th:unless="${t.conVotos}">
+                <span class="rg-estrellas" style="--p:0%">★★★★★</span>
+                <small>Aún sin calificaciones</small>
+              </div>
+              <span class="rg-badge miembro" th:if="${t.miembro and !t.sedeActual}"><i class="fa-solid fa-circle-check"></i> Eres miembro</span>
+            </div>
+
             <div class="rg-resumen-datos">
               <div><span>Artículos</span><strong th:text="${t.articulos}">0</strong></div>
               <div><span>Plazo máx.</span><strong th:text="${t.maxDias + (t.maxDias == 1 ? ' día' : ' días')}">7 días</strong></div>
+              <div><span>Servicio desde</span><strong th:text="${'S/ ' + t.tarifaDesde + ' / día'}">S/ 0.50 / día</strong></div>
+              <div><span>Préstamos activos</span><strong th:text="${t.limitado ? t.maxActivos + ' a la vez' : 'Sin límite'}">3 a la vez</strong></div>
             </div>
+
+            <p class="rg-horario" th:classappend="${#strings.isEmpty(t.horario)} ? 'vacio'">
+              <i class="fa-regular fa-clock"></i>
+              <span th:text="${!#strings.isEmpty(t.horario) ? t.horario : 'Horario no registrado'}">Lun a Sáb, 9:00 a 20:00</span>
+            </p>
 
             <div class="rg-categorias">
               <span class="rg-chip" th:each="c, it : ${t.categorias}" th:if="${it.index < 3}">
@@ -110,7 +136,7 @@
 
             <footer class="rg-card-pie">
               <a class="rg-btn" th:if="${t.sedeActual}" th:href="@{/lector/catalogo}"><i class="fa-solid fa-book-open"></i> Ir al catálogo</a>
-              <button type="button" class="rg-btn" th:unless="${t.sedeActual}" data-ingresar><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
+              <button type="button" class="rg-btn" th:unless="${t.sedeActual}" data-ingresar th:attr="data-lib-id=${t.id},data-lib-nombre=${t.nombre},data-lib-miembro=${t.miembro ? '1' : '0'}"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
               <span class="rg-ver-mas">Ver detalles <i class="fa-solid fa-chevron-right"></i></span>
             </footer>
 
@@ -124,13 +150,33 @@
                     <span th:text="${!#strings.isEmpty(t.direccion) ? t.direccion : 'Ubicación no registrada'}">Dirección</span></p>
                   <div class="rg-modal-etiquetas">
                     <span class="rg-badge sede" th:if="${t.sedeActual}"><i class="fa-solid fa-star"></i> Tu sede actual</span>
-                    <span class="rg-badge miembro" th:if="${t.miembro and !t.sedeActual}"><i class="fa-solid fa-circle-check"></i> Eres miembro</span>
+                    <span class="rg-badge miembro" th:if="${t.miembro}"><i class="fa-solid fa-circle-check"></i> Eres miembro</span>
                   </div>
                 </div>
               </div>
 
               <p class="rg-modal-desc" th:classappend="${#strings.isEmpty(t.descripcion)} ? 'vacio'"
                  th:text="${!#strings.isEmpty(t.descripcion) ? t.descripcion : 'Esta librería aún no agregó una descripción.'}">Descripción</p>
+
+              <h4 class="rg-modal-seccion">Calificación de los lectores</h4>
+              <div class="rg-calif-caja" th:if="${t.conVotos}">
+                <div class="rg-calif-resumen">
+                  <strong class="rg-calif-numero" th:text="${t.promedioTexto}">4.6</strong>
+                  <span class="rg-estrellas grande" th:style="${'--p:' + t.porcentajeEstrellas + '%'}">★★★★★</span>
+                  <small th:text="${t.votos + (t.votos == 1 ? ' voto' : ' votos')}">12 votos</small>
+                </div>
+                <div class="rg-barras">
+                  <div class="rg-barra" th:each="b : ${t.barras}">
+                    <span class="rg-barra-n" th:text="${b.estrellas + '★'}">5★</span>
+                    <span class="rg-barra-pista"><span class="rg-barra-relleno" th:style="${'width:' + b.porcentaje + '%'}"></span></span>
+                    <span class="rg-barra-v" th:text="${b.votos}">0</span>
+                  </div>
+                </div>
+              </div>
+              <p class="rg-calif-vacia" th:unless="${t.conVotos}">
+                <span class="rg-estrellas grande" style="--p:0%">★★★★★</span>
+                Esta librería aún no tiene calificaciones.
+              </p>
 
               <h4 class="rg-modal-seccion">Categorías disponibles</h4>
               <div class="rg-categorias">
@@ -147,7 +193,7 @@
                 <div><dt><i class="fa-solid fa-layer-group"></i> Préstamos activos</dt>
                   <dd th:text="${t.limitado ? t.maxActivos + ' a la vez' : 'Sin límite'}">3 a la vez</dd></div>
                 <div><dt><i class="fa-solid fa-coins"></i> Servicio desde</dt>
-                  <dd th:text="${t.tarifaDesde.signum() > 0 ? 'S/ ' + t.tarifaDesde + ' por día' : 'Sin costo'}">S/ 0.50 por día</dd></div>
+                  <dd th:text="${'S/ ' + t.tarifaDesde + ' por día'}">S/ 0.50 por día</dd></div>
                 <div><dt><i class="fa-regular fa-calendar"></i> Horario</dt>
                   <dd th:classappend="${#strings.isEmpty(t.horario)} ? 'vacio'" th:text="${!#strings.isEmpty(t.horario) ? t.horario : 'No registrado'}">Lun a Sáb</dd></div>
                 <div><dt><i class="fa-solid fa-phone"></i> Teléfono</dt>
@@ -160,7 +206,7 @@
 
               <div class="rg-modal-pie">
                 <a class="rg-btn grande" th:if="${t.sedeActual}" th:href="@{/lector/catalogo}"><i class="fa-solid fa-book-open"></i> Ir al catálogo</a>
-                <button type="button" class="rg-btn grande" th:unless="${t.sedeActual}" data-ingresar><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
+                <button type="button" class="rg-btn grande" th:unless="${t.sedeActual}" data-ingresar th:attr="data-lib-id=${t.id},data-lib-nombre=${t.nombre},data-lib-miembro=${t.miembro ? '1' : '0'}"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
               </div>
             </div>
           </article>
@@ -186,6 +232,16 @@
       </div>
 
       <div class="rg-aviso" id="rgAviso" hidden></div>
+
+      <!-- Pantalla de carga al cambiar de librería (cubre todo, incluido el menú) -->
+      <div class="rg-carga" id="rgCarga" hidden role="status" aria-live="polite">
+        <div class="rg-carga-caja">
+          <img th:src="@{/img/LogoSinFodo.png}" alt="LibRed" class="rg-carga-logo">
+          <div class="rg-carga-spinner"></div>
+          <p class="rg-carga-texto" id="rgCargaTexto">Verificando tu cuenta…</p>
+          <small class="rg-carga-sub">Un momento, por favor</small>
+        </div>
+      </div>
 
     </div>
   </body>

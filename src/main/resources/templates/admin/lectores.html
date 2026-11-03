@@ -109,7 +109,7 @@
               <td style="text-align: center">
                 <!-- Botón Modificar -->
                 <button class="btn-accion-lec" title="Modificar"
-                        th:onclick="abrirModalEditarLector([[${lector.id}]], [[${lector.codigoLector}]], [[${lector.nombres}]], [[${lector.apellidos}]], [[${lector.telefono}]], [[${lector.estadoCuenta}]])">
+                        th:onclick="abrirModalEditarLector([[${lector.id}]], [[${lector.codigoLector}]], [[${lector.nombres}]], [[${lector.apellidos}]], [[${lector.telefono}]])">
                   <i class="fa-solid fa-pen"></i>
                 </button>
                 <!-- Botón Eliminar -->
@@ -158,11 +158,12 @@
 </div>
 
             <div style="margin-bottom: 25px;">
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Estado de Cuenta</label>
-              <select id="modalLectorEstado" name="estadoCuenta" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);">
-                <option value="HABILITADO">Habilitado</option>
-                <option value="SANCIONADO">Sancionado</option>
-              </select>
+              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Contraseña inicial</label>
+              <div style="position: relative;">
+                <input type="password" id="modalLectorPassword" name="password" placeholder="Entre 6 y 20 caracteres" minlength="6" maxlength="20" pattern="\S{6,20}" title="Entre 6 y 20 caracteres, sin espacios" autocomplete="new-password" style="width: 100%; padding: 10px 42px 10px 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+                <button type="button" id="modalLectorOjo" onclick="alternarPasswordLector()" aria-label="Mostrar u ocultar contraseña" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: none; background: none; cursor: pointer; color: var(--text-muted); padding: 6px;"><i class="fa-regular fa-eye" id="modalLectorOjoIcono"></i></button>
+              </div>
+              <div id="modalLectorPasswordAyuda" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 3px;">Sin espacios. El lector podrá cambiarla luego desde Ajustes.</div>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">

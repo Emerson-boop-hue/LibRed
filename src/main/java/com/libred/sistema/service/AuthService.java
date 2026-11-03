@@ -66,7 +66,38 @@ public class AuthService {
             return Optional.empty();
         }
 
-        Lector base = origen.get();
+        return Optional.of(crearRegistro(origen.get(), libreriaId));
+    }
+
+    /** Resultado de cambiar de librería desde Red Global. */
+    public record CambioSede(Lector lector, boolean creado, String libreriaNombre) {}
+
+    /**
+     * Pasa al lector (que ya inició sesión) a OTRA librería de la red sin volver a pedirle la contraseña.
+     * - Si ya tiene registro en esa librería: se usa ese (con su estado propio allí).
+     * - Si es su primera vez: se le crea automáticamente un registro nuevo, igual que en el login.
+     * Se identifica por el código de lector de su sesión actual, así nadie puede entrar a la cuenta de otra persona.
+     */
+    @Transactional
+    public CambioSede cambiarSede(Integer lectorIdActual, Integer libreriaId) {
+        Lector actual = lectorRepository.findById(lectorIdActual)
+                .orElseThrow(() -> new AjustesException(null, "Tu sesión ya no es válida. Inicia sesión de nuevo."));
+        Libreria destino = libreriaId == null ? null : libreriaRepository.findById(libreriaId).orElse(null);
+        if (destino == null) {
+            throw new AjustesException(null, "La librería que elegiste ya no existe en la red.");
+        }
+
+        Optional<Lector> yaRegistrado = lectorRepository.findAllByCodigoLector(actual.getCodigoLector()).stream()
+                .filter(l -> libreriaId.equals(l.getLibreriaId()))
+                .findFirst();
+        if (yaRegistrado.isPresent()) {
+            return new CambioSede(yaRegistrado.get(), false, destino.getNombreComercial());
+        }
+        return new CambioSede(crearRegistro(actual, libreriaId), true, destino.getNombreComercial());
+    }
+
+    // Registro nuevo del lector en otra librería, copiando sus datos
+    private Lector crearRegistro(Lector base, Integer libreriaId) {
         Lector nuevo = new Lector();
         nuevo.setCodigoLector(base.getCodigoLector());
         nuevo.setNombres(base.getNombres());
@@ -75,7 +106,7 @@ public class AuthService {
         nuevo.setPassword(base.getPassword());
         nuevo.setEstadoCuenta("HABILITADO"); // empieza limpio: las sanciones de otras librerías no lo afectan
         nuevo.setLibreriaId(libreriaId);
-        return Optional.of(lectorRepository.save(nuevo));
+        return lectorRepository.save(nuevo);
     }
 
     private boolean contrasenaCorrecta(Lector lector, String password) {

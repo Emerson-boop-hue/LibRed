@@ -1,0 +1,136 @@
+/* =====================================================================
+   MÓDULO AYUDA Y SOPORTE DEL LECTOR (tema azul)
+   La página no se desplaza: el lateral y la lista de preguntas tienen su propio scroll.
+   ===================================================================== */
+.lector-container:has(> .ay-guia) { overflow: hidden; }
+
+/* --- GUÍA RÁPIDA --- */
+.ay-guia {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    flex-shrink: 0;
+}
+.ay-tile {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px;
+    padding: 12px 14px; text-decoration: none; color: var(--text-dark);
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+.ay-tile:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 6px 16px rgba(30, 64, 175, 0.12); }
+.ay-tile-ico {
+    flex: 0 0 38px; height: 38px; border-radius: 10px;
+    background: var(--primary-soft); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.ay-tile strong { display: block; font-size: 0.88rem; }
+.ay-tile small { display: block; font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; margin-top: 1px; }
+
+/* --- DISTRIBUCIÓN --- */
+.ay-layout {
+    flex: 1; min-height: 0;
+    display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 18px;
+}
+.ay-lateral {
+    display: flex; flex-direction: column; gap: 14px;
+    overflow-y: auto; min-height: 0; padding-right: 2px;
+}
+.ay-card, .ay-faq {
+    background: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+}
+.ay-card { padding: 16px 18px; flex-shrink: 0; }
+.ay-card-titulo {
+    font-size: 0.74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    color: var(--primary); display: flex; align-items: center; gap: 8px;
+}
+
+/* --- TU LIBRERÍA --- */
+.ay-lib-nombre { font-size: 1.05rem; color: var(--text-dark); margin: 8px 0 10px; }
+.ay-datos { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.ay-datos li { display: flex; gap: 10px; font-size: 0.84rem; color: var(--text-dark); line-height: 1.4; }
+.ay-datos i { width: 16px; margin-top: 2px; color: var(--primary); flex-shrink: 0; text-align: center; }
+.ay-datos span { min-width: 0; overflow-wrap: anywhere; }
+.ay-nota {
+    margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--sidebar-border);
+    font-size: 0.76rem; color: var(--text-muted); line-height: 1.45;
+}
+
+/* --- REGLAS --- */
+.ay-reglas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0 14px; }
+.ay-regla { background: var(--bg-main); border-radius: 10px; padding: 10px 12px; }
+.ay-regla span { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 2px; }
+.ay-regla strong { font-size: 0.95rem; color: var(--text-dark); }
+.ay-tarifas-titulo { font-size: 0.76rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+.ay-tarifas { list-style: none; display: flex; flex-direction: column; }
+.ay-tarifas li {
+    display: flex; justify-content: space-between; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid var(--sidebar-border); font-size: 0.84rem;
+}
+.ay-tarifas li:last-child { border-bottom: 0; }
+.ay-tarifas strong { color: var(--primary); }
+.ay-tarifas .ay-vacio span { color: var(--text-muted); font-size: 0.8rem; }
+
+/* --- PREGUNTAS FRECUENTES --- */
+.ay-faq { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.ay-faq-cabecera { padding: 16px 18px 12px; border-bottom: 1px solid var(--sidebar-border); flex-shrink: 0; }
+.ay-buscador { position: relative; margin: 10px 0; }
+.ay-buscador i {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 0.85rem; pointer-events: none;
+}
+.ay-buscador input {
+    width: 100%; padding: 10px 12px 10px 34px; border: 1px solid var(--sidebar-border); border-radius: 8px;
+    font-size: 0.86rem; color: var(--text-dark); background: #fff; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+}
+.ay-buscador input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12); }
+.ay-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ay-chip {
+    border: 1px solid var(--sidebar-border); background: #fff; color: var(--sidebar-text);
+    border-radius: 999px; padding: 5px 13px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.ay-chip:hover { border-color: var(--primary); color: var(--primary); }
+.ay-chip.activo { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.ay-lista { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 18px 14px; }
+.ay-item { border-bottom: 1px solid var(--sidebar-border); }
+.ay-item[hidden] { display: none; }
+.ay-item summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 14px 2px; font-size: 0.92rem; font-weight: 600; color: var(--text-dark);
+}
+.ay-item summary::-webkit-details-marker { display: none; }
+.ay-item summary:hover { color: var(--primary); }
+.ay-item summary i { font-size: 0.75rem; color: var(--text-muted); transition: transform .2s; flex-shrink: 0; }
+.ay-item[open] summary { color: var(--primary); }
+.ay-item[open] summary i { transform: rotate(180deg); color: var(--primary); }
+.ay-resp {
+    padding: 0 2px 16px; font-size: 0.86rem; line-height: 1.6; color: var(--sidebar-text);
+    animation: ayAbre .2s ease;
+}
+.ay-resp strong { color: var(--text-dark); }
+@keyframes ayAbre { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.ay-sin-resultados { text-align: center; padding: 40px 10px; color: var(--text-muted); }
+.ay-sin-resultados[hidden] { display: none; }
+.ay-sin-resultados i { font-size: 1.8rem; margin-bottom: 10px; color: var(--primary); }
+.ay-sin-resultados p { font-weight: 600; color: var(--text-dark); }
+.ay-sin-resultados small { font-size: 0.8rem; }
+
+/* --- PANTALLAS PEQUEÑAS: se permite el scroll normal de la página --- */
+@media (max-width: 1100px) {
+    .ay-guia { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px), (max-height: 640px) {
+    .lector-container:has(> .ay-guia) { overflow-y: auto; }
+    .ay-layout { grid-template-columns: 1fr; flex: none; }
+    .ay-lateral { overflow: visible; }
+    .ay-faq { overflow: visible; }
+    .ay-lista { overflow: visible; }
+}
+@media (max-width: 600px) {
+    .ay-guia { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

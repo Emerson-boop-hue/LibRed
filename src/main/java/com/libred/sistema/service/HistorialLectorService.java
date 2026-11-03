@@ -2,6 +2,7 @@ package com.libred.sistema.service;
 
 import com.libred.sistema.model.CategoriaRecurso;
 import com.libred.sistema.model.Devolucion;
+import com.libred.sistema.model.HistorialLectorVista.FilaCalificacion;
 import com.libred.sistema.model.HistorialLectorVista.FilaMulta;
 import com.libred.sistema.model.HistorialLectorVista.FilaPrestamo;
 import com.libred.sistema.model.HistorialLectorVista.Pantalla;
@@ -10,6 +11,8 @@ import com.libred.sistema.model.Libreria;
 import com.libred.sistema.model.Multa;
 import com.libred.sistema.model.Prestamo;
 import com.libred.sistema.model.Recurso;
+import com.libred.sistema.model.Calificacion;
+import com.libred.sistema.repository.CalificacionRepository;
 import com.libred.sistema.repository.DevolucionRepository;
 import com.libred.sistema.repository.LectorRepository;
 import com.libred.sistema.repository.LibreriaRepository;
@@ -44,17 +47,23 @@ public class HistorialLectorService {
     private final PrestamoRepository prestamoRepository;
     private final DevolucionRepository devolucionRepository;
     private final MultaRepository multaRepository;
+    private final CalificacionRepository calificacionRepository;
+    private final CalificacionService calificacionService;
 
     public HistorialLectorService(LectorRepository lectorRepository,
                                   LibreriaRepository libreriaRepository,
                                   PrestamoRepository prestamoRepository,
                                   DevolucionRepository devolucionRepository,
-                                  MultaRepository multaRepository) {
+                                  MultaRepository multaRepository,
+                                  CalificacionRepository calificacionRepository,
+                                  CalificacionService calificacionService) {
         this.lectorRepository = lectorRepository;
         this.libreriaRepository = libreriaRepository;
         this.prestamoRepository = prestamoRepository;
         this.devolucionRepository = devolucionRepository;
         this.multaRepository = multaRepository;
+        this.calificacionRepository = calificacionRepository;
+        this.calificacionService = calificacionService;
     }
 
     @Transactional(readOnly = true)
@@ -74,16 +83,37 @@ public class HistorialLectorService {
             devoluciones.put(d.getPrestamo().getId(), d);
         }
 
+        // Estrellas que el lector ya dio a cada préstamo
+        Map<Integer, Integer> calificaciones = new HashMap<>();
+        Map<Integer, Calificacion> calificacionPorPrestamo = new HashMap<>();
+        for (Calificacion c : calificacionRepository.findByLectorId(lectorId)) {
+            calificaciones.put(c.getPrestamoId(), c.getEstrellas());
+            calificacionPorPrestamo.put(c.getPrestamoId(), c);
+        }
+        List<FilaCalificacion> filasCalificacion = new ArrayList<>();
+
         List<FilaPrestamo> filasPrestamo = new ArrayList<>();
+        int porCalificar = 0;
         TreeSet<String> categorias = new TreeSet<>();
         int enCurso = 0;
         int devueltos = 0;
         for (Prestamo p : prestamoRepository.findByLectorIdOrderByFechaPrestamoDesc(lectorId)) {
-            FilaPrestamo fila = aFilaPrestamo(p, devoluciones.get(p.getId()), hoy);
+            FilaPrestamo fila = aFilaPrestamo(p, devoluciones.get(p.getId()), hoy,
+                    calificaciones.getOrDefault(p.getId(), 0));
             filasPrestamo.add(fila);
+            Calificacion cal = calificacionPorPrestamo.get(p.getId());
+            if (cal != null) {
+                filasCalificacion.add(new FilaCalificacion(p.getId(), fila.getTitulo(), fila.getCodigo(), fila.getCategoria(),
+                        cal.getEstrellas(), calificacionService.etiqueta(cal.getEstrellas()),
+                        cal.getFechaCalificacion() == null ? "—" : cal.getFechaCalificacion().format(FECHA),
+                        cal.isModificada()));
+            }
             categorias.add(fila.getCategoria());
             if ("DEVUELTO".equals(fila.getEstado())) {
                 devueltos++;
+                if (fila.getCalificacion() == 0) {
+                    porCalificar++;
+                }
             } else {
                 enCurso++;
             }
@@ -107,10 +137,10 @@ public class HistorialLectorService {
         }
 
         return Optional.of(new Pantalla(sede, filasPrestamo.size(), enCurso, devueltos, multasPendientes,
-                montoPendiente, filasPrestamo, filasMulta, new ArrayList<>(categorias)));
+                montoPendiente, filasPrestamo, filasMulta, new ArrayList<>(categorias), porCalificar, filasCalificacion));
     }
 
-    private FilaPrestamo aFilaPrestamo(Prestamo p, Devolucion dev, LocalDate hoy) {
+    private FilaPrestamo aFilaPrestamo(Prestamo p, Devolucion dev, LocalDate hoy, int calificacion) {
         Recurso r = p.getRecurso();
         LocalDate limite = p.getFechaDevolucionLimite();
         boolean devuelto = "DEVUELTO".equalsIgnoreCase(p.getEstadoPrestamo());
@@ -160,6 +190,6 @@ public class HistorialLectorService {
                 CategoriaRecurso.desdeValor(r.getTipoRecurso()).getEtiqueta(),
                 p.getFechaPrestamo() == null ? "—" : p.getFechaPrestamo().format(FECHA),
                 limite == null ? "—" : limite.format(FECHA), devueltoEl, dias, p.getMontoServicio(),
-                cargos, detalleCargos, estado, texto, detalle);
+                cargos, detalleCargos, estado, texto, detalle, calificacion);
     }
 }
