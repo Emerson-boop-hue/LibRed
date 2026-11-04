@@ -6,10 +6,10 @@ import java.util.List;
 /** Datos de la Vista General del lector (su resumen en la librería donde está). */
 public class PanelLectorVista {
 
-    // ---- Cabecera ----
+    // ---- Cabecera (va en el título de la página) ----
     private final String saludo;          // "Buenas noches"
     private final String nombre;          // primer nombre
-    private final String fechaHoy;        // "lunes, 2 de noviembre"
+    private final String fechaHoy;        // "Lunes, 2 de noviembre"
     private final String estadoCuenta;    // HABILITADO / SANCIONADO
 
     // ---- Números ----
@@ -24,32 +24,42 @@ public class PanelLectorVista {
     private final long calificadas;
     private final String promedioCalif;
 
-    private final List<Alerta> alertas;
+    private final long vencidos;           // préstamos con la fecha límite ya pasada
+    private final String vencidoTitulo;    // el más atrasado (para decirle qué devolver); null si no hay
+    private final long porCalificar;      // préstamos devueltos que todavía no calificó (recordatorio flotante)
     private final List<EnCurso> enCurso;
-    private final List<Novedad> novedades;
+
+    // ---- Gráficos de "Tu actividad" ----
+    private final List<Mes> meses;             // préstamos por mes (últimos 6)
+    private final List<Categoria> categorias;  // préstamos por categoría (de mayor a menor)
+    private final long totalPrestamos;
+    private final int puntualidad;             // % de devoluciones a tiempo; -1 si todavía no hay devoluciones
 
     // ---- Su librería y su red ----
     private final String sedeNombre;
     private final String sedeIniciales;
-    private final String sedeDireccion;
     private final String sedeHorario;
-    private final List<SedeRed> otrasSedes;
+    private final List<SedeRed> otrasSedes;    // las primeras 3
+    private final int otrasMas;                // cuántas más hay (no se muestran)
 
     public PanelLectorVista(String saludo, String nombre, String fechaHoy, String estadoCuenta,
                             long activos, Integer maxActivos, String proximaNivel, String proximaValor,
                             String proximaDetalle, long multasPendientes, BigDecimal montoPendiente,
                             long devueltos, long calificadas, String promedioCalif,
-                            List<Alerta> alertas, List<EnCurso> enCurso, List<Novedad> novedades,
-                            String sedeNombre, String sedeIniciales, String sedeDireccion, String sedeHorario,
-                            List<SedeRed> otrasSedes) {
+                            long vencidos, String vencidoTitulo, long porCalificar, List<EnCurso> enCurso,
+                            List<Mes> meses, List<Categoria> categorias, long totalPrestamos, int puntualidad,
+                            String sedeNombre, String sedeIniciales, String sedeHorario,
+                            List<SedeRed> otrasSedes, int otrasMas) {
         this.saludo = saludo; this.nombre = nombre; this.fechaHoy = fechaHoy; this.estadoCuenta = estadoCuenta;
         this.activos = activos; this.maxActivos = maxActivos; this.proximaNivel = proximaNivel;
         this.proximaValor = proximaValor; this.proximaDetalle = proximaDetalle;
         this.multasPendientes = multasPendientes; this.montoPendiente = montoPendiente;
         this.devueltos = devueltos; this.calificadas = calificadas; this.promedioCalif = promedioCalif;
-        this.alertas = alertas; this.enCurso = enCurso; this.novedades = novedades;
-        this.sedeNombre = sedeNombre; this.sedeIniciales = sedeIniciales;
-        this.sedeDireccion = sedeDireccion; this.sedeHorario = sedeHorario; this.otrasSedes = otrasSedes;
+        this.vencidos = vencidos; this.vencidoTitulo = vencidoTitulo; this.porCalificar = porCalificar; this.enCurso = enCurso;
+        this.meses = meses; this.categorias = categorias; this.totalPrestamos = totalPrestamos;
+        this.puntualidad = puntualidad;
+        this.sedeNombre = sedeNombre; this.sedeIniciales = sedeIniciales; this.sedeHorario = sedeHorario;
+        this.otrasSedes = otrasSedes; this.otrasMas = otrasMas;
     }
 
     public String getSaludo() { return saludo; }
@@ -68,28 +78,46 @@ public class PanelLectorVista {
     public long getDevueltos() { return devueltos; }
     public long getCalificadas() { return calificadas; }
     public String getPromedioCalif() { return promedioCalif; }
-    public List<Alerta> getAlertas() { return alertas; }
+    public long getVencidos() { return vencidos; }
+    public String getVencidoTitulo() { return vencidoTitulo; }
+    public long getPorCalificar() { return porCalificar; }
     public List<EnCurso> getEnCurso() { return enCurso; }
-    public List<Novedad> getNovedades() { return novedades; }
+    public List<Mes> getMeses() { return meses; }
+    public List<Categoria> getCategorias() { return categorias; }
+    public long getTotalPrestamos() { return totalPrestamos; }
+    public int getPuntualidad() { return puntualidad; }
+    public boolean isConPuntualidad() { return puntualidad >= 0; }
     public String getSedeNombre() { return sedeNombre; }
     public String getSedeIniciales() { return sedeIniciales; }
-    public String getSedeDireccion() { return sedeDireccion; }
     public String getSedeHorario() { return sedeHorario; }
     public List<SedeRed> getOtrasSedes() { return otrasSedes; }
+    public int getOtrasMas() { return otrasMas; }
 
-    /** Aviso prioritario de la parte de arriba. nivel: peligro | aviso | ok | info. */
-    public static class Alerta {
-        private final String nivel, icono, titulo, detalle, enlace, boton;
-        public Alerta(String nivel, String icono, String titulo, String detalle, String enlace, String boton) {
-            this.nivel = nivel; this.icono = icono; this.titulo = titulo;
-            this.detalle = detalle; this.enlace = enlace; this.boton = boton;
+    /** Barra del gráfico de préstamos por mes. */
+    public static class Mes {
+        private final String etiqueta;
+        private final long cantidad;
+        private final int porcentaje; // altura de la barra respecto al mes con más préstamos
+        public Mes(String etiqueta, long cantidad, int porcentaje) {
+            this.etiqueta = etiqueta; this.cantidad = cantidad; this.porcentaje = porcentaje;
         }
-        public String getNivel() { return nivel; }
+        public String getEtiqueta() { return etiqueta; }
+        public long getCantidad() { return cantidad; }
+        public int getPorcentaje() { return porcentaje; }
+    }
+
+    /** Barra horizontal del gráfico de préstamos por categoría. */
+    public static class Categoria {
+        private final String etiqueta, icono;
+        private final long cantidad;
+        private final int porcentaje; // ancho de la barra respecto a la categoría con más préstamos
+        public Categoria(String etiqueta, String icono, long cantidad, int porcentaje) {
+            this.etiqueta = etiqueta; this.icono = icono; this.cantidad = cantidad; this.porcentaje = porcentaje;
+        }
+        public String getEtiqueta() { return etiqueta; }
         public String getIcono() { return icono; }
-        public String getTitulo() { return titulo; }
-        public String getDetalle() { return detalle; }
-        public String getEnlace() { return enlace; }
-        public String getBoton() { return boton; }
+        public long getCantidad() { return cantidad; }
+        public int getPorcentaje() { return porcentaje; }
     }
 
     /** Un préstamo en curso (ACTIVO o VENCIDO) con su barra de tiempo. */
@@ -108,23 +136,6 @@ public class PanelLectorVista {
         public String getRestante() { return restante; }
         public String getNivel() { return nivel; }   // ok | pronto | vencido
         public int getPorcentaje() { return porcentaje; }
-    }
-
-    /** Artículo recién agregado al catálogo de la librería. */
-    public static class Novedad {
-        private final Integer id;
-        private final String titulo, autor, categoria, icono;
-        private final int disponibles;
-        public Novedad(Integer id, String titulo, String autor, String categoria, String icono, int disponibles) {
-            this.id = id; this.titulo = titulo; this.autor = autor;
-            this.categoria = categoria; this.icono = icono; this.disponibles = disponibles;
-        }
-        public Integer getId() { return id; }
-        public String getTitulo() { return titulo; }
-        public String getAutor() { return autor; }
-        public String getCategoria() { return categoria; }
-        public String getIcono() { return icono; }
-        public int getDisponibles() { return disponibles; }
     }
 
     /** Otra librería donde el lector ya está registrado (para saltar a ella). */

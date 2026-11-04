@@ -31,12 +31,6 @@ public class LectorPanelController {
             return "redirect:/login";
         }
         model.addAttribute("p", vista.get());
-        // Aviso de "Ahora estás en ..." tras cambiar de librería desde Red Global (se muestra una sola vez)
-        Object avisoSede = session.getAttribute("avisoSede");
-        if (avisoSede != null) {
-            model.addAttribute("avisoSede", avisoSede);
-            session.removeAttribute("avisoSede");
-        }
         return "lector/panel_lector";
     }
 

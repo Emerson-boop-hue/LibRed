@@ -47,10 +47,6 @@ public class CambioSedeController {
         session.setAttribute("lectorId", l.getId());
         session.setAttribute("lectorNombre", l.getNombres() + " " + l.getApellidos());
         session.setAttribute("lectorCodigo", l.getCodigoLector());
-        // Aviso que se muestra una sola vez en la Vista General
-        session.setAttribute("avisoSede", cambio.creado()
-                ? "Te damos la bienvenida a " + cambio.libreriaNombre() + ". Creamos tu cuenta con tus mismos datos."
-                : "Ahora estás en " + cambio.libreriaNombre() + ".");
 
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("ok", true);

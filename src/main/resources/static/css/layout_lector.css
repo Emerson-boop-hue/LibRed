@@ -433,3 +433,101 @@ body {
     .lector-container { padding: 8px 16px 24px 16px; }
     .topbar { padding: 0 16px; }
 }
+
+/* --- ENCABEZADO: modo oscuro e invitar --- */
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.theme-toggle {
+    display: flex; background: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 20px; padding: 3px;
+}
+.theme-btn {
+    border: 0; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 50%;
+    width: 30px; height: 28px; font-size: .82rem; display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+}
+.theme-btn:hover { color: var(--text-dark); }
+.theme-btn.activo { background: var(--primary); color: #fff; box-shadow: 0 2px 6px rgba(30, 64, 175, .3); }
+.btn-invite {
+    background: var(--primary); color: #fff; border: 0; border-radius: 10px; padding: 9px 18px; font-size: .85rem;
+    font-weight: 600; font-family: inherit; cursor: pointer; transition: opacity .2s, transform .15s;
+}
+.btn-invite:hover { opacity: .92; transform: translateY(-1px); }
+
+/* --- MODAL INVITAR --- */
+.modal-content.modal-invitar { width: 100%; max-width: 440px; text-align: center; padding: 28px; }
+.invitar-cerrar { position: absolute; top: 12px; right: 14px; background: none; border: 0; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; }
+.invitar-icono {
+    width: 54px; height: 54px; border-radius: 50%; margin: 0 auto 12px; background: var(--primary-soft); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.modal-invitar h3 { font-size: 1.15rem; color: var(--text-dark); margin-bottom: 6px; }
+.invitar-sub { font-size: .84rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px; }
+.invitar-texto {
+    width: 100%; resize: none; border: 1px solid var(--sidebar-border); border-radius: 10px; padding: 12px; font-family: inherit;
+    font-size: .84rem; line-height: 1.5; color: var(--text-dark); background: var(--bg-main); text-align: left; margin-bottom: 14px;
+}
+.invitar-acciones { display: flex; gap: 10px; }
+.btn-copiar, .btn-whatsapp {
+    flex: 1; border-radius: 10px; padding: 10px 12px; font-size: .85rem; font-weight: 600; font-family: inherit; cursor: pointer;
+    text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-copiar { background: var(--card-bg); color: var(--primary); border: 1px solid var(--sidebar-border); }
+.btn-copiar:hover { background: var(--sidebar-hover-bg); }
+.btn-copiar.listo { color: #16a34a; border-color: #86efac; }
+.btn-whatsapp { background: #16a34a; color: #fff; border: 1px solid #16a34a; }
+.btn-whatsapp:hover { opacity: .92; }
+
+/* =====================================================================
+   MODO OSCURO (se activa con data-tema="oscuro" en <html>)
+   Casi todo usa las variables de color; abajo se ajustan los fondos blancos fijos de cada módulo.
+   ===================================================================== */
+[data-tema="oscuro"] {
+    --bg-main: #0b1226;
+    --sidebar-bg: #111a33;
+    --sidebar-border: #26334f;
+    --sidebar-text: #a9b6d3;
+    --sidebar-hover-bg: #1a2644;
+    --primary: #4f86f7;
+    --primary-dark: #1e3a8a;
+    --primary-soft: #1e2d57;
+    --active-bg: #1e40af;
+    --text-dark: #e6ecfa;
+    --text-muted: #93a3c4;
+    --card-bg: #16203b;
+    color-scheme: dark;
+}
+/* Logo: en modo oscuro se usa la versión con letras claras (LogoModoOscuro.png), sin pastilla blanca */
+.sidebar-logo.logo-claro { height: 89px; width: auto; flex-shrink: 0; margin: -26px 0 -26px -13px; }
+.sidebar-logo.logo-oscuro { display: none; }
+[data-tema="oscuro"] .sidebar-logo.logo-claro { display: none; }
+[data-tema="oscuro"] .sidebar-logo.logo-oscuro { display: block; }
+[data-tema="oscuro"] .sidebar.collapsed .sidebar-logo { display: none; }
+@media (max-width: 900px) { [data-tema="oscuro"] .sidebar .sidebar-logo { display: none; } }
+[data-tema="oscuro"] .btn-primario, [data-tema="oscuro"] .btn-invite { color: #fff; }
+/* Campos y superficies que en cada módulo estaban en blanco fijo */
+[data-tema="oscuro"] .aj-campo input,
+[data-tema="oscuro"] .ay-buscador input,
+[data-tema="oscuro"] .ay-chip,
+[data-tema="oscuro"] .campo input,
+[data-tema="oscuro"] .campo select,
+[data-tema="oscuro"] .hs-campo input,
+[data-tema="oscuro"] .hs-campo select,
+[data-tema="oscuro"] .hs-modal-caja,
+[data-tema="oscuro"] .hs-btn-sec,
+[data-tema="oscuro"] .hs-btn-cambiar,
+[data-tema="oscuro"] .pl-campo input,
+[data-tema="oscuro"] .pl-campo select,
+[data-tema="oscuro"] .rg-campo input,
+[data-tema="oscuro"] .rg-campo select,
+[data-tema="oscuro"] .rg-chip.mas,
+[data-tema="oscuro"] .rg-modal-caja {
+    background: var(--card-bg);
+    color: var(--text-dark);
+}
+[data-tema="oscuro"] input::placeholder, [data-tema="oscuro"] textarea::placeholder { color: var(--text-muted); }
+[data-tema="oscuro"] .pn-anillo { background: conic-gradient(#22c55e calc(var(--p) * 1%), #26334f 0); }
+[data-tema="oscuro"] .modal-overlay { background: rgba(2, 6, 18, 0.78); }
+[data-tema="oscuro"] .pn-sede-actual { color: #c7d7ff; background: #24366b; }
+[data-tema="oscuro"] .pn-estado-chip.habilitada { color: #bbf7d0; background: #14532d; }
+[data-tema="oscuro"] .pn-kpi.nivel-ok .pn-kpi-valor, [data-tema="oscuro"] .pn-fila-rest { color: #4ade80; }
+[data-tema="oscuro"] .pn-fila.nivel-pronto .pn-fila-rest, [data-tema="oscuro"] .pn-kpi.nivel-pronto .pn-kpi-valor { color: #fb923c; }
+[data-tema="oscuro"] .pn-fila.nivel-vencido .pn-fila-rest, [data-tema="oscuro"] .pn-kpi.nivel-vencido .pn-kpi-valor { color: #f87171; }

@@ -192,3 +192,72 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") cerrarModalLogout();
   });
 });
+
+// ---------- Modo claro / oscuro ----------
+function aplicarTema(tema) {
+  if (tema === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro");
+  else document.documentElement.removeAttribute("data-tema");
+  document.querySelectorAll("[data-tema-btn]").forEach((b) => {
+    b.classList.toggle("activo", b.dataset.temaBtn === (tema === "oscuro" ? "oscuro" : "claro"));
+  });
+}
+
+document.addEventListener("click", (e) => {
+  const boton = e.target.closest("[data-tema-btn]");
+  if (!boton) return;
+  const tema = boton.dataset.temaBtn;
+  aplicarTema(tema);
+  try {
+    localStorage.setItem("lectorTema", tema);
+  } catch (err) {
+    /* sin almacenamiento: el tema solo dura mientras la página esté abierta */
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  aplicarTema(document.documentElement.getAttribute("data-tema") === "oscuro" ? "oscuro" : "claro");
+});
+
+// ---------- Invitar a un amigo ----------
+function textoInvitacion() {
+  const nombre = (document.querySelector(".user-name") || {}).textContent || "";
+  const quien = nombre.trim() ? "Soy " + nombre.trim() + " y " : "";
+  return "¡Hola! " + quien + "uso LibRed, una red de librerías donde puedes pedir prestados libros, mangas, cómics y más, " +
+         "y llevar el control de tus préstamos desde la web. Regístrate en tu librería y entra aquí: " + window.location.origin;
+}
+
+function abrirModalInvitar() {
+  const texto = textoInvitacion();
+  document.getElementById("invitarTexto").value = texto;
+  document.getElementById("invitarWhatsapp").href = "https://wa.me/?text=" + encodeURIComponent(texto);
+  document.getElementById("invitarCopiarTxt").textContent = "Copiar mensaje";
+  document.querySelector(".btn-copiar").classList.remove("listo");
+  document.getElementById("modalInvitar").classList.add("active");
+}
+
+function cerrarModalInvitar() {
+  document.getElementById("modalInvitar").classList.remove("active");
+}
+
+function copiarInvitacion() {
+  const area = document.getElementById("invitarTexto");
+  const listo = () => {
+    document.getElementById("invitarCopiarTxt").textContent = "¡Copiado!";
+    document.querySelector(".btn-copiar").classList.add("listo");
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(area.value).then(listo).catch(() => {
+      area.select();
+      try { document.execCommand("copy"); listo(); } catch (e) { /* el usuario puede copiar a mano */ }
+    });
+  } else {
+    area.select();
+    try { document.execCommand("copy"); listo(); } catch (e) { /* el usuario puede copiar a mano */ }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const m = document.getElementById("modalInvitar");
+  if (m) m.addEventListener("click", (e) => { if (e.target === m) cerrarModalInvitar(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarModalInvitar(); });
+});

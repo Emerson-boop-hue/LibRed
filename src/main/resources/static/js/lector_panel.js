@@ -60,4 +60,29 @@
   }
 
   document.querySelectorAll(".pn-sede-chip").forEach((b) => b.addEventListener("click", () => entrar(b)));
+
+  // Tarjeta de sanción / vencido (esquina): abre y cierra la ventana con el detalle
+  const esquina = document.getElementById("pnEsquina");
+  const modal = document.getElementById("pnModal");
+  if (esquina && modal) {
+    const abrir = () => { modal.hidden = false; };
+    const cerrar = () => { modal.hidden = true; esquina.focus(); };
+    esquina.addEventListener("click", abrir);
+    document.getElementById("pnModalX").addEventListener("click", cerrar);
+    document.getElementById("pnModalCerrar").addEventListener("click", cerrar);
+    modal.addEventListener("click", (e) => { if (e.target === modal) cerrar(); });
+    const teclado = (e) => {
+      if (!modal.isConnected) { document.removeEventListener("keydown", teclado); return; } // el layout cambió de módulo
+      if (e.key === "Escape" && !modal.hidden) cerrar();
+    };
+    document.addEventListener("keydown", teclado);
+  }
+
+  // Pestañas del gráfico "Tu actividad": Por mes / Por categoría
+  const tabs = Array.from(document.querySelectorAll(".pn-tab"));
+  const paneles = Array.from(document.querySelectorAll(".pn-panel"));
+  tabs.forEach((t) => t.addEventListener("click", () => {
+    tabs.forEach((x) => x.classList.toggle("activo", x === t));
+    paneles.forEach((p) => { p.hidden = p.dataset.panel !== t.dataset.tab; });
+  }));
 })();

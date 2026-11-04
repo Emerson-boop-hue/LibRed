@@ -17,6 +17,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- Tema recordado: se aplica antes de pintar la página para que no parpadee -->
+    <script>
+      try { if (localStorage.getItem("lectorTema") === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro"); } catch (e) {}
+    </script>
     <link rel="stylesheet" th:href="@{/css/layout_lector.css}" />
     <link
       id="dynamic-specific-css"
@@ -29,10 +33,18 @@
     <!-- BARRA LATERAL -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
+        <!-- Dos versiones del logo: el CSS muestra una u otra según el tema (claro / oscuro) -->
         <img
           th:src="@{/img/LogoSinFodo.png}"
           alt="LibRed Logo"
-          class="sidebar-logo"
+          class="sidebar-logo logo-claro"
+          width="109"
+          height="48"
+        />
+        <img
+          th:src="@{/img/LogoModoOscuro.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo logo-oscuro"
           width="109"
           height="48"
         />
@@ -112,6 +124,15 @@
           <h1 th:text="${titulo}">Título</h1>
           <p th:text="${descripcion}">Descripción</p>
         </div>
+
+        <div class="topbar-actions">
+          <!-- Modo claro / oscuro -->
+          <div class="theme-toggle" role="group" aria-label="Tema de la interfaz">
+            <button type="button" class="theme-btn" data-tema-btn="claro" title="Modo claro" aria-label="Modo claro"><i class="fa-regular fa-sun"></i></button>
+            <button type="button" class="theme-btn" data-tema-btn="oscuro" title="Modo oscuro" aria-label="Modo oscuro"><i class="fa-regular fa-moon"></i></button>
+          </div>
+          <button type="button" class="btn-invite" onclick="abrirModalInvitar()">+ Invitar</button>
+        </div>
       </header>
 
       <!-- AQUÍ SE INYECTA EL CONTENIDO ESPECÍFICO DE CADA MÓDULO -->
@@ -129,6 +150,21 @@
             <button type="button" class="btn-volver" onclick="cerrarModalLogout()">Volver</button>
             <a href="/lector/logout" class="btn-confirmar-salir">Sí, cerrar sesión</a>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL PARA INVITAR A UN AMIGO -->
+    <div id="modalInvitar" class="modal-overlay">
+      <div class="modal-content modal-invitar">
+        <button type="button" class="invitar-cerrar" onclick="cerrarModalInvitar()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="invitar-icono"><i class="fa-solid fa-user-plus"></i></div>
+        <h3>Invita a un amigo a LibRed</h3>
+        <p class="invitar-sub">Comparte este mensaje. Para usar LibRed, tu amigo solo debe registrarse en su librería.</p>
+        <textarea id="invitarTexto" class="invitar-texto" rows="5" readonly></textarea>
+        <div class="invitar-acciones">
+          <button type="button" class="btn-copiar" onclick="copiarInvitacion()"><i class="fa-regular fa-copy"></i> <span id="invitarCopiarTxt">Copiar mensaje</span></button>
+          <a id="invitarWhatsapp" class="btn-whatsapp" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
         </div>
       </div>
     </div>
