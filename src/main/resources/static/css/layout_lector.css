@@ -25,6 +25,35 @@
     --text-dark: #0f1b3d;
     --text-muted: #5f6f8f;
     --card-bg: #ffffff;
+
+    /* ---- Variables nuevas (v2 modo oscuro) ----
+       En modo claro valen EXACTAMENTE los colores que antes estaban escritos a mano en cada módulo,
+       así el modo claro se ve igual que siempre. El bloque [data-tema="oscuro"] les da su valor oscuro. */
+    --primary-strong: #1e3a8a;          /* texto azul sobre fondos azul suave */
+    --surface-input: #ffffff;           /* campos de formulario */
+    --surface-2: #f1f5fb;               /* cajas internas y campos de solo lectura */
+    --surface-soft: #f8faff;            /* encabezados de tabla y comprobante */
+    --surface-hover: #f8faff;           /* fila de tabla al pasar el cursor */
+    --faint: #aebfe6;                   /* bordes punteados e iconos tenues */
+    --primary-soft-border: #b9ccff;
+    --primary-hover-border: #93b0f0;
+    --focus-ring: rgba(30, 64, 175, 0.12);
+    --track: #dbe3f0;                   /* pistas de barras */
+    --star-off: #cbd5e1;                /* estrellas apagadas */
+    --toast-bg: #0f1b3d;
+
+    /* Estados: éxito, peligro, informativo y aviso */
+    --ok-bg: #dcfce7;      --ok-text: #166534;      --ok-accent: #15803d;   --ok-icon: #16a34a;
+    --danger-bg: #fee2e2;  --danger-text: #b91c1c;  --danger-border: #fca5a5;  --danger-icon: #dc2626;  --danger-bg-soft: #fff7f7;
+    --info-bg: #dbeafe;    --info-text: #1d4ed8;
+    --warn-bg: #fef3c7;    --warn-text: #92400e;    --warn-border: #fcd34d;  --warn-accent: #c2410c;
+    --warn-bg-soft: #fffbeb;  --warn-border-soft: #fde68a;
+
+    /* Tarjeta de "la librería donde estoy" (Red Global) */
+    --sede-bg: linear-gradient(160deg, #e6eeff 0%, #f4f8ff 55%, #ffffff 100%);
+    --sede-shadow: 0 0 0 4px rgba(30, 64, 175, 0.12), 0 10px 24px rgba(30, 64, 175, 0.16);
+    --sede-celda: rgba(255, 255, 255, 0.75);
+    --cinta-bg: linear-gradient(90deg, #1e40af, #3b6fe0);
 }
 
 body {
@@ -157,7 +186,7 @@ body {
 
 .nav-item:hover {
     background-color: var(--sidebar-hover-bg);
-    color: var(--primary-dark);
+    color: var(--primary-strong);
 }
 
 .nav-item.active {
@@ -229,11 +258,11 @@ body {
 }
 
 .logout-btn {
-    color: #dc2626 !important;
+    color: var(--danger-icon) !important;
     margin-bottom: 0;
 }
 .logout-btn:hover {
-    background-color: #fee2e2 !important;
+    background-color: var(--danger-bg) !important;
 }
 
 /* --- CONTENIDO PRINCIPAL --- */
@@ -385,8 +414,8 @@ body {
 .logout-icon {
     width: 55px;
     height: 55px;
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--danger-bg);
+    color: var(--danger-icon);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -493,6 +522,30 @@ body {
     --text-dark: #e6ecfa;
     --text-muted: #93a3c4;
     --card-bg: #16203b;
+
+    --primary-strong: #c7d7ff;
+    --surface-input: #101a34;
+    --surface-2: #1b2745;
+    --surface-soft: #1a2644;
+    --surface-hover: #202e55;
+    --faint: #4a5c88;
+    --primary-soft-border: #35519a;
+    --primary-hover-border: #4468b8;
+    --focus-ring: rgba(79, 134, 247, 0.30);
+    --track: #2a3858;
+    --star-off: #3a4a6b;
+    --toast-bg: #2a3b66;
+
+    --ok-bg: rgba(34, 197, 94, 0.16);      --ok-text: #86efac;      --ok-accent: #4ade80;   --ok-icon: #4ade80;
+    --danger-bg: rgba(239, 68, 68, 0.18);  --danger-text: #fca5a5;  --danger-border: rgba(248, 113, 113, 0.45);  --danger-icon: #f87171;  --danger-bg-soft: rgba(239, 68, 68, 0.10);
+    --info-bg: rgba(59, 130, 246, 0.20);   --info-text: #93c5fd;
+    --warn-bg: rgba(245, 158, 11, 0.18);   --warn-text: #fcd34d;    --warn-border: rgba(245, 158, 11, 0.45);  --warn-accent: #fb923c;
+    --warn-bg-soft: rgba(245, 158, 11, 0.12);  --warn-border-soft: rgba(245, 158, 11, 0.35);
+
+    --sede-bg: linear-gradient(160deg, #1f3a78 0%, #1a2d5e 55%, #16203b 100%);
+    --sede-shadow: 0 0 0 4px rgba(79, 134, 247, 0.22), 0 10px 28px rgba(0, 0, 0, 0.45);
+    --sede-celda: rgba(255, 255, 255, 0.07);
+    --cinta-bg: linear-gradient(90deg, #1e40af, #2f5fd0);
     color-scheme: dark;
 }
 /* Logo: en modo oscuro se usa la versión con letras claras (LogoModoOscuro.png), sin pastilla blanca */
@@ -503,31 +556,11 @@ body {
 [data-tema="oscuro"] .sidebar.collapsed .sidebar-logo { display: none; }
 @media (max-width: 900px) { [data-tema="oscuro"] .sidebar .sidebar-logo { display: none; } }
 [data-tema="oscuro"] .btn-primario, [data-tema="oscuro"] .btn-invite { color: #fff; }
-/* Campos y superficies que en cada módulo estaban en blanco fijo */
-[data-tema="oscuro"] .aj-campo input,
-[data-tema="oscuro"] .ay-buscador input,
-[data-tema="oscuro"] .ay-chip,
-[data-tema="oscuro"] .campo input,
-[data-tema="oscuro"] .campo select,
-[data-tema="oscuro"] .hs-campo input,
-[data-tema="oscuro"] .hs-campo select,
-[data-tema="oscuro"] .hs-modal-caja,
-[data-tema="oscuro"] .hs-btn-sec,
-[data-tema="oscuro"] .hs-btn-cambiar,
-[data-tema="oscuro"] .pl-campo input,
-[data-tema="oscuro"] .pl-campo select,
-[data-tema="oscuro"] .rg-campo input,
-[data-tema="oscuro"] .rg-campo select,
-[data-tema="oscuro"] .rg-chip.mas,
-[data-tema="oscuro"] .rg-modal-caja {
-    background: var(--card-bg);
-    color: var(--text-dark);
-}
+/* Los campos, modales y chips ya usan las variables de superficie (--surface-input, --card-bg...): no necesitan parches aquí */
 [data-tema="oscuro"] input::placeholder, [data-tema="oscuro"] textarea::placeholder { color: var(--text-muted); }
 [data-tema="oscuro"] .pn-anillo { background: conic-gradient(#22c55e calc(var(--p) * 1%), #26334f 0); }
 [data-tema="oscuro"] .modal-overlay { background: rgba(2, 6, 18, 0.78); }
 [data-tema="oscuro"] .pn-sede-actual { color: #c7d7ff; background: #24366b; }
-[data-tema="oscuro"] .pn-estado-chip.habilitada { color: #bbf7d0; background: #14532d; }
 [data-tema="oscuro"] .pn-kpi.nivel-ok .pn-kpi-valor, [data-tema="oscuro"] .pn-fila-rest { color: #4ade80; }
 [data-tema="oscuro"] .pn-fila.nivel-pronto .pn-fila-rest, [data-tema="oscuro"] .pn-kpi.nivel-pronto .pn-kpi-valor { color: #fb923c; }
 [data-tema="oscuro"] .pn-fila.nivel-vencido .pn-fila-rest, [data-tema="oscuro"] .pn-kpi.nivel-vencido .pn-kpi-valor { color: #f87171; }

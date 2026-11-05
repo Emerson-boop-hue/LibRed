@@ -26,7 +26,7 @@
 }
 .pr-head-icono {
     width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
-    background: #0f172a; color: #fff; font-size: 20px;
+    background: var(--active-bg); color: #fff; font-size: 20px;
     display: flex; align-items: center; justify-content: center;
 }
 .pr-head-texto { flex: 1; min-width: 220px; }
@@ -51,7 +51,7 @@
     font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 7px;
 }
 .pr-num {
-    width: 20px; height: 20px; border-radius: 50%; background: #0f172a; color: #fff;
+    width: 20px; height: 20px; border-radius: 50%; background: var(--active-bg); color: #fff;
     font-size: 11px; display: inline-flex; align-items: center; justify-content: center;
 }
 .pr-control {
@@ -59,7 +59,7 @@
     background: #fff; border: 1px solid var(--sidebar-border); border-radius: 9px; outline: none;
     transition: border-color .15s, box-shadow .15s;
 }
-.pr-control:focus { border-color: #0f172a; box-shadow: 0 0 0 3px rgba(15, 23, 42, .08); }
+.pr-control:focus { border-color: var(--active-bg); box-shadow: 0 0 0 3px rgba(51, 65, 85, .14); }
 .pr-control.pr-sancionado { color: #dc2626; font-weight: 600; }
 .pr-control option.op-sancionado { color: #dc2626; font-weight: 600; }
 .pr-control option { color: var(--text-dark); font-weight: 400; }
@@ -88,7 +88,7 @@
 }
 .pr-calc-card span { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
 .pr-calc-card strong { font-size: 14px; color: var(--text-dark); white-space: nowrap; }
-.pr-calc-total { background: #0f172a; border-color: #0f172a; }
+.pr-calc-total { background: var(--active-deep, #1e293b); border-color: var(--active-deep, #1e293b); }
 .pr-calc-total span { color: #cbd5e1; }
 .pr-calc-total strong { color: #fff; }
 
@@ -121,7 +121,7 @@
     display: flex; flex-direction: column; max-height: 100%; min-height: 0;
 }
 .ticket-header {
-    background: #0f172a; color: #fff; text-align: center; padding: 14px; flex-shrink: 0;
+    background: var(--active-bg); color: #fff; text-align: center; padding: 14px; flex-shrink: 0;
 }
 .ticket-header i { font-size: 20px; margin-bottom: 6px; display: block; }
 .ticket-header h4 { font-size: 15px; margin-bottom: 2px; }

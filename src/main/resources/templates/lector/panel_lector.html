@@ -139,16 +139,60 @@
               <h3><i class="fa-solid fa-globe"></i> Tu librería y tu red</h3>
               <a th:href="@{/lector/red-global}">Red Global <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            <div class="pn-sede">
+            <div class="pn-sede" th:classappend="${p.sancionado} ? 'e-sancionada' : (${p.vencidos > 0} ? 'e-vencido' : 'e-ok')">
               <span class="pn-avatar" th:text="${p.sedeIniciales}">LN</span>
               <div class="pn-sede-datos">
                 <strong th:text="${p.sedeNombre}">Librería</strong>
                 <small th:if="${!#strings.isEmpty(p.sedeHorario)}"><i class="fa-regular fa-clock"></i> <span th:text="${p.sedeHorario}">Horario</span></small>
                 <div class="pn-sede-etiquetas">
                   <span class="pn-sede-actual"><i class="fa-solid fa-location-dot"></i> Estás aquí</span>
-                  <span class="pn-estado-chip" th:classappend="${p.sancionado} ? 'sancionada' : 'habilitada'"
-                        th:text="${p.sancionado} ? 'Sancionada' : 'Habilitada'">Habilitada</span>
                 </div>
+              </div>
+              <!-- CINTA DE ESTADO: va dentro de esta tarjeta, de borde a borde en vertical. Prioridad: sancionada > préstamo vencido > todo en orden.
+                   Las dos primeras abren la ventana con el detalle (id pnEsquina, lo usa lector_panel.js). -->
+              <button type="button" class="pn-cinta sancionada" id="pnEsquina" th:if="${p.sancionado}" aria-haspopup="dialog" title="Ver detalle">
+                <svg class="pn-cara pc-triste" viewBox="4 4 40 40" aria-hidden="true">
+                  <g class="pc-cabeza">
+                    <circle class="pc-aro" cx="24" cy="24" r="20"/>
+                    <path class="pc-ceja" d="M11 18L19.5 14.5"/>
+                    <path class="pc-ceja" d="M37 18L28.5 14.5"/>
+                    <circle class="pc-ojo" cx="17" cy="22" r="2.5"/>
+                    <circle class="pc-ojo" cx="31" cy="22" r="2.5"/>
+                    <path class="pc-boca" d="M16.5 34Q24 27.5 31.5 34"/>
+                  </g>
+                  <path class="pc-lagrima" d="M17 25.5C17 25.5 13.8 29.4 13.8 31.6A3.2 3.2 0 0 0 20.2 31.6C20.2 29.4 17 25.5 17 25.5Z"/>
+                </svg>
+                <span class="pn-cinta-txt"><strong>Cuenta sancionada</strong><small>Ver detalle →</small></span>
+              </button>
+              <button type="button" class="pn-cinta vencido" id="pnEsquina" th:if="${!p.sancionado and p.vencidos > 0}" aria-haspopup="dialog" title="Ver detalle">
+                <svg class="pn-cara pc-preocupada" viewBox="4 4 40 40" aria-hidden="true">
+                  <g class="pc-cabeza">
+                    <circle class="pc-aro" cx="24" cy="24" r="20"/>
+                    <path class="pc-ceja" d="M11 17L19.5 15"/>
+                    <path class="pc-ceja" d="M37 17L28.5 15"/>
+                    <circle class="pc-ojo" cx="17" cy="22" r="2.5"/>
+                    <circle class="pc-ojo" cx="31" cy="22" r="2.5"/>
+                    <path class="pc-boca" d="M15.5 33.5q2.6-3 5.2 0t5.2 0t5.2 0"/>
+                  </g>
+                  <path class="pc-sudor" d="M36 10.5C36 10.5 33.2 14.1 33.2 15.9A2.8 2.8 0 0 0 38.8 15.9C38.8 14.1 36 10.5 36 10.5Z"/>
+                </svg>
+                <span class="pn-cinta-txt"><strong>Préstamo vencido</strong><small>Ver detalle →</small></span>
+              </button>
+              <div class="pn-cinta ok" th:if="${!p.sancionado and p.vencidos == 0}" role="status">
+                <svg class="pn-cara pc-feliz" viewBox="4 4 40 40" aria-hidden="true">
+                  <g class="pc-cabeza">
+                    <circle class="pc-aro" cx="24" cy="24" r="20"/>
+                    <circle class="pc-ojo" cx="17" cy="22" r="2.5"/>
+                    <circle class="pc-ojo" cx="31" cy="22" r="2.5"/>
+                    <path class="pc-boca" d="M14.5 28Q24 38.5 33.5 28"/>
+                    <circle class="pc-mejilla" cx="11.5" cy="28.5" r="2.6"/>
+                    <circle class="pc-mejilla" cx="36.5" cy="28.5" r="2.6"/>
+                  </g>
+                  <path class="pc-destello d1" d="M40 6v6M37 9h6"/>
+                  <path class="pc-destello d2" d="M7 11v4M5 13h4"/>
+                  <path class="pc-destello d3" d="M42 34v4M40 36h4"/>
+                </svg>
+                <span class="pn-cinta-txt"><strong>Todo en orden</strong><small>Cuenta habilitada</small></span>
               </div>
             </div>
 
@@ -168,16 +212,6 @@
           </section>
         </div>
       </div>
-
-      <!-- SANCIÓN / VENCIDO: tarjeta fija en la esquina (no se cierra). Abre la ventana con el detalle -->
-      <button type="button" class="pn-esquina" id="pnEsquina" th:if="${p.sancionado or p.vencidos > 0}"
-              th:classappend="${!p.sancionado} ? 'vencido'" aria-haspopup="dialog">
-        <span class="pn-esquina-ico"><i class="fa-solid" th:classappend="${p.sancionado} ? 'fa-ban' : 'fa-triangle-exclamation'"></i></span>
-        <span class="pn-esquina-txt">
-          <strong th:text="${p.sancionado} ? 'Cuenta sancionada' : 'Préstamo vencido'">Cuenta sancionada</strong>
-          <small>Ver detalle →</small>
-        </span>
-      </button>
 
       <div class="pn-modal-fondo" id="pnModal" hidden th:if="${p.sancionado or p.vencidos > 0}">
         <div class="pn-modal" th:classappend="${!p.sancionado} ? 'vencido'" role="dialog" aria-modal="true" aria-labelledby="pnModalTitulo">

@@ -62,29 +62,6 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
 .pn-aviso.info strong { color: #1e3a8a; } .pn-aviso.info small { color: #1e40af; }
 @keyframes pnEstrella { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25) rotate(8deg); } }
 
-/* --- Sanción / vencido: tarjeta simple fija en la esquina (no se puede cerrar). Al pulsarla abre el detalle --- */
-.pn-esquina {
-    position: fixed; right: 22px; bottom: 18px; z-index: 900; display: flex; align-items: center; gap: 13px; min-width: 270px;
-    padding: 12px 20px 12px 13px; border-radius: 16px; border: 1px solid #f87171; cursor: pointer; font-family: inherit; text-align: left;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2); animation: pnHalo 2s ease-in-out infinite;
-}
-.pn-esquina:hover { filter: brightness(.98); transform: translateY(-2px); }
-.pn-esquina-ico {
-    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; background: #dc2626; color: #fff; font-size: 1.2rem;
-    display: flex; align-items: center; justify-content: center;
-}
-.pn-esquina-ico i { display: inline-block; animation: pnSacude 3.5s ease-in-out infinite; }
-.pn-esquina-txt { display: flex; flex-direction: column; line-height: 1.25; }
-.pn-esquina-txt strong { font-size: 1rem; color: #7f1d1d; }
-.pn-esquina-txt small { font-size: .8rem; font-weight: 700; color: #b91c1c; }
-.pn-esquina.vencido { border-color: #fb923c; background: linear-gradient(135deg, #fff7ed, #ffedd5); animation: pnHaloNaranja 2.4s ease-in-out infinite; }
-.pn-esquina.vencido .pn-esquina-ico { background: #ea580c; }
-.pn-esquina.vencido .pn-esquina-txt strong { color: #7c2d12; }
-.pn-esquina.vencido .pn-esquina-txt small { color: #c2410c; }
-@keyframes pnHalo { 0%, 100% { box-shadow: 0 6px 16px rgba(15,23,42,.14), 0 0 0 0 rgba(220, 38, 38, 0); } 50% { box-shadow: 0 6px 16px rgba(15,23,42,.14), 0 0 0 5px rgba(220, 38, 38, .22); } }
-@keyframes pnHaloNaranja { 0%, 100% { box-shadow: 0 6px 16px rgba(15,23,42,.14), 0 0 0 0 rgba(234, 88, 12, 0); } 50% { box-shadow: 0 6px 16px rgba(15,23,42,.14), 0 0 0 5px rgba(234, 88, 12, .22); } }
-@keyframes pnSacude { 0%, 86%, 100% { transform: rotate(0); } 90% { transform: rotate(-14deg); } 94% { transform: rotate(14deg); } 97% { transform: rotate(-8deg); } }
-
 /* Ventana con el detalle */
 .pn-modal-fondo {
     position: fixed; inset: 0; z-index: 4000; display: flex; align-items: center; justify-content: center; padding: 20px;
@@ -102,7 +79,7 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
 .pn-modal-cuerpo { padding: 16px 18px 6px; display: flex; flex-direction: column; gap: 14px; color: var(--text-dark); }
 .pn-modal-sec h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin: 0 0 6px; }
 .pn-modal-sec ul, .pn-modal-sec ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: .86rem; line-height: 1.4; }
-.pn-modal-sec b { color: #b91c1c; }
+.pn-modal-sec b { color: var(--danger-text); }
 .pn-modal-nota { display: flex; gap: 8px; align-items: flex-start; font-size: .8rem; line-height: 1.4; padding: 9px 11px; border-radius: 10px; background: var(--bg-main); color: var(--text-muted); }
 .pn-modal-nota i { color: var(--primary); margin-top: 2px; }
 .pn-modal-pie { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px 16px; }
@@ -200,7 +177,7 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
 }
 .pn-anillo::before { content: ""; position: absolute; inset: 9px; background: var(--card-bg); border-radius: 50%; }
 .pn-anillo span { position: relative; display: flex; flex-direction: column; align-items: center; line-height: 1.1; text-align: center; }
-.pn-anillo strong { font-size: 1.1rem; color: #15803d; }
+.pn-anillo strong { font-size: 1.1rem; color: var(--ok-accent); }
 .pn-anillo small { font-size: .6rem; color: var(--text-muted); }
 .pn-anillo.sin-datos strong { color: var(--text-muted); }
 .pn-act-vacio { padding: 4px 22px 16px; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; align-items: center; }
@@ -208,9 +185,10 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
 .pn-act-vacio small { font-size: .78rem; line-height: 1.45; }
 
 /* --- Tu librería y tu red --- */
-.pn-red { flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 14px; } /* baja hasta alinearse con el borde inferior de "Tus préstamos en curso" */
+.pn-red { flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 14px; container: sede / inline-size; } /* baja hasta alinearse con el borde inferior de "Tus préstamos en curso" */
 .pn-sede {
-    flex: 1 0 auto; display: flex; gap: 14px; align-items: center; margin: 0 16px; padding: 12px 14px; border-radius: 12px;
+    flex: 1 0 auto; display: flex; gap: 14px; align-items: center; margin: 0 16px; padding: 12px calc(var(--cinta-w) + 32px) 12px 14px; border-radius: 12px;
+    position: relative; overflow: hidden; min-height: 132px; --cinta-w: 150px;
     background: linear-gradient(135deg, var(--primary-soft), var(--bg-main)); border: 1px solid var(--sidebar-border);
 }
 .pn-avatar {
@@ -229,12 +207,113 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
 .pn-sede-datos small { font-size: 0.76rem; color: var(--text-muted); line-height: 1.3; }
 .pn-sede-datos small i { width: 14px; color: var(--primary); }
 .pn-sede-etiquetas { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px; }
-.pn-sede-actual, .pn-estado-chip {
+.pn-sede-actual {
     font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; letter-spacing: .02em;
 }
 .pn-sede-actual { color: #fff; background: var(--primary); }
-.pn-estado-chip.habilitada { color: #166534; background: #dcfce7; }
-.pn-estado-chip.sancionada { color: #fff; background: #dc2626; text-transform: uppercase; }
+
+/* --- Cinta de estado de la cuenta (versión suave) ---
+   Dentro de la tarjeta, de borde a borde en vertical y con un margen a la derecha. Fondo pastel del color del estado,
+   una línea del color fuerte a la izquierda y la carita dentro de un disco de color con un halo que late.
+   Va en posición absoluta DENTRO de .pn-sede (que reserva su espacio con padding-right), así que no tapa el contenido. */
+.pn-cinta {
+    position: absolute; top: 0; bottom: 0; right: 18px; width: var(--cinta-w); z-index: 1; margin: 0; padding: 12px 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px;
+    border: 0; border-left: 3px solid var(--tono); border-radius: 0; color: var(--texto); text-align: center; font-family: inherit;
+    box-shadow: 0 0 0 1px rgba(var(--tono-rgb), .14);
+}
+.pn-cinta.sancionada { --tono: #dc2626; --tono-rgb: 220, 38, 38; --texto: #7f1d1d; --subtexto: #b91c1c; background: linear-gradient(180deg, #fef2f2, #fee2e2); }
+.pn-cinta.vencido { --tono: #ea580c; --tono-rgb: 234, 88, 12; --texto: #7c2d12; --subtexto: #c2410c; background: linear-gradient(180deg, #fff7ed, #ffedd5); }
+.pn-cinta.ok { --tono: #16a34a; --tono-rgb: 22, 163, 74; --texto: #14532d; --subtexto: #15803d; background: linear-gradient(180deg, #f0fdf4, #dcfce7); }
+
+/* El fondo de la tarjeta toma un leve tinte del estado hacia la derecha, para que la franja del margen no parezca un resto sobrante */
+.pn-sede.e-sancionada { background: linear-gradient(90deg, transparent 40%, rgba(220, 38, 38, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
+.pn-sede.e-vencido { background: linear-gradient(90deg, transparent 40%, rgba(234, 88, 12, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
+.pn-sede.e-ok { background: linear-gradient(90deg, transparent 40%, rgba(22, 163, 74, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
+
+.pn-cinta-txt { display: flex; flex-direction: column; gap: 3px; line-height: 1.2; }
+.pn-cinta strong { font-size: .86rem; font-weight: 800; color: var(--texto); }
+.pn-cinta small { font-size: .7rem; font-weight: 600; color: var(--subtexto); }
+button.pn-cinta { cursor: pointer; transition: filter .2s ease; }
+button.pn-cinta:hover { filter: brightness(.97); }
+button.pn-cinta:hover small { text-decoration: underline; }
+button.pn-cinta:focus-visible { outline: 3px solid var(--tono); outline-offset: -6px; }
+
+/* Caritas (SVG): rasgos blancos sobre un disco del color fuerte del estado. El halo late alrededor del disco y cada carita tiene su movimiento. */
+.pn-cara { display: block; width: 60px; height: 60px; flex: none; overflow: visible; border-radius: 50%; animation: pcHalo 2.6s ease-out infinite; }
+.pc-aro { fill: var(--tono); }
+.pc-ojo { fill: #fff; }
+.pc-ceja, .pc-boca { fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pc-destello { fill: none; stroke: var(--tono); stroke-width: 2; stroke-linecap: round; }
+.pc-lagrima, .pc-sudor { fill: #fff; }
+.pc-mejilla { fill: rgba(255, 255, 255, .35); }
+.pc-lagrima, .pc-sudor, .pc-destello, .pc-feliz .pc-ojo, .pc-feliz .pc-boca { transform-box: fill-box; transform-origin: center; }
+@keyframes pcHalo {
+    0% { box-shadow: 0 5px 12px -4px rgba(var(--tono-rgb), .5), 0 0 0 0 rgba(var(--tono-rgb), .38); }
+    70%, 100% { box-shadow: 0 5px 12px -4px rgba(var(--tono-rgb), .5), 0 0 0 14px rgba(var(--tono-rgb), 0); }
+}
+
+/* Triste: se balancea despacio y una lágrima resbala por la mejilla */
+.pc-triste { animation: pcHalo 2.6s ease-out infinite, pcBalanceo 4s ease-in-out infinite; }
+.pc-lagrima { transform-origin: 50% 0; animation: pcLagrima 3.2s ease-in infinite; }
+@keyframes pcBalanceo { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } }
+@keyframes pcLagrima {
+    0%, 10% { transform: translateY(-2px) scale(.4); opacity: 0; }
+    25% { transform: translateY(0) scale(1); opacity: 1; }
+    65% { transform: translateY(6px); opacity: 1; }
+    82%, 100% { transform: translateY(8px); opacity: 0; }
+}
+
+/* Preocupada: tiembla un instante y una gota de sudor baja por la sien */
+.pc-preocupada { animation: pcHalo 2.6s ease-out infinite, pcTiembla 3s ease-in-out infinite; }
+.pc-sudor { transform-origin: 50% 0; animation: pcSudor 2.6s ease-in infinite; }
+@keyframes pcTiembla {
+    0%, 66%, 100% { transform: translateX(0); }
+    70% { transform: translateX(-1.6px); } 74% { transform: translateX(1.6px); }
+    78% { transform: translateX(-1.3px); } 82% { transform: translateX(1.3px); } 86% { transform: translateX(0); }
+}
+@keyframes pcSudor {
+    0%, 8% { transform: translateY(-2px) scale(.5); opacity: 0; }
+    25% { transform: translateY(0) scale(1); opacity: 1; }
+    65% { transform: translateY(7px); opacity: 1; }
+    82%, 100% { transform: translateY(9px); opacity: 0; }
+}
+
+/* Feliz: salta, parpadea, la sonrisa se ensancha y saltan destellos alrededor del disco */
+.pc-feliz { animation: pcHalo 2.6s ease-out infinite, pcSalto 2.8s ease-in-out infinite; }
+.pc-feliz .pc-ojo { animation: pcParpadeo 4s ease-in-out infinite; }
+.pc-feliz .pc-boca { transform-origin: 50% 0; animation: pcSonrisa 2.8s ease-in-out infinite; }
+.pc-destello { animation: pcBrilla 2.4s ease-in-out infinite; }
+.pc-destello.d2 { animation-delay: .8s; }
+.pc-destello.d3 { animation-delay: 1.5s; }
+@keyframes pcSalto { 0%, 55%, 100% { transform: translateY(0); } 18% { transform: translateY(-4px); } 32% { transform: translateY(0); } 42% { transform: translateY(-2px); } }
+@keyframes pcParpadeo { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(.1); } }
+@keyframes pcSonrisa { 0%, 55%, 100% { transform: scale(1); } 18% { transform: scale(1.1, 1.18); } }
+@keyframes pcBrilla { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(20deg); } }
+
+/* Modo oscuro: los pasteles pasan a tintes translúcidos del mismo color sobre el fondo oscuro */
+[data-tema="oscuro"] .pn-cinta.sancionada { --texto: #fecaca; --subtexto: #fca5a5; background: linear-gradient(180deg, rgba(220, 38, 38, .24), rgba(220, 38, 38, .12)); }
+[data-tema="oscuro"] .pn-cinta.vencido { --texto: #fed7aa; --subtexto: #fdba74; background: linear-gradient(180deg, rgba(234, 88, 12, .26), rgba(234, 88, 12, .13)); }
+[data-tema="oscuro"] .pn-cinta.ok { --texto: #bbf7d0; --subtexto: #86efac; background: linear-gradient(180deg, rgba(34, 197, 94, .22), rgba(34, 197, 94, .11)); }
+
+/* Tarjeta angosta (columna estrecha o celular): la cinta pasa a ser una franja horizontal en la parte de abajo de la tarjeta */
+@container sede (max-width: 480px) {
+    .pn-sede { flex-wrap: wrap; padding: 12px 14px 0; align-content: flex-start; }
+    .pn-cinta {
+        position: static; flex: 0 0 calc(100% + 28px); width: auto; margin: 12px -14px 0;
+        flex-direction: row; justify-content: flex-start; text-align: left; gap: 14px; padding: 10px 16px;
+    }
+    .pn-cinta .pn-cara { width: 46px; height: 46px; }
+    .pn-cinta-txt { align-items: flex-start; }
+}
+/* Pantallas bajas: cinta más compacta para no agrandar la tarjeta; "Ver detalle" se mantiene visible */
+@media (max-height: 800px) {
+    .pn-sede { min-height: 108px; }
+    .pn-cinta { gap: 4px; padding: 6px 8px; }
+    .pn-cinta .pn-cara { width: 46px; height: 46px; }
+    .pn-cinta strong { font-size: .8rem; }
+    .pn-cinta small { font-size: .66rem; }
+}
 .pn-otras-tit { padding: 9px 16px 5px; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); }
 .pn-otras { padding: 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .pn-sede-chip {
@@ -288,5 +367,21 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
     .pn-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
-    .pn-esquina, .pn-esquina-ico i, .pn-aviso.calificar .pn-aviso-ico i { animation: none; }
+    .pn-aviso.calificar .pn-aviso-ico i { animation: none; }
+    .pn-cara, .pn-cara * { animation: none !important; }
+    button.pn-cinta { transition: none; }
 }
+
+/* =====================================================================
+   MODO OSCURO: avisos del panel.
+   En claro son pastel con texto oscuro; en oscuro pasan a fondos oscuros con el texto del mismo color en tono claro.
+   ===================================================================== */
+[data-tema="oscuro"] .pn-aviso.calificar { background: linear-gradient(135deg, #3a2c0b, #2f2409); border-color: #8a6516; }
+[data-tema="oscuro"] .pn-aviso.calificar strong { color: #fcd34d; }
+[data-tema="oscuro"] .pn-aviso.calificar small { color: #fde68a; }
+[data-tema="oscuro"] .pn-aviso.ok { background: linear-gradient(135deg, #0f2a1c, #12341f); border-color: #1f6b3b; }
+[data-tema="oscuro"] .pn-aviso.ok strong { color: #86efac; }
+[data-tema="oscuro"] .pn-aviso.ok small { color: #bbf7d0; }
+[data-tema="oscuro"] .pn-aviso.info { background: linear-gradient(135deg, #14224a, #1a2d63); border-color: #2f4f9c; }
+[data-tema="oscuro"] .pn-aviso.info strong { color: #c7d7ff; }
+[data-tema="oscuro"] .pn-aviso.info small { color: #93b4ff; }

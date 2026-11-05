@@ -7,9 +7,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fef3c7;
-    border: 1px solid #fcd34d;
-    color: #92400e;
+    background: var(--warn-bg);
+    border: 1px solid var(--warn-border);
+    color: var(--warn-text);
     padding: 12px 16px;
     border-radius: 10px;
     font-size: 0.86rem;
@@ -87,18 +87,18 @@
     border-radius: 8px;
     font-size: 0.86rem;
     color: var(--text-dark);
-    background: #fff;
+    background: var(--surface-input);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .pl-campo input:focus,
 .pl-campo select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+    box-shadow: 0 0 0 3px var(--focus-ring);
 }
-.pl-campo select:disabled { background: #f1f5fb; color: var(--text-muted); cursor: not-allowed; }
+.pl-campo select:disabled { background: var(--surface-2); color: var(--text-muted); cursor: not-allowed; }
 .pl-campo .con-error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
-.pl-solo-lectura { background: #f1f5fb !important; color: var(--text-dark); font-weight: 600; cursor: default; }
+.pl-solo-lectura { background: var(--surface-2) !important; color: var(--text-dark); font-weight: 600; cursor: default; }
 .pl-ayuda { font-size: 0.76rem; color: var(--text-muted); }
 .pl-ayuda strong { color: var(--primary); }
 
@@ -116,7 +116,7 @@
     margin: 4px 0 16px 0;
 }
 .pl-dato {
-    background: #f1f5fb;
+    background: var(--surface-2);
     border: 1px solid var(--sidebar-border);
     border-radius: 10px;
     padding: 10px 14px;
@@ -126,14 +126,14 @@
 }
 .pl-dato span { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
 .pl-dato strong { font-size: 0.98rem; color: var(--text-dark); }
-.pl-dato.destacado { background: var(--primary-soft); border-color: #b9ccff; }
-.pl-dato.destacado strong { color: var(--primary-dark); font-size: 1.1rem; }
+.pl-dato.destacado { background: var(--primary-soft); border-color: var(--primary-soft-border); }
+.pl-dato.destacado strong { color: var(--primary-strong); font-size: 1.1rem; }
 
 /* --- ERROR Y BOTONES --- */
 .pl-error {
-    background: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid var(--danger-border);
     padding: 10px 14px;
     border-radius: 8px;
     font-size: 0.83rem;
@@ -148,8 +148,8 @@
 
 /* --- COMPROBANTE --- */
 .pl-ticket {
-    background: #f8faff;
-    border: 1px dashed #aebfe6;
+    background: var(--surface-soft);
+    border: 1px dashed var(--faint);
     border-radius: 14px;
     padding: 22px 24px;
     display: flex;
@@ -161,7 +161,7 @@
     margin-bottom: 14px;
     border-bottom: 1px solid var(--sidebar-border);
 }
-.pl-ticket-head h4 { font-size: 1.05rem; color: var(--primary-dark); margin-bottom: 3px; }
+.pl-ticket-head h4 { font-size: 1.05rem; color: var(--primary-strong); margin-bottom: 3px; }
 .pl-ticket-head span { font-size: 0.78rem; color: var(--text-muted); }
 
 .pl-ticket-cuerpo { display: flex; flex-direction: column; gap: 11px; font-size: 0.86rem; }
@@ -187,7 +187,7 @@
     border-top: 1px solid var(--sidebar-border);
 }
 .pl-fila.total span { color: var(--text-dark); font-weight: 700; }
-.pl-fila.total strong { color: var(--primary-dark); font-size: 1.15rem; }
+.pl-fila.total strong { color: var(--primary-strong); font-size: 1.15rem; }
 
 .pl-ticket-nota {
     margin-top: 16px;
@@ -202,7 +202,7 @@
 .pl-contador {
     margin-left: auto;
     background: var(--primary-soft);
-    color: var(--primary-dark);
+    color: var(--primary-strong);
     font-size: 0.78rem;
     font-weight: 600;
     padding: 6px 12px;
@@ -210,7 +210,7 @@
     white-space: nowrap;
 }
 .pl-contador i { margin-right: 4px; }
-.pl-contador.lleno { background: #fee2e2; color: #b91c1c; }
+.pl-contador.lleno { background: var(--danger-bg); color: var(--danger-text); }
 
 /* --- MODAL DE ÉXITO --- */
 .pl-modal-box { text-align: center; padding: 6px; }
@@ -219,8 +219,8 @@
     height: 58px;
     margin: 0 auto 12px auto;
     border-radius: 50%;
-    background: #dcfce7;
-    color: #16a34a;
+    background: var(--ok-bg);
+    color: var(--ok-icon);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -229,7 +229,7 @@
 .pl-modal-box h3 { font-size: 1.2rem; color: var(--text-dark); }
 .pl-modal-sub { font-size: 0.84rem; color: var(--text-muted); margin: 4px 0 14px 0; }
 .pl-modal-detalle {
-    background: #f1f5fb;
+    background: var(--surface-2);
     border-radius: 10px;
     padding: 12px 14px;
     display: flex;

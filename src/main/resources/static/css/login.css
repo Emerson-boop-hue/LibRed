@@ -176,7 +176,7 @@ body { display: flex; height: 100vh; overflow: hidden; background-color: #f8f9fa
 .btn-submit-admin {
     flex: 1.2;
     padding: 12px;
-    background-color: #0f172a;
+    background-color: #334155;
     color: white;
     border: none;
     border-radius: 8px;
@@ -197,23 +197,196 @@ body { display: flex; height: 100vh; overflow: hidden; background-color: #f8f9fa
 .register-link a { color: #2563eb; font-weight: 600; text-decoration: none; display: block; margin-top: 5px;}
 .register-link a:hover { text-decoration: underline; }
 
-/* Animación de latido para los enlaces inferiores */
-@keyframes latido {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); color: #2563eb; }
-    100% { transform: scale(1); }
+/* =====================================================================
+   ENLACE INFERIOR PARA CAMBIAR DE ACCESO (píldora)
+   - Lector -> administrador: píldora azul marino (identidad del panel de administrador). Un icono animado
+     (inventario, préstamos, lectores, reportes) cambia cada 3 s y, a la vez, un destello cruza la píldora.
+     No se escala el texto: no se ve borroso.
+   - Administrador -> lector: píldora con borde, sin animación continua; solo la flecha se desplaza al pasar el cursor.
+   ===================================================================== */
+.switch-mode { position: absolute; bottom: 30px; text-align: center; width: 100%; left: 0; padding: 0 16px; }
+
+.switch-pill {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+.switch-pill:focus-visible { outline: 3px solid rgba(51, 65, 85, 0.4); outline-offset: 3px; }
+.switch-pill .switch-arrow { font-size: 12px; transition: transform 0.2s ease; }
+
+/* Lector -> administrador */
+.switch-admin {
+    background-color: #334155;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(51, 65, 85, 0.28);
+}
+.switch-admin strong { font-weight: 700; }
+.switch-admin:hover {
+    background-color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(51, 65, 85, 0.34);
+}
+.switch-admin:hover .switch-arrow { transform: translateX(4px); }
+
+/* Iconos animados: 4 SVG apilados; cada uno es visible 3 s dentro de un ciclo de 12 s.
+   Los valores base de cada pieza son su estado final; la animación solo la hace "llegar" a él. */
+.switch-icons { position: relative; flex-shrink: 0; width: 22px; height: 22px; color: #bfdbfe; }
+.sic {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: sicVer 12s ease-in-out infinite backwards;
+    animation-delay: var(--d);
+}
+.sic-inv { --d: 0s; }
+.sic-pre { --d: 3s; }
+.sic-lec { --d: 6s; }
+.sic-rep { --d: 9s; }
+@keyframes sicVer {
+    0% { opacity: 0; transform: translateY(6px); }
+    3%, 22% { opacity: 1; transform: translateY(0); }
+    25%, 100% { opacity: 0; transform: translateY(-6px); }
 }
 
-.switch-mode { position: absolute; bottom: 30px; text-align: center; width: 100%; left: 0; }
-.switch-mode a { 
-    color: #111; 
-    font-size: 14px; 
-    font-weight: 600; 
-    text-decoration: none; 
-    display: inline-block;
-    animation: latido 2.5s infinite ease-in-out;
+/* 1. Inventario: tres cajas caen una tras otra y se apilan */
+.caja { animation: sicCae 12s cubic-bezier(0.3, 0, 0.4, 1) infinite backwards; }
+.caja.c1 { animation-delay: calc(var(--d) + 0.1s); }
+.caja.c2 { animation-delay: calc(var(--d) + 0.55s); }
+.caja.c3 { animation-delay: calc(var(--d) + 1s); }
+@keyframes sicCae {
+    0% { transform: translateY(-12px); opacity: 0; }
+    2% { opacity: 1; }
+    5% { transform: translateY(1.5px); }
+    6.5%, 100% { transform: translateY(0); opacity: 1; }
 }
-.switch-mode a:hover { text-decoration: underline; }
+
+/* 2. Préstamos: libro abierto con una página que se voltea */
+.sic-pre .pag {
+    opacity: 0;
+    fill-opacity: 0.3;
+    transform-box: view-box;
+    transform-origin: 12px 12px;
+    animation: sicVoltea 12s ease-in-out infinite backwards;
+    animation-delay: calc(var(--d) + 0.3s);
+}
+@keyframes sicVoltea {
+    0%, 2% { transform: scaleX(1); opacity: 0; }
+    3% { transform: scaleX(1); opacity: 1; }
+    9% { transform: scaleX(0.05); opacity: 1; }
+    15%, 20% { transform: scaleX(-1); opacity: 1; }
+    22%, 100% { transform: scaleX(-1); opacity: 0; }
+}
+
+/* 3. Lectores: aparece una persona y luego se suman otras dos a sus lados */
+.per { transform-box: fill-box; }
+.p-c { transform-origin: 50% 100%; animation: sicPop 12s ease-out infinite backwards; animation-delay: calc(var(--d) + 0.1s); }
+.p-l { animation: sicEntraIzq 12s ease-out infinite backwards; animation-delay: calc(var(--d) + 0.8s); }
+.p-r { animation: sicEntraDer 12s ease-out infinite backwards; animation-delay: calc(var(--d) + 0.95s); }
+@keyframes sicPop {
+    0% { transform: scale(0.3); opacity: 0; }
+    3% { opacity: 1; }
+    6% { transform: scale(1.12); }
+    8%, 100% { transform: scale(1); opacity: 1; }
+}
+@keyframes sicEntraIzq {
+    0% { transform: translateX(5px); opacity: 0; }
+    5% { opacity: 1; }
+    9%, 100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes sicEntraDer {
+    0% { transform: translateX(-5px); opacity: 0; }
+    5% { opacity: 1; }
+    9%, 100% { transform: translateX(0); opacity: 1; }
+}
+
+/* 4. Reportes: las barras crecen una tras otra y se traza la línea de tendencia */
+.barra { transform-box: fill-box; transform-origin: 50% 100%; animation: sicCrece 12s cubic-bezier(0.3, 0, 0.4, 1) infinite backwards; }
+.barra.b1 { animation-delay: calc(var(--d) + 0.1s); }
+.barra.b2 { animation-delay: calc(var(--d) + 0.4s); }
+.barra.b3 { animation-delay: calc(var(--d) + 0.7s); }
+@keyframes sicCrece {
+    0% { transform: scaleY(0); }
+    6%, 100% { transform: scaleY(1); }
+}
+.tendencia {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: sicTrazo 12s ease-out infinite backwards;
+    animation-delay: calc(var(--d) + 1s);
+}
+@keyframes sicTrazo {
+    0% { stroke-dashoffset: 1; }
+    8%, 100% { stroke-dashoffset: 0; }
+}
+
+/* Destello: pasa en ~0,9 s justo cuando cambia el icono (cada 3 s) y reposa el resto del ciclo */
+.switch-admin::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.3) 50%, transparent 80%);
+    transform: translateX(-130%) skewX(-20deg);
+    animation: switchBrillo 3s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes switchBrillo {
+    0% { transform: translateX(-130%) skewX(-20deg); }
+    30%, 100% { transform: translateX(330%) skewX(-20deg); }
+}
+
+/* Administrador -> lector: píldora blanca con la flecha dentro de un círculo.
+   Al pasar el cursor el círculo se llena de plomo grafito, la flecha se desplaza y la píldora se eleva. */
+.switch-back {
+    padding: 6px 18px 6px 6px;
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(51, 65, 85, 0.1);
+}
+.switch-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #f1f5f9;
+    color: #334155;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.switch-back:hover {
+    border-color: #334155;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(51, 65, 85, 0.2);
+}
+.switch-back:hover .switch-chip { background-color: #334155; color: #ffffff; }
+.switch-back:hover .switch-arrow { transform: translateX(-2px); }
+
+@media (max-width: 480px) {
+    .switch-pill { font-size: 12px; padding: 9px 14px; gap: 8px; }
+}
+
+/* Quien tiene el movimiento reducido en su sistema ve la píldora quieta, con el icono de inventario fijo */
+@media (prefers-reduced-motion: reduce) {
+    .switch-admin::after { display: none; }
+    .sic, .sic * { animation: none !important; }
+    .sic-inv { opacity: 1; }
+    .switch-pill, .switch-pill .switch-arrow, .switch-chip { transition: none; }
+    .switch-admin:hover, .switch-back:hover { transform: none; }
+}
 
 .error-msg { 
     background-color: #fee2e2; 
@@ -229,4 +402,105 @@ body { display: flex; height: 100vh; overflow: hidden; background-color: #f8f9fa
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================================
+   TEMA DEL LECTOR EN EL LOGIN
+   Solo se aplica cuando #cardContent lleva la clase .tema-lector (login de lectores).
+   El login de administrador (.tema-admin) NO usa nada de este bloque y se ve igual que antes.
+   Paleta tomada del interior del lector: azul #1e40af / #1e3a8a, texto #0f1b3d, apagado #5f6f8f, borde #dbe3f0.
+   El enlace de abajo ("¿Eres administrador de librería?") no se toca: conserva su estilo original.
+   ===================================================================== */
+.right-side.tema-lector { background-color: #f1f5fb; }
+
+/* Menú superior */
+.tema-lector .top-nav { color: #5f6f8f; }
+.tema-lector .top-nav span:hover { color: #1e40af; }
+.tema-lector .top-nav span::after { background-color: #1e40af; }
+
+/* Tarjeta y textos */
+.tema-lector .login-card-container { box-shadow: 0 4px 14px rgba(30, 64, 175, 0.08); }
+.tema-lector .login-card h2 { color: #0f1b3d; }
+.tema-lector .login-card p { color: #5f6f8f; }
+.tema-lector .form-group label { color: #0f1b3d; }
+
+/* Campos */
+.tema-lector .input-container input,
+.tema-lector .input-container select {
+    border-color: #dbe3f0;
+    background-color: #f8faff;
+    color: #0f1b3d;
+}
+.tema-lector .input-container input:focus,
+.tema-lector .input-container select:focus {
+    border-color: #1e40af;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12);
+}
+.tema-lector .input-container i.field-icon,
+.tema-lector .input-container i.toggle-password { color: #8a9abb; }
+.tema-lector .input-container i.toggle-password:hover { color: #1e40af; }
+
+/* Botón "Iniciar sesión": mismo degradado que el ítem activo del menú del lector */
+.tema-lector .btn-submit {
+    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.28);
+}
+.tema-lector .btn-submit:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #172e72 100%);
+    box-shadow: 0 6px 16px rgba(30, 64, 175, 0.34);
+    transform: translateY(-1px);
+}
+.tema-lector .btn-submit:active { transform: translateY(0); }
+.tema-lector .btn-submit:focus-visible { outline: 3px solid rgba(30, 64, 175, 0.35); outline-offset: 2px; }
+
+/* Enlaces y separador */
+.tema-lector .forgot-pass,
+.tema-lector .register-link a { color: #1e40af; }
+.tema-lector .register-link { color: #5f6f8f; }
+.tema-lector .divider { border-bottom-color: #dbe3f0; }
+.tema-lector .divider span { color: #8a9abb; }
+
+/* =====================================================================
+   DISTRIBUCIÓN COMÚN A LOS DOS LOGINS (lector y administrador)
+   Los dos usan la misma base: la tarjeta arranca siempre a la misma altura, con el mismo logo y los mismos
+   espacios; la única diferencia es el campo "Librería" del lector, que la hace un campo más alta.
+   La píldora de cambio de acceso ocupa el espacio libre que queda bajo la tarjeta y se centra en él
+   (con un mínimo de separación, para que nunca quede pegada).
+   Los espacios usan clamp(mín, vh, máx): se adaptan solos a la altura de la pantalla.
+   ===================================================================== */
+.right-side {
+    justify-content: flex-start;               /* la tarjeta queda anclada arriba: al cambiar de login no "salta" */
+    padding-top: clamp(76px, 12vh, 100px);     /* deja libre el menú superior (Conócenos...) */
+    padding-bottom: 0;
+    overflow-y: auto;                          /* en pantallas muy bajas se desplaza en vez de recortar */
+}
+.login-card-container { flex: none; padding: clamp(14px, 3vh, 22px) 40px; }
+.logo-area { margin-bottom: clamp(6px, 1.6vh, 12px); }
+.custom-logo { max-height: clamp(44px, 9vh, 64px); }
+.login-card h2 { margin-bottom: 4px; }
+.login-card p { margin-bottom: clamp(10px, 2.2vh, 16px); }
+.form-group { margin-bottom: clamp(7px, 1.5vh, 10px); }
+.input-container input,
+.input-container select { padding-top: clamp(9px, 1.5vh, 11px); padding-bottom: clamp(9px, 1.5vh, 11px); }
+.form-actions { margin-top: clamp(8px, 1.8vh, 13px); }
+.divider { margin: clamp(9px, 1.8vh, 14px) 0; }
+
+/* Zona de la píldora: ocupa todo el espacio libre bajo la tarjeta y centra la píldora en él */
+.switch-mode {
+    position: static;
+    width: 100%;
+    flex: 1 0 auto;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 16px;
+}
+
+/* Alinea los centros: la tarjeta del administrador (2 campos) baja medio campo para quedar centrada
+   verticalmente igual que la del lector (3 campos). Medio campo = (etiqueta + campo + espacio) / 2,
+   calculado con los mismos clamp() de arriba, así sigue cuadrando en cualquier altura de pantalla. */
+.tema-admin .login-card-container {
+    margin-top: calc(19px + clamp(9px, 1.5vh, 11px) + clamp(7px, 1.5vh, 10px) / 2);
 }

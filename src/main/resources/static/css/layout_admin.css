@@ -12,7 +12,8 @@
     --sidebar-border: #e2e8f0;
     --sidebar-text: #475569;
     --sidebar-hover-bg: #f1f5f9;
-    --active-bg: #0f172a;
+    --active-bg: #334155;      /* plomo grafito: menú activo, botones, avatar */
+    --active-deep: #1e293b;    /* plomo profundo: cajas de énfasis (p. ej. Servicio total) y hover */
     --active-text: #ffffff;
     --text-dark: #0f172a;
     --text-muted: #64748b;
@@ -166,7 +167,7 @@ body {
     background-color: var(--active-bg);
     color: var(--active-text);
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);
 }
 
 /* --- MENÚS DESPLEGABLES --- */

@@ -82,13 +82,13 @@
 }
 .ay-buscador input {
     width: 100%; padding: 10px 12px 10px 34px; border: 1px solid var(--sidebar-border); border-radius: 8px;
-    font-size: 0.86rem; color: var(--text-dark); background: #fff; outline: none;
+    font-size: 0.86rem; color: var(--text-dark); background: var(--surface-input); outline: none;
     transition: border-color .15s, box-shadow .15s;
 }
-.ay-buscador input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12); }
+.ay-buscador input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--focus-ring); }
 .ay-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .ay-chip {
-    border: 1px solid var(--sidebar-border); background: #fff; color: var(--sidebar-text);
+    border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--sidebar-text);
     border-radius: 999px; padding: 5px 13px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
     transition: background .15s, color .15s, border-color .15s;
 }
