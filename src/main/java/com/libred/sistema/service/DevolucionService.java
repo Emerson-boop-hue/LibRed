@@ -99,11 +99,11 @@ public class DevolucionService {
         devolucion.setMontoTotal(montoMora.add(montoMulta));
         Devolucion devGuardada = devolucionRepository.save(devolucion);
 
-        // 6. Sincronizar estado del lector (HABILITADO / SANCIONADO)
+        // 6. Sincronizar estado del lector (HABILITADO / BLOQUEADO)
         if (prestamo.getLector() != null) {
             Lector lector = prestamo.getLector();
             boolean tieneOtrasMultas = multaRepository.existsByLectorIdAndEstadoPago(lector.getId(), "PENDIENTE");
-            String estadoFinal = tieneOtrasMultas ? "SANCIONADO" : "HABILITADO";
+            String estadoFinal = tieneOtrasMultas ? "BLOQUEADO" : "HABILITADO";
             if (!estadoFinal.equalsIgnoreCase(lector.getEstadoCuenta())) {
                 lector.setEstadoCuenta(estadoFinal);
                 lectorRepository.save(lector);

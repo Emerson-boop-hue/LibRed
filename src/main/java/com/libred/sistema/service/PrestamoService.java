@@ -53,8 +53,8 @@ public class PrestamoService {
             throw new Exception("El lector seleccionado no pertenece a tu librería.");
         }
 
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            throw new Exception("No se puede realizar el préstamo. El lector se encuentra SANCIONADO.");
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            throw new Exception("No se puede realizar el préstamo. El lector se encuentra BLOQUEADO.");
         }
 
         // Límite de préstamos activos por lector (opcional, lo define cada librería en Ajustes)

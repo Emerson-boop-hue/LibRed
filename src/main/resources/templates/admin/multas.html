@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org" 
-      th:replace="~{admin/layout :: molde('Gestión de Multas', 'Control de sanciones y pagos pendientes por daños o pérdidas', 'multas.css', 'multas.js', 'multas', ~{:: .dashboard-container})}">
+      th:replace="~{admin/layout :: molde('Gestión de Multas', 'Control de multas y pagos pendientes por daños o pérdidas', 'multas.css', 'multas.js', 'multas', ~{:: .dashboard-container})}">
 <head>
     <meta charset="UTF-8">
     <title>Multas | LibRed</title>
@@ -12,7 +12,7 @@
           <!-- COLUMNA IZQUIERDA: LISTADO DE MULTAS PENDIENTES -->
           <div class="multas-card-section">
             <div class="section-header">
-              <h2>Multas y Sanciones Pendientes</h2>
+              <h2>Multas Pendientes</h2>
             </div>
 
             <div class="table-responsive">
@@ -139,7 +139,7 @@
                   <strong id="sumFechaLimite">--</strong>
                 </div>
                 <div class="summary-row">
-                  <span>Motivo Sanción:</span>
+                  <span>Motivo de la multa:</span>
                   <strong id="sumMotivo">--</strong>
                 </div>
                 

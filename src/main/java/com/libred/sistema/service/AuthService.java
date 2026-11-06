@@ -1,5 +1,6 @@
 package com.libred.sistema.service;
 
+import com.libred.sistema.util.TelefonoUtil;
 import com.libred.sistema.model.Lector;
 import com.libred.sistema.model.Libreria;
 import com.libred.sistema.repository.LectorRepository;
@@ -32,7 +33,7 @@ public class AuthService {
      * Login del lector (Ej: LEC-1001) en la librería elegida. El lector puede entrar a CUALQUIER librería de la red.
      *
      * - Si ya está registrado en esa librería: se valida su contraseña y entra con su registro de esa librería
-     *   (con el estado propio que tenga allí: HABILITADO o SANCIONADO).
+     *   (con el estado propio que tenga allí: HABILITADO o BLOQUEADO).
      * - Si es su PRIMERA VEZ en esa librería: se valida su contraseña contra su registro en otra librería y se
      *   le crea automáticamente un registro nuevo (HABILITADO) en la librería elegida, copiando sus datos.
      *   Así aparece solo en la tabla de lectores de esa librería.
@@ -102,9 +103,9 @@ public class AuthService {
         nuevo.setCodigoLector(base.getCodigoLector());
         nuevo.setNombres(base.getNombres());
         nuevo.setApellidos(base.getApellidos());
-        nuevo.setTelefono(base.getTelefono());
+        nuevo.setTelefono(TelefonoUtil.normalizar(base.getTelefono()));
         nuevo.setPassword(base.getPassword());
-        nuevo.setEstadoCuenta("HABILITADO"); // empieza limpio: las sanciones de otras librerías no lo afectan
+        nuevo.setEstadoCuenta("HABILITADO"); // empieza limpio: los bloqueos de otras librerías no lo afectan
         nuevo.setLibreriaId(libreriaId);
         return lectorRepository.save(nuevo);
     }

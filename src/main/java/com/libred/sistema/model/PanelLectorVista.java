@@ -10,7 +10,7 @@ public class PanelLectorVista {
     private final String saludo;          // "Buenas noches"
     private final String nombre;          // primer nombre
     private final String fechaHoy;        // "Lunes, 2 de noviembre"
-    private final String estadoCuenta;    // HABILITADO / SANCIONADO
+    private final String estadoCuenta;    // HABILITADO / BLOQUEADO
 
     // ---- Números ----
     private final long activos;
@@ -66,7 +66,7 @@ public class PanelLectorVista {
     public String getNombre() { return nombre; }
     public String getFechaHoy() { return fechaHoy; }
     public String getEstadoCuenta() { return estadoCuenta; }
-    public boolean isSancionado() { return "SANCIONADO".equalsIgnoreCase(estadoCuenta); }
+    public boolean isBloqueado() { return "BLOQUEADO".equalsIgnoreCase(estadoCuenta); }
     public long getActivos() { return activos; }
     public Integer getMaxActivos() { return maxActivos; }
     public boolean isLimitado() { return maxActivos != null; }

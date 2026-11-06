@@ -18,9 +18,9 @@
   <body>
     <div class="lector-container">
 
-      <!-- Aviso cuando no puede solicitar (sanción, vencidos, límite, sin stock). Se refresca tras cada préstamo -->
+      <!-- Aviso cuando no puede solicitar (bloqueo, vencidos, límite, sin stock). Se refresca tras cada préstamo -->
       <div id="plBanner" th:attr="data-bloqueado=${p.bloqueo != null}">
-        <div class="pl-aviso" th:classappend="${p.sancionado} ? 'sancionado'" th:if="${p.bloqueo != null}">
+        <div class="pl-aviso" th:classappend="${p.bloqueado} ? 'bloqueado'" th:if="${p.bloqueo != null}">
           <i class="fa-solid fa-triangle-exclamation"></i>
           <span th:text="${p.bloqueo}">Motivo</span>
         </div>

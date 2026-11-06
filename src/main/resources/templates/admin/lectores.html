@@ -18,16 +18,35 @@
     <!-- Contenedor principal con data-css para que el layout gestione dinámicamente -->
     <div class="dashboard-container" data-css="lectores.css">
       
-      <!-- BARRA SUPERIOR DE ACCIONES Y FILTROS -->
+      <!-- BARRA SUPERIOR: buscador, filtro por fechas (calendario) y registrar -->
       <div class="lectores-toolbar">
-        <div class="search-box-lectores">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input
-            type="text"
-            id="inputBuscarLector"
-            placeholder="Buscar por nombre, apellido o código..."
-            th:value="${keyword}"
-          />
+        <div class="lectores-filtros">
+          <div class="search-box-lectores">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
+              id="inputBuscarLector"
+              placeholder="Buscar por nombre, apellido o código..."
+              th:value="${keyword}"
+            />
+          </div>
+
+          <!-- Rango de fechas de registro: calendario nativo del navegador, sin fechas futuras -->
+          <div class="filtro-fechas-lec">
+            <label class="fecha-campo" for="filtroDesde">
+              <span>Desde</span>
+              <input type="date" id="filtroDesde" th:value="${desde}" th:max="${hoy}" />
+            </label>
+            <label class="fecha-campo" for="filtroHasta">
+              <span>Hasta</span>
+              <input type="date" id="filtroHasta" th:value="${hasta}" th:max="${hoy}" />
+            </label>
+            <div class="atajos-fecha">
+              <button type="button" class="chip-fecha" data-atajo="hoy">Hoy</button>
+              <button type="button" class="chip-fecha" data-atajo="7dias">7 días</button>
+              <button type="button" class="chip-fecha" data-atajo="mes">Este mes</button>
+            </div>
+          </div>
         </div>
 
         <button class="btn-nuevo-lector" onclick="abrirModalCrearLector()">
@@ -35,92 +54,95 @@
         </button>
       </div>
 
-      <!-- KPIS DE LECTORES (2 EN FILA) -->
+      <!-- KPIS: los dos funcionan como filtro (clic para activar, otro clic para quitar). Muestran el total de la librería. -->
       <div class="lectores-kpis">
-        <div class="kpi-card-lec">
-          <div
-            class="kpi-icon-box-lec"
-            style="background-color: #dbeafe; color: #2563eb"
-          >
-            <i class="fa-solid fa-users"></i>
+        <button type="button" class="kpi-card-lec" id="kpiTotal" th:classappend="${estado == null} ? 'activo'"
+                title="Ver todos los lectores y quitar los filtros">
+          <div class="kpi-icon-box-lec azul"><i class="fa-solid fa-users"></i></div>
+          <div class="kpi-info-lec">
+            <span class="kpi-label-lec">LECTORES TOTALES</span>
+            <span class="kpi-value-lec" th:text="${totalLectores}">0</span>
+            <span class="kpi-pista-lec">Clic para ver todos</span>
           </div>
-          <div>
-            <span class="kpi-label-lec">LECTORES REGISTRADOS</span>
-            <h2 class="kpi-value-lec" th:text="${totalLectores}">0</h2>
-          </div>
-        </div>
+        </button>
 
-        <div class="kpi-card-lec">
-          <div
-            class="kpi-icon-box-lec"
-            style="background-color: #fee2e2; color: #dc2626"
-          >
-            <i class="fa-solid fa-user-slash"></i>
+        <button type="button" class="kpi-card-lec bloqueados" id="kpiBloqueados" th:classappend="${estado == 'BLOQUEADO'} ? 'activo'"
+                title="Mostrar solo los lectores bloqueados">
+          <div class="kpi-icon-box-lec rojo"><i class="fa-solid fa-user-slash"></i></div>
+          <div class="kpi-info-lec">
+            <span class="kpi-label-lec">LECTORES BLOQUEADOS</span>
+            <span class="kpi-value-lec text-danger-lec" th:text="${totalBloqueados}">0</span>
+            <span class="kpi-pista-lec" th:text="${estado == 'BLOQUEADO'} ? 'Filtrando · clic para quitar' : 'Clic para ver solo bloqueados'">Clic para ver solo bloqueados</span>
           </div>
-          <div>
-            <span class="kpi-label-lec">LECTORES SANCIONADOS</span>
-            <h2 class="kpi-value-lec text-danger-lec" th:text="${totalSancionados}">0</h2>
-          </div>
-        </div>
+        </button>
       </div>
 
-      <!-- TABLA DE LECTORES CON SCROLL FIJO -->
-      <div class="tabla-contenedor-fijo-lec" id="tablaLectoresContenedor">
-        <table class="tabla-lectores">
-          <thead>
-            <tr>
-              <th style="width: 60px; text-align: center">AVATAR</th>
-              <th>LECTOR</th>
-              <th style="width: 150px">CÓDIGO</th>
-              <th style="width: 160px">ESTADO</th>
-              <th style="width: 180px">FECHA DE REGISTRO</th>
-              <th style="width: 110px; text-align: center">ACCIONES</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Mensaje si la tabla está vacía -->
-            <tr th:if="${#lists.isEmpty(lectores)}">
-              <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">
-                No se encontraron lectores registrados.
-              </td>
-            </tr>
+      <!-- RESULTADO (se reemplaza completo al filtrar): línea de resumen + tabla -->
+      <div id="lectoresResultado">
+        <div class="lectores-resumen" th:if="${hayFiltros}">
+          <span>Mostrando <strong th:text="${#lists.size(lectores)}">0</strong> de <strong th:text="${totalLectores}">0</strong> lectores</span>
+          <span class="chip-filtro" th:if="${keyword != null and !#strings.isEmpty(#strings.trim(keyword))}" th:text="${'“' + keyword + '”'}">“ana”</span>
+          <span class="chip-filtro" th:if="${estado == 'BLOQUEADO'}">Bloqueados</span>
+          <span class="chip-filtro" th:if="${rangoTexto != null}" th:text="${rangoTexto}">del 02/11/2026 al 05/11/2026</span>
+          <button type="button" class="enlace-limpiar" id="btnLimpiarFiltros">Limpiar filtros</button>
+        </div>
 
-            <!-- Iteración de lectores -->
-            <tr th:each="lector : ${lectores}">
-              <td style="text-align: center">
-                <div class="lector-avatar" style="margin: 0 auto;">
-                  <i class="fa-solid fa-user"></i>
-                </div>
-              </td>
-              <td>
-                <div class="lector-nombre" th:text="${lector.nombres + ' ' + lector.apellidos}">Nombre y Apellidos</div>
-                <div class="lector-sub" style="font-size: 0.78rem; color: var(--text-muted);" th:text="${lector.telefono != null ? 'Tel: ' + lector.telefono : 'Sin teléfono'}">Teléfono</div>
-              </td>
-              <td th:text="${lector.codigoLector}">LEC-1001</td>
-              <td>
-                <span
-                  th:class="'txt-estado-cuenta ' + ${lector.estadoCuenta.toLowerCase()}"
-                  th:text="${lector.estadoCuenta}"
-                >HABILITADO</span>
-              </td>
-              <td style="color: var(--text-muted); font-size: 0.82rem;" th:text="${lector.fechaRegistro != null ? #temporals.format(lector.fechaRegistro, 'dd/MM/yyyy HH:mm') : '-'}">
-                27/10/2026
-              </td>
-              <td style="text-align: center">
-                <!-- Botón Modificar -->
-                <button class="btn-accion-lec" title="Modificar"
-                        th:onclick="abrirModalEditarLector([[${lector.id}]], [[${lector.codigoLector}]], [[${lector.nombres}]], [[${lector.apellidos}]], [[${lector.telefono}]])">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <!-- Botón Eliminar -->
-                <button class="btn-accion-lec eliminar" title="Eliminar"
-                        th:onclick="abrirModalEliminarLector([[${lector.id}]], [[${lector.nombres + ' ' + lector.apellidos}]], [[${lector.codigoLector}]])">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- TABLA DE LECTORES CON SCROLL FIJO -->
+        <div class="tabla-contenedor-fijo-lec" id="tablaLectoresContenedor">
+          <table class="tabla-lectores">
+            <thead>
+              <tr>
+                <th style="width: 60px; text-align: center">AVATAR</th>
+                <th>LECTOR</th>
+                <th style="width: 150px">CÓDIGO</th>
+                <th style="width: 160px">ESTADO</th>
+                <th style="width: 180px">FECHA DE REGISTRO</th>
+                <th style="width: 110px; text-align: center">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Sin resultados -->
+              <tr th:if="${#lists.isEmpty(lectores)}">
+                <td colspan="6" class="fila-sin-resultados">Sin resultados</td>
+              </tr>
+
+              <!-- Iteración de lectores -->
+              <tr th:each="lector : ${lectores}">
+                <td style="text-align: center">
+                  <div class="lector-avatar" style="margin: 0 auto;">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                </td>
+                <td>
+                  <div class="lector-nombre" th:text="${lector.nombres + ' ' + lector.apellidos}">Nombre y Apellidos</div>
+                  <div class="lector-sub" th:text="${lector.telefonoFormateado != null ? 'Tel: ' + lector.telefonoFormateado : 'Sin teléfono'}">Teléfono</div>
+                </td>
+                <td th:text="${lector.codigoLector}">LEC-1001</td>
+                <td>
+                  <span th:class="'estado-pill ' + ${lector.estadoCuenta.toLowerCase()}">
+                    <i th:class="${lector.estadoCuenta == 'BLOQUEADO'} ? 'fa-solid fa-lock' : 'fa-solid fa-circle-check'"></i>
+                    <span th:text="${lector.estadoCuenta}">HABILITADO</span>
+                  </span>
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.82rem;" th:text="${lector.fechaRegistro != null ? #temporals.format(lector.fechaRegistro, 'dd/MM/yyyy HH:mm') : '-'}">
+                  27/10/2026
+                </td>
+                <td style="text-align: center">
+                  <!-- Botón Modificar -->
+                  <button class="btn-accion-lec" title="Modificar"
+                          th:onclick="abrirModalEditarLector([[${lector.id}]], [[${lector.codigoLector}]], [[${lector.nombres}]], [[${lector.apellidos}]], [[${lector.telefono}]])">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <!-- Botón Eliminar -->
+                  <button class="btn-accion-lec eliminar" title="Eliminar"
+                          th:onclick="abrirModalEliminarLector([[${lector.id}]], [[${lector.nombres + ' ' + lector.apellidos}]], [[${lector.codigoLector}]])">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- MODAL UNIFICADO (REGISTRO Y EDICIÓN DE LECTOR) -->

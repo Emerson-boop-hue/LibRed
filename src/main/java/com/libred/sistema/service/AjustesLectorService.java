@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * Recuerda que un lector tiene UNA FILA POR LIBRERÍA (misma persona = mismo código).
  * Como son sus datos personales, los cambios se aplican a TODAS sus filas, para que sus datos
- * y su contraseña sean los mismos en cualquier librería de la red. El estado (HABILITADO/SANCIONADO)
+ * y su contraseña sean los mismos en cualquier librería de la red. El estado (HABILITADO/BLOQUEADO)
  * NO se toca: es propio de cada librería.
  */
 @Service

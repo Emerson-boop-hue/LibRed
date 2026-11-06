@@ -44,7 +44,7 @@
 
       <div class="pn-medio">
         <section class="pn-card pn-curso"
-                 th:classappend="${p.porCalificar > 0 or (!p.sancionado and p.vencidos == 0 and (p.calificadas > 0 or p.devueltos == 0))} ? 'con-aviso'">
+                 th:classappend="${p.porCalificar > 0 or (!p.bloqueado and p.vencidos == 0 and (p.calificadas > 0 or p.devueltos == 0))} ? 'con-aviso'">
           <div class="pn-card-cab">
             <h3><i class="fa-solid fa-book-open-reader"></i> Tus préstamos en curso</h3>
             <a th:href="@{/lector/prestamos}">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
@@ -74,12 +74,12 @@
             <span class="pn-aviso-cuerpo"><strong th:text="${'Tienes ' + p.porCalificar + (p.porCalificar == 1 ? ' préstamo por calificar' : ' préstamos por calificar')}">Tienes 1 préstamo por calificar</strong></span>
             <span class="pn-aviso-cta">Calificar ahora <i class="fa-solid fa-arrow-right"></i></span>
           </a>
-          <a class="pn-aviso ok" th:if="${!p.sancionado and p.vencidos == 0 and p.porCalificar == 0 and p.calificadas > 0}" th:href="@{/lector/historial}">
+          <a class="pn-aviso ok" th:if="${!p.bloqueado and p.vencidos == 0 and p.porCalificar == 0 and p.calificadas > 0}" th:href="@{/lector/historial}">
             <span class="pn-aviso-ico"><i class="fa-solid fa-face-smile-beam"></i></span>
             <span class="pn-aviso-cuerpo"><strong>¡Estás al día! 😊</strong> <small th:text="${'Calificaste ' + p.calificadas + (p.calificadas == 1 ? ' préstamo' : ' préstamos') + ' · Promedio ' + p.promedioCalif + ' ★'}">Calificaste 4</small></span>
             <span class="pn-aviso-cta">Ver calificaciones <i class="fa-solid fa-arrow-right"></i></span>
           </a>
-          <a class="pn-aviso info" th:if="${!p.sancionado and p.vencidos == 0 and p.porCalificar == 0 and p.calificadas == 0 and p.devueltos == 0}" th:href="@{/lector/prestamos}">
+          <a class="pn-aviso info" th:if="${!p.bloqueado and p.vencidos == 0 and p.porCalificar == 0 and p.calificadas == 0 and p.devueltos == 0}" th:href="@{/lector/prestamos}">
             <span class="pn-aviso-ico"><i class="fa-solid fa-star"></i></span>
             <span class="pn-aviso-cuerpo"><strong>Aquí podrás calificar tus préstamos</strong> <small>Cuando devuelvas tu primer artículo, cuéntanos cómo te fue.</small></span>
             <span class="pn-aviso-cta">Pedir un préstamo <i class="fa-solid fa-arrow-right"></i></span>
@@ -139,7 +139,7 @@
               <h3><i class="fa-solid fa-globe"></i> Tu librería y tu red</h3>
               <a th:href="@{/lector/red-global}">Red Global <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            <div class="pn-sede" th:classappend="${p.sancionado} ? 'e-sancionada' : (${p.vencidos > 0} ? 'e-vencido' : 'e-ok')">
+            <div class="pn-sede" th:classappend="${p.bloqueado} ? 'e-bloqueada' : (${p.vencidos > 0} ? 'e-vencido' : 'e-ok')">
               <span class="pn-avatar" th:text="${p.sedeIniciales}">LN</span>
               <div class="pn-sede-datos">
                 <strong th:text="${p.sedeNombre}">Librería</strong>
@@ -148,9 +148,9 @@
                   <span class="pn-sede-actual"><i class="fa-solid fa-location-dot"></i> Estás aquí</span>
                 </div>
               </div>
-              <!-- CINTA DE ESTADO: va dentro de esta tarjeta, de borde a borde en vertical. Prioridad: sancionada > préstamo vencido > todo en orden.
+              <!-- CINTA DE ESTADO: va dentro de esta tarjeta, de borde a borde en vertical. Prioridad: bloqueada > préstamo vencido > todo en orden.
                    Las dos primeras abren la ventana con el detalle (id pnEsquina, lo usa lector_panel.js). -->
-              <button type="button" class="pn-cinta sancionada" id="pnEsquina" th:if="${p.sancionado}" aria-haspopup="dialog" title="Ver detalle">
+              <button type="button" class="pn-cinta bloqueada" id="pnEsquina" th:if="${p.bloqueado}" aria-haspopup="dialog" title="Ver detalle">
                 <svg class="pn-cara pc-triste" viewBox="4 4 40 40" aria-hidden="true">
                   <g class="pc-cabeza">
                     <circle class="pc-aro" cx="24" cy="24" r="20"/>
@@ -162,9 +162,9 @@
                   </g>
                   <path class="pc-lagrima" d="M17 25.5C17 25.5 13.8 29.4 13.8 31.6A3.2 3.2 0 0 0 20.2 31.6C20.2 29.4 17 25.5 17 25.5Z"/>
                 </svg>
-                <span class="pn-cinta-txt"><strong>Cuenta sancionada</strong><small>Ver detalle →</small></span>
+                <span class="pn-cinta-txt"><strong>Cuenta bloqueada</strong><small>Ver detalle →</small></span>
               </button>
-              <button type="button" class="pn-cinta vencido" id="pnEsquina" th:if="${!p.sancionado and p.vencidos > 0}" aria-haspopup="dialog" title="Ver detalle">
+              <button type="button" class="pn-cinta vencido" id="pnEsquina" th:if="${!p.bloqueado and p.vencidos > 0}" aria-haspopup="dialog" title="Ver detalle">
                 <svg class="pn-cara pc-preocupada" viewBox="4 4 40 40" aria-hidden="true">
                   <g class="pc-cabeza">
                     <circle class="pc-aro" cx="24" cy="24" r="20"/>
@@ -178,7 +178,7 @@
                 </svg>
                 <span class="pn-cinta-txt"><strong>Préstamo vencido</strong><small>Ver detalle →</small></span>
               </button>
-              <div class="pn-cinta ok" th:if="${!p.sancionado and p.vencidos == 0}" role="status">
+              <div class="pn-cinta ok" th:if="${!p.bloqueado and p.vencidos == 0}" role="status">
                 <svg class="pn-cara pc-feliz" viewBox="4 4 40 40" aria-hidden="true">
                   <g class="pc-cabeza">
                     <circle class="pc-aro" cx="24" cy="24" r="20"/>
@@ -213,13 +213,13 @@
         </div>
       </div>
 
-      <div class="pn-modal-fondo" id="pnModal" hidden th:if="${p.sancionado or p.vencidos > 0}">
-        <div class="pn-modal" th:classappend="${!p.sancionado} ? 'vencido'" role="dialog" aria-modal="true" aria-labelledby="pnModalTitulo">
+      <div class="pn-modal-fondo" id="pnModal" hidden th:if="${p.bloqueado or p.vencidos > 0}">
+        <div class="pn-modal" th:classappend="${!p.bloqueado} ? 'vencido'" role="dialog" aria-modal="true" aria-labelledby="pnModalTitulo">
           <div class="pn-modal-cab">
-            <i class="fa-solid" th:classappend="${p.sancionado} ? 'fa-ban' : 'fa-triangle-exclamation'"></i>
+            <i class="fa-solid" th:classappend="${p.bloqueado} ? 'fa-ban' : 'fa-triangle-exclamation'"></i>
             <div>
-              <h3 id="pnModalTitulo" th:text="${p.sancionado} ? 'Tu cuenta está sancionada' : 'Tienes un préstamo vencido'">Tu cuenta está sancionada</h3>
-              <small th:text="${p.sancionado} ? ('No puedes pedir préstamos en ' + p.sedeNombre + ' hasta regularizarla') : ('Devuélvelo para poder pedir otros artículos en ' + p.sedeNombre)">No puedes pedir préstamos</small>
+              <h3 id="pnModalTitulo" th:text="${p.bloqueado} ? 'Tu cuenta está bloqueada' : 'Tienes un préstamo vencido'">Tu cuenta está bloqueada</h3>
+              <small th:text="${p.bloqueado} ? ('No puedes pedir préstamos en ' + ${p.sedeNombre} + ' hasta regularizarla') : ('Devuélvelo para poder pedir otros artículos en ' + ${p.sedeNombre})">No puedes pedir préstamos</small>
             </div>
             <button type="button" class="pn-modal-x" id="pnModalX" aria-label="Cerrar">&times;</button>
           </div>
@@ -229,7 +229,7 @@
               <ul>
                 <li th:if="${p.vencidos > 0}"><b th:text="${p.vencidos + (p.vencidos == 1 ? ' préstamo vencido' : ' préstamos vencidos')}">1 préstamo vencido</b>: «<span th:text="${p.vencidoTitulo}">Título</span>»</li>
                 <li th:if="${p.multasPendientes > 0}"><b th:text="${p.multasPendientes + (p.multasPendientes == 1 ? ' multa pendiente' : ' multas pendientes')}">1 multa pendiente</b> por un total de <b th:text="${'S/ ' + #numbers.formatDecimal(p.montoPendiente, 1, 'POINT', 2, 'POINT')}">S/ 25.00</b></li>
-                <li th:if="${p.vencidos == 0 and p.multasPendientes == 0}">La librería marcó tu cuenta como sancionada.</li>
+                <li th:if="${p.vencidos == 0 and p.multasPendientes == 0}">La librería marcó tu cuenta como bloqueada.</li>
               </ul>
             </div>
             <div class="pn-modal-sec">
@@ -241,13 +241,13 @@
                 <li th:if="${!#strings.isEmpty(p.sedeHorario)}">Atienden <b th:text="${p.sedeHorario}">Lun a Sáb, 9:00 a 18:00</b>.</li>
               </ol>
             </div>
-            <div class="pn-modal-nota" th:if="${p.sancionado}">
+            <div class="pn-modal-nota" th:if="${p.bloqueado}">
               <i class="fa-solid fa-circle-info"></i>
               <span>Cuando el administrador registre el pago o la devolución, tu cuenta se habilita sola. No tienes que hacer nada más.</span>
             </div>
-            <div class="pn-modal-nota" th:unless="${p.sancionado}">
+            <div class="pn-modal-nota" th:unless="${p.bloqueado}">
               <i class="fa-solid fa-circle-info"></i>
-              <span>Mientras tengas un préstamo vencido no podrás pedir otro artículo. Si se genera una multa, tu cuenta quedará sancionada.</span>
+              <span>Mientras tengas un préstamo vencido no podrás pedir otro artículo. Si se genera una multa, tu cuenta quedará bloqueada.</span>
             </div>
           </div>
           <div class="pn-modal-pie">

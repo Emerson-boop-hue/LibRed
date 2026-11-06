@@ -120,7 +120,7 @@ public class PanelLectorService {
                 montoPend = montoPend.add(m.getMonto() == null ? BigDecimal.ZERO : m.getMonto());
             }
         }
-        boolean sancionado = "SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta()) || multasPend > 0;
+        boolean bloqueado = "BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta()) || multasPend > 0;
 
         // ---------- Calificaciones ----------
         var calif = calificacionService.resumen(lectorId);
@@ -186,7 +186,7 @@ public class PanelLectorService {
         fecha = fecha.substring(0, 1).toUpperCase() + fecha.substring(1);
 
         return Optional.of(new PanelLectorVista(
-                saludo(), primerNombre, fecha, sancionado ? "SANCIONADO" : "HABILITADO",
+                saludo(), primerNombre, fecha, bloqueado ? "BLOQUEADO" : "HABILITADO",
                 enCursoBd.size(), sede == null ? null : politicaService.obtenerMaxActivos(libreriaId),
                 proximaNivel, proximaValor, proximaDetalle, multasPend, montoPend,
                 calif.devueltos(), calif.calificadas(), calif.promedio(),

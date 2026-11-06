@@ -48,7 +48,7 @@ function inicializarPrestamos() {
     function actualizar() {
         let bloqueo = '', rojo = false;
         const hayLector = selLector.value !== '';
-        selLector.classList.toggle('pr-sancionado', hayLector && opcionLector().dataset.estado === 'SANCIONADO');
+        selLector.classList.toggle('pr-bloqueado', hayLector && opcionLector().dataset.estado === 'BLOQUEADO');
         const hayCat = selCat.value !== '';
         const hayArt = selArt.value !== '';
         const dias = parseInt(selDias.value, 10) || 0;
@@ -64,10 +64,10 @@ function inicializarPrestamos() {
             chip.hidden = false;
             chip.className = 'pr-chip';
             chip.innerHTML = '<i class="fa-solid fa-user-check"></i> ' + estado + ' · ' + cupo;
-            if (estado === 'SANCIONADO') {
+            if (estado === 'BLOQUEADO') {
                 chip.classList.add('pr-chip-mal');
-                chip.innerHTML = '<i class="fa-solid fa-user-slash"></i> SANCIONADO · ' + cupo;
-                bloqueo = 'Este lector está SANCIONADO y no puede recibir préstamos.'; rojo = true;
+                chip.innerHTML = '<i class="fa-solid fa-user-slash"></i> BLOQUEADO · ' + cupo;
+                bloqueo = 'Este lector está BLOQUEADO y no puede recibir préstamos.'; rojo = true;
             } else if (maxActivos !== null && activos >= maxActivos) {
                 chip.classList.add('pr-chip-warn');
                 bloqueo = 'Este lector ya alcanzó el máximo de ' + maxActivos + ' préstamos activos permitido por tu librería.';

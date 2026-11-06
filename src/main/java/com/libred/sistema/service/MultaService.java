@@ -140,7 +140,7 @@ public class MultaService {
             Lector lectorCompleto = lectorRepository.findById(lectorFront.getId()).orElse(null);
             if (lectorCompleto != null) {
                 boolean tienePendientes = multaRepository.existsByLectorIdAndEstadoPago(lectorCompleto.getId(), "PENDIENTE");
-                String estadoReal = tienePendientes ? "SANCIONADO" : "HABILITADO";
+                String estadoReal = tienePendientes ? "BLOQUEADO" : "HABILITADO";
                 if (!estadoReal.equals(lectorCompleto.getEstadoCuenta())) {
                     lectorCompleto.setEstadoCuenta(estadoReal);
                     lectorRepository.save(lectorCompleto);

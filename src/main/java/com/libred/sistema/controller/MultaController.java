@@ -35,7 +35,7 @@ public class MultaController {
         Integer libreriaId = libreriaActual(session);
 
         model.addAttribute("titulo", "Gestión de Multas");
-        model.addAttribute("descripcion", "Control de sanciones y pagos pendientes por retraso o daños");
+        model.addAttribute("descripcion", "Control de multas y pagos pendientes por retraso o daños");
         model.addAttribute("menuActivo", "multas");
         model.addAttribute("multas", multaService.obtenerMultasPendientes(libreriaId));
 

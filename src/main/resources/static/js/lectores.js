@@ -7,37 +7,8 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 }
 
 function inicializarLectores() {
-    const inputBuscar = document.getElementById("inputBuscarLector");
-
-    function ejecutarFiltroLector() {
-        const keyword = inputBuscar ? inputBuscar.value.trim() : "";
-        const url = `/admin/lectores?keyword=${encodeURIComponent(keyword)}`;
-
-        fetch(url, {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const nuevaTabla = doc.getElementById("tablaLectoresContenedor");
-            
-            if (nuevaTabla) {
-                document.getElementById("tablaLectoresContenedor").replaceWith(nuevaTabla);
-                window.history.pushState({}, "", url);
-            }
-        })
-        .catch(err => console.error("Error al filtrar lectores:", err));
-    }
-
-    if (inputBuscar) {
-        inputBuscar.removeEventListener("input", window.searchLectorHandler);
-        window.searchLectorHandler = () => {
-            clearTimeout(window.searchLectorTimer);
-            window.searchLectorTimer = setTimeout(ejecutarFiltroLector, 300); 
-        };
-        inputBuscar.addEventListener("input", window.searchLectorHandler);
-    }
+    registrarFiltrosLectores();
+    actualizarAtajosFecha();
 
     // MASCARA Y VALIDACIÓN ESTRICTA PARA EL TELÉFONO (Solo números, bloques de 3 en 3)
     const inputTelefono = document.getElementById("modalLectorTelefono");
@@ -64,6 +35,173 @@ function inicializarLectores() {
             this.value = valorFormateado;
         });
     }
+}
+
+/* =====================================================================
+   FILTROS DEL MÓDULO: buscador + estado (KPI "bloqueados") + rango de fechas (calendario)
+   Se combinan entre sí. Al filtrar se reemplaza solo el bloque #lectoresResultado (resumen + tabla);
+   los KPIs siguen mostrando el total de la librería.
+   Los eventos son delegados y se registran una sola vez, aunque la página se vuelva a inicializar.
+   ===================================================================== */
+let peticionLectores = 0;
+
+function registrarFiltrosLectores() {
+    if (window.__filtrosLectoresListos) return;
+    window.__filtrosLectoresListos = true;
+
+    document.addEventListener("input", (e) => {
+        if (e.target && e.target.id === "inputBuscarLector") {
+            clearTimeout(window.searchLectorTimer);
+            window.searchLectorTimer = setTimeout(aplicarFiltrosLectores, 300);
+        }
+    });
+
+    document.addEventListener("change", (e) => {
+        if (e.target && (e.target.id === "filtroDesde" || e.target.id === "filtroHasta")) {
+            ajustarRangoFechas(e.target.id);
+            aplicarFiltrosLectores();
+        }
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!e.target || !e.target.closest) return;
+        const objetivo = e.target.closest("#kpiTotal, #kpiBloqueados, .chip-fecha, #btnLimpiarFiltros");
+        if (!objetivo) return;
+
+        if (objetivo.id === "kpiTotal" || objetivo.id === "btnLimpiarFiltros") {
+            limpiarFiltrosLectores();
+        } else if (objetivo.id === "kpiBloqueados") {
+            marcarKpis(estadoLectores() === "BLOQUEADO" ? "" : "BLOQUEADO");
+        } else {
+            aplicarAtajoFecha(objetivo.dataset.atajo);
+        }
+        aplicarFiltrosLectores();
+    });
+}
+
+// --- Estado (KPI) ---
+function estadoLectores() {
+    const kpi = document.getElementById("kpiBloqueados");
+    return kpi && kpi.classList.contains("activo") ? "BLOQUEADO" : "";
+}
+
+function marcarKpis(estado) {
+    const total = document.getElementById("kpiTotal");
+    const bloqueados = document.getElementById("kpiBloqueados");
+    if (total) total.classList.toggle("activo", estado !== "BLOQUEADO");
+    if (bloqueados) {
+        bloqueados.classList.toggle("activo", estado === "BLOQUEADO");
+        const pista = bloqueados.querySelector(".kpi-pista-lec");
+        if (pista) {
+            pista.textContent = estado === "BLOQUEADO" ? "Filtrando · clic para quitar" : "Clic para ver solo bloqueados";
+        }
+    }
+}
+
+function limpiarFiltrosLectores() {
+    const buscar = document.getElementById("inputBuscarLector");
+    const desde = document.getElementById("filtroDesde");
+    const hasta = document.getElementById("filtroHasta");
+    if (buscar) buscar.value = "";
+    if (desde) desde.value = "";
+    if (hasta) hasta.value = "";
+    marcarKpis("");
+}
+
+// --- Fechas (formato ISO yyyy-MM-dd; "hoy" lo da el servidor en el atributo max, para usar su mismo reloj) ---
+function fechaIso(f) {
+    return `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, "0")}-${String(f.getDate()).padStart(2, "0")}`;
+}
+
+function restarDias(iso, dias) {
+    const [a, m, d] = iso.split("-").map(Number);
+    const f = new Date(a, m - 1, d);
+    f.setDate(f.getDate() - dias);
+    return fechaIso(f);
+}
+
+function hoyLectores() {
+    const desde = document.getElementById("filtroDesde");
+    return desde && desde.max ? desde.max : fechaIso(new Date());
+}
+
+function rangoDeAtajo(atajo) {
+    const hoy = hoyLectores();
+    if (atajo === "hoy") return [hoy, hoy];
+    if (atajo === "7dias") return [restarDias(hoy, 6), hoy];
+    if (atajo === "mes") return [hoy.substring(0, 8) + "01", hoy];
+    return ["", ""];
+}
+
+function actualizarAtajosFecha() {
+    const desde = document.getElementById("filtroDesde");
+    const hasta = document.getElementById("filtroHasta");
+    const dv = desde ? desde.value : "";
+    const hv = hasta ? hasta.value : "";
+    document.querySelectorAll(".chip-fecha").forEach((boton) => {
+        const [d, h] = rangoDeAtajo(boton.dataset.atajo);
+        boton.classList.toggle("activo", dv !== "" && dv === d && hv === h);
+    });
+}
+
+// Un atajo activo se vuelve a pulsar para quitar el rango
+function aplicarAtajoFecha(atajo) {
+    const desde = document.getElementById("filtroDesde");
+    const hasta = document.getElementById("filtroHasta");
+    if (!desde || !hasta) return;
+    const [d, h] = rangoDeAtajo(atajo);
+    const yaActivo = desde.value === d && hasta.value === h;
+    desde.value = yaActivo ? "" : d;
+    hasta.value = yaActivo ? "" : h;
+}
+
+// Sin fechas futuras y con "Desde" <= "Hasta": se corrige el campo que no se acaba de tocar
+function ajustarRangoFechas(cambiado) {
+    const desde = document.getElementById("filtroDesde");
+    const hasta = document.getElementById("filtroHasta");
+    if (!desde || !hasta) return;
+    const hoy = hoyLectores();
+    if (desde.value && desde.value > hoy) desde.value = hoy;
+    if (hasta.value && hasta.value > hoy) hasta.value = hoy;
+    if (desde.value && hasta.value && desde.value > hasta.value) {
+        if (cambiado === "filtroDesde") hasta.value = desde.value;
+        else desde.value = hasta.value;
+    }
+}
+
+// --- Consulta al servidor y reemplazo del resultado ---
+function aplicarFiltrosLectores() {
+    const buscar = document.getElementById("inputBuscarLector");
+    const desde = document.getElementById("filtroDesde");
+    const hasta = document.getElementById("filtroHasta");
+
+    const params = new URLSearchParams();
+    const keyword = buscar ? buscar.value.trim() : "";
+    const estado = estadoLectores();
+    if (keyword) params.set("keyword", keyword);
+    if (estado) params.set("estado", estado);
+    if (desde && desde.value) params.set("desde", desde.value);
+    if (hasta && hasta.value) params.set("hasta", hasta.value);
+
+    const consulta = params.toString();
+    const url = "/admin/lectores" + (consulta ? "?" + consulta : "");
+    const turno = ++peticionLectores;
+
+    actualizarAtajosFecha();
+
+    fetch(url, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+        .then((respuesta) => respuesta.text())
+        .then((html) => {
+            if (turno !== peticionLectores) return; // llegó una respuesta más nueva: esta se descarta
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            const nuevo = doc.getElementById("lectoresResultado");
+            const actual = document.getElementById("lectoresResultado");
+            if (nuevo && actual) {
+                actual.replaceWith(nuevo);
+                window.history.replaceState({}, "", url);
+            }
+        })
+        .catch((err) => console.error("Error al filtrar lectores:", err));
 }
 
 // Funciones globales para modales

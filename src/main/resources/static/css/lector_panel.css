@@ -222,12 +222,12 @@ a.pn-aviso:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(15,
     border: 0; border-left: 3px solid var(--tono); border-radius: 0; color: var(--texto); text-align: center; font-family: inherit;
     box-shadow: 0 0 0 1px rgba(var(--tono-rgb), .14);
 }
-.pn-cinta.sancionada { --tono: #dc2626; --tono-rgb: 220, 38, 38; --texto: #7f1d1d; --subtexto: #b91c1c; background: linear-gradient(180deg, #fef2f2, #fee2e2); }
+.pn-cinta.bloqueada { --tono: #dc2626; --tono-rgb: 220, 38, 38; --texto: #7f1d1d; --subtexto: #b91c1c; background: linear-gradient(180deg, #fef2f2, #fee2e2); }
 .pn-cinta.vencido { --tono: #ea580c; --tono-rgb: 234, 88, 12; --texto: #7c2d12; --subtexto: #c2410c; background: linear-gradient(180deg, #fff7ed, #ffedd5); }
 .pn-cinta.ok { --tono: #16a34a; --tono-rgb: 22, 163, 74; --texto: #14532d; --subtexto: #15803d; background: linear-gradient(180deg, #f0fdf4, #dcfce7); }
 
 /* El fondo de la tarjeta toma un leve tinte del estado hacia la derecha, para que la franja del margen no parezca un resto sobrante */
-.pn-sede.e-sancionada { background: linear-gradient(90deg, transparent 40%, rgba(220, 38, 38, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
+.pn-sede.e-bloqueada { background: linear-gradient(90deg, transparent 40%, rgba(220, 38, 38, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
 .pn-sede.e-vencido { background: linear-gradient(90deg, transparent 40%, rgba(234, 88, 12, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
 .pn-sede.e-ok { background: linear-gradient(90deg, transparent 40%, rgba(22, 163, 74, .09) 100%), linear-gradient(135deg, var(--primary-soft), var(--bg-main)); }
 
@@ -292,7 +292,7 @@ button.pn-cinta:focus-visible { outline: 3px solid var(--tono); outline-offset: 
 @keyframes pcBrilla { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1) rotate(20deg); } }
 
 /* Modo oscuro: los pasteles pasan a tintes translúcidos del mismo color sobre el fondo oscuro */
-[data-tema="oscuro"] .pn-cinta.sancionada { --texto: #fecaca; --subtexto: #fca5a5; background: linear-gradient(180deg, rgba(220, 38, 38, .24), rgba(220, 38, 38, .12)); }
+[data-tema="oscuro"] .pn-cinta.bloqueada { --texto: #fecaca; --subtexto: #fca5a5; background: linear-gradient(180deg, rgba(220, 38, 38, .24), rgba(220, 38, 38, .12)); }
 [data-tema="oscuro"] .pn-cinta.vencido { --texto: #fed7aa; --subtexto: #fdba74; background: linear-gradient(180deg, rgba(234, 88, 12, .26), rgba(234, 88, 12, .13)); }
 [data-tema="oscuro"] .pn-cinta.ok { --texto: #bbf7d0; --subtexto: #86efac; background: linear-gradient(180deg, rgba(34, 197, 94, .22), rgba(34, 197, 94, .11)); }
 

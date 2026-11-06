@@ -12,7 +12,7 @@ function inicializarDevoluciones() {
 inicializarDevoluciones();
 
 // Lee las multas PENDIENTES del préstamo desde los <span> ocultos que renderiza Thymeleaf
-function obtenerSancionPrestamo(prestamoId) {
+function obtenerMultaPrestamo(prestamoId) {
     let total = 0;
     const motivos = [];
     document.querySelectorAll("#multasPendientesData span").forEach(s => {
@@ -117,10 +117,10 @@ function actualizarCalculoMora() {
     }
 
     // Multas pendientes previas (daño / pérdida) asociadas a este préstamo
-    const sancion = obtenerSancionPrestamo(prestamoId);
-    const montoMulta = sancion.total;
-    const sancionTexto = montoMulta > 0
-        ? "S/. " + montoMulta.toFixed(2) + (sancion.motivos.length ? " (" + sancion.motivos.join(", ") + ")" : "")
+    const multasPrevias = obtenerMultaPrestamo(prestamoId);
+    const montoMulta = multasPrevias.total;
+    const multaTexto = montoMulta > 0
+        ? "S/. " + montoMulta.toFixed(2) + (multasPrevias.motivos.length ? " (" + multasPrevias.motivos.join(", ") + ")" : "")
         : "NINGUNA";
 
     const totalPagar = montoMora + montoMulta;
@@ -134,7 +134,7 @@ function actualizarCalculoMora() {
     document.getElementById("sumFechaLimite").innerText = fechaLimiteStr || "--";
     document.getElementById("sumDiasExcedidos").innerText = `${diasRetraso} día(s)`;
     document.getElementById("sumMora").innerText = "S/. " + montoMora.toFixed(2);
-    document.getElementById("sumSancion").innerText = sancionTexto;
+    document.getElementById("sumMulta").innerText = multaTexto;
     document.getElementById("sumMontoTotal").innerText = "S/. " + totalPagar.toFixed(2);
 
     document.getElementById("subtituloComprobante").style.display = "none";

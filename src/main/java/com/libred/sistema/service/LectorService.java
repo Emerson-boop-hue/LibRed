@@ -5,6 +5,11 @@ import com.libred.sistema.repository.LectorRepository;
 import com.libred.sistema.repository.MultaRepository;
 import org.springframework.stereotype.Service;
 
+import com.libred.sistema.util.TelefonoUtil;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -29,8 +34,18 @@ public class LectorService {
         return lectores;
     }
 
-    // Método filtrado por librería actual con verificación dinámica de sanciones
+    // Método filtrado por librería actual con verificación dinámica de bloqueos (sin más filtros)
     public List<Lector> listarPorLibreria(Integer libreriaId, String keyword) {
+        return listarPorLibreria(libreriaId, keyword, null, null, null);
+    }
+
+    // Lista los lectores de la librería con los filtros del módulo (todos opcionales y combinables):
+    //  - keyword: nombre, apellido o código
+    //  - estado: "BLOQUEADO" (o "HABILITADO") -> se filtra DESPUÉS de sincronizar con las multas pendientes,
+    //    porque el estado real depende de ellas y el valor guardado podría estar desactualizado
+    //  - desde / hasta: rango por fecha de registro (por día, ambos extremos incluidos)
+    // Orden: del más reciente al más antiguo según la fecha de registro.
+    public List<Lector> listarPorLibreria(Integer libreriaId, String keyword, String estado, LocalDate desde, LocalDate hasta) {
         List<Lector> lectores;
         if (keyword != null && !keyword.isBlank()) {
             lectores = lectorRepository.searchByLibreria(libreriaId, keyword.trim());
@@ -38,14 +53,24 @@ public class LectorService {
             lectores = lectorRepository.findByLibreriaId(libreriaId);
         }
         sincronizarEstados(lectores);
-        return lectores;
+
+        return lectores.stream()
+                .filter(l -> estado == null || estado.equalsIgnoreCase(l.getEstadoCuenta()))
+                .filter(l -> desde == null
+                        || (l.getFechaRegistro() != null && !l.getFechaRegistro().toLocalDate().isBefore(desde)))
+                .filter(l -> hasta == null
+                        || (l.getFechaRegistro() != null && !l.getFechaRegistro().toLocalDate().isAfter(hasta)))
+                .sorted(Comparator
+                        .comparing(Lector::getFechaRegistro, Comparator.nullsLast(Comparator.<LocalDateTime>reverseOrder()))
+                        .thenComparing(Lector::getId, Comparator.<Integer>reverseOrder()))
+                .toList();
     }
 
     // Método privado para asegurar que el estado en memoria refleje las multas pendientes reales
     private void sincronizarEstados(List<Lector> lectores) {
         for (Lector lector : lectores) {
             boolean tienePendientes = multaRepository.existsByLectorIdAndEstadoPago(lector.getId(), "PENDIENTE");
-            String estadoReal = tienePendientes ? "SANCIONADO" : "HABILITADO";
+            String estadoReal = tienePendientes ? "BLOQUEADO" : "HABILITADO";
             
             // Si difiere del estado actual en la BD, lo actualizamos al vuelo
             if (!estadoReal.equals(lector.getEstadoCuenta())) {
@@ -66,7 +91,7 @@ public class LectorService {
             }
             existente.setNombres(lector.getNombres());
             existente.setApellidos(lector.getApellidos());
-            existente.setTelefono(lector.getTelefono());
+            existente.setTelefono(TelefonoUtil.normalizar(lector.getTelefono())); // siempre solo dígitos
             lectorRepository.save(existente);
             return;
         }
@@ -77,6 +102,7 @@ public class LectorService {
             throw new IllegalArgumentException("La contraseña debe tener entre 6 y 20 caracteres, sin espacios.");
         }
 
+        lector.setTelefono(TelefonoUtil.normalizar(lector.getTelefono())); // siempre solo dígitos
         lector.setLibreriaId(libreriaId);
         lector.setCodigoLector(generarSiguienteCodigo());
         lector.setEstadoCuenta("HABILITADO"); // todo lector nuevo entra habilitado
@@ -87,7 +113,7 @@ public class LectorService {
         Lector lector = lectorRepository.findById(id).orElse(null);
         if (lector != null) {
             boolean tienePendientes = multaRepository.existsByLectorIdAndEstadoPago(lector.getId(), "PENDIENTE");
-            lector.setEstadoCuenta(tienePendientes ? "SANCIONADO" : "HABILITADO");
+            lector.setEstadoCuenta(tienePendientes ? "BLOQUEADO" : "HABILITADO");
         }
         return lector;
     }
@@ -128,17 +154,17 @@ public class LectorService {
         return lectorRepository.count();
     }
 
-    public long contarLectoresSancionados() {
-        return lectorRepository.countByEstadoCuenta("SANCIONADO");
+    public long contarLectoresBloqueados() {
+        return lectorRepository.countByEstadoCuenta("BLOQUEADO");
     }
 
     public long contarTotalLectoresPorLibreria(Integer libreriaId) {
         return lectorRepository.countByLibreriaId(libreriaId);
     }
 
-    public long contarLectoresSancionadosPorLibreria(Integer libreriaId) {
+    public long contarLectoresBloqueadosPorLibreria(Integer libreriaId) {
         // Aseguramos sincronización antes de contar
         sincronizarEstados(lectorRepository.findByLibreriaId(libreriaId));
-        return lectorRepository.countByLibreriaIdAndEstadoCuenta(libreriaId, "SANCIONADO");
+        return lectorRepository.countByLibreriaIdAndEstadoCuenta(libreriaId, "BLOQUEADO");
     }
 }

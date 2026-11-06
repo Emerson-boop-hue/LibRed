@@ -1,11 +1,12 @@
 package com.libred.sistema.model;
 
 import jakarta.persistence.*;
+import com.libred.sistema.util.TelefonoUtil;
 import java.time.LocalDateTime;
 
 /**
  * Un lector tiene UNA FILA POR LIBRERÍA en la que está registrado: la misma persona (mismo código y contraseña)
- * aparece en cada librería con su propio estado (HABILITADO / SANCIONADO). Así una sanción en una librería
+ * aparece en cada librería con su propio estado (HABILITADO / BLOQUEADO). Así un bloqueo en una librería
  * no afecta a las demás. Por eso el código solo es único dentro de cada librería.
  */
 @Entity
@@ -67,6 +68,9 @@ public class Lector {
 
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    // Dato calculado (no se guarda): el teléfono siempre con el mismo formato "945 612 378"
+    public String getTelefonoFormateado() { return TelefonoUtil.formatear(telefono); }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }

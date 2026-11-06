@@ -135,7 +135,7 @@ public class PrestamoController {
             prestamo.setFechaDevolucionLimite(LocalDate.parse(fechaDevolucionLimite));
             prestamo.setOrigen("ADMIN");
 
-            // Ejecuta la lógica de negocio (pertenencia, sanciones, límites, plazo, tarifa, stock)
+            // Ejecuta la lógica de negocio (pertenencia, bloqueos, límites, plazo, tarifa, stock)
             Prestamo guardado = prestamoService.registrarPrestamo(libreriaActual(session), prestamo);
 
             // Datos para la ventana de confirmación

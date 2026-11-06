@@ -60,10 +60,10 @@
     transition: border-color .15s, box-shadow .15s;
 }
 .pr-control:focus { border-color: var(--active-bg); box-shadow: 0 0 0 3px rgba(51, 65, 85, .14); }
-.pr-control.pr-sancionado { color: #dc2626; font-weight: 600; }
-.pr-control option.op-sancionado { color: #dc2626; font-weight: 600; }
+.pr-control.pr-bloqueado { color: #dc2626; font-weight: 600; }
+.pr-control option.op-bloqueado { color: #dc2626; font-weight: 600; }
 .pr-control option { color: var(--text-dark); font-weight: 400; }
-.pr-control option.op-sancionado { color: #dc2626; font-weight: 600; }
+.pr-control option.op-bloqueado { color: #dc2626; font-weight: 600; }
 .pr-control:disabled { background: var(--sidebar-hover-bg); color: var(--text-muted); cursor: not-allowed; }
 .pr-fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .pr-hint { display: block; margin-top: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }

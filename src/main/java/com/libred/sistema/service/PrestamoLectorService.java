@@ -121,9 +121,9 @@ public class PrestamoLectorService {
         }
 
         String bloqueo = null;
-        boolean sancionado = "SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta());
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            bloqueo = "Tu cuenta está SANCIONADA en esta librería. Regulariza tus multas para volver a solicitar préstamos.";
+        boolean bloqueado = "BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta());
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            bloqueo = "Tu cuenta está BLOQUEADA en esta librería. Regulariza tus multas para volver a solicitar préstamos.";
         } else if (vencidos > 0) {
             bloqueo = "Tienes " + vencidos + (vencidos == 1 ? " préstamo vencido" : " préstamos vencidos")
                     + ". Devuélvelo en la librería para poder solicitar otro.";
@@ -137,7 +137,7 @@ public class PrestamoLectorService {
 
         return Optional.of(new Pantalla(
                 lector.getNombres() + " " + lector.getApellidos(), lector.getCodigoLector(), sede,
-                maxDias, maxActivos, activos, bloqueo, sancionado, categorias, articulos, filas));
+                maxDias, maxActivos, activos, bloqueo, bloqueado, categorias, articulos, filas));
     }
 
     private FilaPrestamo aFila(Prestamo p, boolean enCurso, boolean vencido, LocalDate hoy) {
@@ -197,8 +197,8 @@ public class PrestamoLectorService {
                     + (maxDias == 1 ? " día." : " días."));
         }
 
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            throw new AjustesException(null, "Tu cuenta está SANCIONADA en esta librería. No puedes solicitar préstamos.");
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            throw new AjustesException(null, "Tu cuenta está BLOQUEADA en esta librería. No puedes solicitar préstamos.");
         }
         if (prestamoRepository.countByLectorIdAndEstadoPrestamoAndFechaDevolucionLimiteBefore(
                 lectorId, "ACTIVO", LocalDate.now()) > 0

@@ -110,13 +110,13 @@ public class PrestamoLectorVista {
         private final Integer maxActivos; // null = sin límite
         private final long activos;
         private final String bloqueo; // null si puede pedir; si no, el motivo
-        private final boolean sancionado; // true si el motivo es una sanción (se resalta en rojo)
+        private final boolean bloqueado; // true si el motivo es el bloqueo de la cuenta (se resalta en rojo)
         private final List<CategoriaVista> categorias;
         private final List<ArticuloVista> articulos;
         private final List<FilaPrestamo> prestamos;
 
         public Pantalla(String lectorNombre, String lectorCodigo, String sedeNombre, int maxDias, Integer maxActivos,
-                        long activos, String bloqueo, boolean sancionado, List<CategoriaVista> categorias,
+                        long activos, String bloqueo, boolean bloqueado, List<CategoriaVista> categorias,
                         List<ArticuloVista> articulos, List<FilaPrestamo> prestamos) {
             this.lectorNombre = lectorNombre;
             this.lectorCodigo = lectorCodigo;
@@ -125,7 +125,7 @@ public class PrestamoLectorVista {
             this.maxActivos = maxActivos;
             this.activos = activos;
             this.bloqueo = bloqueo;
-            this.sancionado = sancionado;
+            this.bloqueado = bloqueado;
             this.categorias = categorias;
             this.articulos = articulos;
             this.prestamos = prestamos;
@@ -140,7 +140,7 @@ public class PrestamoLectorVista {
         public boolean isLleno() { return maxActivos != null && activos >= maxActivos; }
         public long getActivos() { return activos; }
         public String getBloqueo() { return bloqueo; }
-        public boolean isSancionado() { return sancionado; }
+        public boolean isBloqueado() { return bloqueado; }
         public List<CategoriaVista> getCategorias() { return categorias; }
         public List<ArticuloVista> getArticulos() { return articulos; }
         public List<FilaPrestamo> getPrestamos() { return prestamos; }

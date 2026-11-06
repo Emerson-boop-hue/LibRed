@@ -52,8 +52,8 @@
                         th:data-codigo="${l.codigoLector}"
                         th:data-estado="${l.estadoCuenta}"
                         th:data-activos="${enCursoPorLector[l.id] != null ? enCursoPorLector[l.id] : 0}"
-                        th:classappend="${l.estadoCuenta == 'SANCIONADO'} ? 'op-sancionado'"
-                        th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + (l.estadoCuenta == 'SANCIONADO' ? ' (SANCIONADO)' : '')}">
+                        th:classappend="${l.estadoCuenta == 'BLOQUEADO'} ? 'op-bloqueado'"
+                        th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + (l.estadoCuenta == 'BLOQUEADO' ? ' (BLOQUEADO)' : '')}">
                 </option>
               </select>
               <div id="lectorChip" class="pr-chip" hidden></div>
