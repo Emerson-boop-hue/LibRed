@@ -1,0 +1,208 @@
+/* PÁGINAS PÚBLICAS: Conócenos, Contáctenos y Ayuda (menú superior del login). */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+.inf-body { font-family: 'Inter', system-ui, sans-serif; color: #0f1b3d; background: #fff; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.inf-body a { color: inherit; }
+.inf-cont { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.inf-angosto { max-width: 820px; }
+[hidden] { display: none !important; }
+
+/* Cabecera */
+.inf-top { position: sticky; top: 0; z-index: 50; background: rgba(255, 255, 255, 0.96); border-bottom: 1px solid #dbe3f0; }
+.inf-top-in { max-width: 1120px; margin: 0 auto; padding: 0 24px; height: 80px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.inf-marca img { height: 62px; width: auto; display: block; }
+.inf-nav { display: flex; align-items: center; gap: 6px; }
+.inf-nav a { text-decoration: none; font-size: 14px; font-weight: 600; color: #5f6f8f; padding: 8px 14px; border-radius: 8px; transition: color 0.2s, background-color 0.2s; }
+.inf-nav a:hover { color: #1e3a8a; background: #eaf0fb; }
+.inf-nav a.activo { color: #1e40af; background: #e6edfb; }
+.inf-nav .inf-btn-nav { margin-left: 10px; background: #1e40af; color: #fff; padding: 9px 20px; }
+.inf-nav .inf-btn-nav:hover { background: #1e3a8a; color: #fff; }
+.inf-burger { display: none; border: 0; background: none; font-size: 20px; color: #1e3a8a; cursor: pointer; padding: 8px; }
+
+/* Botones y piezas comunes */
+.inf-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 10px;
+    border: 1px solid transparent; font: inherit; font-size: 14.5px; font-weight: 600; text-decoration: none; cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.inf-btn-pri { background: #1e40af; color: #fff !important; }
+.inf-btn-pri:hover:not(:disabled) { background: #1e3a8a; }
+.inf-btn-sec { background: #fff; color: #1e40af !important; border-color: #b9ccff; }
+.inf-btn-sec:hover { background: #f1f5fb; }
+.inf-btn-claro { background: #fff; color: #1e3a8a !important; }
+.inf-btn-claro:hover { background: #e6edfb; }
+.inf-btn-borde { background: transparent; color: #fff !important; border-color: rgba(255, 255, 255, 0.55); }
+.inf-btn-borde:hover { background: rgba(255, 255, 255, 0.12); }
+.inf-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.inf-ancho { width: 100%; }
+.inf-btn:focus-visible, .inf-nav a:focus-visible, .inf-chip:focus-visible, .inf-faq summary:focus-visible, .inf-conmuta-btn:focus-visible { outline: 2px solid #1e40af; outline-offset: 2px; }
+.inf-ico { width: 46px; height: 46px; border-radius: 12px; background: #e6edfb; color: #1e40af; display: inline-flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+.inf-link { border: 0; background: none; font: inherit; font-weight: 600; color: #1e40af; cursor: pointer; }
+.inf-link:hover { text-decoration: underline; }
+
+/* Secciones */
+.inf-seccion { padding: 76px 0; }
+.inf-sin-arriba { padding-top: 40px; }
+.inf-fondo { background: #f1f5fb; }
+.inf-cab { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.inf-cab h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; color: #0f1b3d; margin-bottom: 10px; }
+.inf-cab p { font-size: 16px; color: #5f6f8f; }
+
+/* Portada (Conócenos) */
+.inf-hero { position: relative; background-size: cover; background-position: center; color: #fff; }
+.inf-hero-vel { position: absolute; inset: 0; background: rgba(15, 27, 61, 0.82); }
+.inf-hero-in { position: relative; max-width: 1120px; margin: 0 auto; padding: 104px 24px 112px; }
+.inf-etiqueta { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #b9ccff; margin-bottom: 16px; }
+.inf-hero h1 { font-size: 46px; line-height: 1.12; font-weight: 800; letter-spacing: -0.02em; max-width: 760px; margin-bottom: 20px; }
+.inf-hero p { font-size: 18px; line-height: 1.6; color: #d6e0f5; max-width: 640px; margin-bottom: 32px; }
+.inf-hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Pilares */
+.inf-pilares { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.inf-pilar { padding: 28px; border: 1px solid #dbe3f0; border-radius: 14px; background: #fff; }
+.inf-pilar h3 { font-size: 18px; margin: 16px 0 8px; }
+.inf-pilar p { font-size: 14.5px; color: #475a7a; }
+
+/* Cómo funciona */
+.inf-conmuta { display: flex; gap: 4px; width: fit-content; margin: 0 auto 32px; padding: 4px; background: #fff; border: 1px solid #dbe3f0; border-radius: 12px; }
+.inf-conmuta-btn { border: 0; background: none; padding: 10px 22px; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 600; color: #5f6f8f; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+.inf-conmuta-btn:hover { color: #1e3a8a; }
+.inf-conmuta-btn.activo { background: #1e40af; color: #fff; }
+.inf-pasos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; animation: infEntrar 0.25s ease; }
+.inf-paso { background: #fff; border: 1px solid #dbe3f0; border-radius: 14px; padding: 26px; }
+.inf-num { width: 34px; height: 34px; border-radius: 50%; background: #1e40af; color: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.inf-paso h3 { font-size: 17px; margin-bottom: 8px; }
+.inf-paso p { font-size: 14.5px; color: #475a7a; }
+@keyframes infEntrar { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Funciones */
+.inf-funciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.inf-func { padding: 22px; border: 1px solid #dbe3f0; border-radius: 14px; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
+.inf-func:hover { border-color: #b9ccff; box-shadow: 0 6px 18px rgba(15, 27, 61, 0.07); }
+.inf-func .inf-ico { width: 40px; height: 40px; font-size: 1rem; }
+.inf-func h3 { font-size: 15.5px; margin: 14px 0 6px; }
+.inf-func p { font-size: 13.5px; color: #475a7a; line-height: 1.5; }
+
+/* Planes */
+.inf-planes { display: grid; grid-template-columns: repeat(2, minmax(0, 340px)); gap: 24px; justify-content: center; }
+.inf-plan { position: relative; display: flex; flex-direction: column; padding: 30px; background: #fff; border: 1px solid #dbe3f0; border-radius: 16px; }
+.inf-plan-dest { border: 2px solid #1e40af; }
+.inf-plan-tag { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); background: #1e40af; color: #fff; font-size: 12px; font-weight: 700; padding: 4px 14px; border-radius: 999px; white-space: nowrap; }
+.inf-plan h3 { font-size: 17px; margin-bottom: 8px; }
+.inf-precio { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; color: #0f1b3d; margin-bottom: 18px; }
+.inf-precio small { font-size: 14px; font-weight: 500; color: #5f6f8f; letter-spacing: 0; }
+.inf-plan ul { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; flex: 1; }
+.inf-plan li { font-size: 14px; color: #475a7a; padding-left: 24px; position: relative; }
+.inf-plan li i { color: #1e40af; font-size: 12px; position: absolute; left: 2px; top: 5px; }
+
+/* Equipo */
+.inf-equipo { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.inf-equipo img { width: 168px; height: 168px; border-radius: 50%; object-fit: cover; object-position: center 25%; border: 4px solid #fff; box-shadow: 0 0 0 1px #dbe3f0, 0 6px 18px rgba(15, 27, 61, 0.12); background: #eef2f8; }
+
+/* Llamada final */
+.inf-llamada { background: #1e3a8a; color: #fff; text-align: center; padding: 64px 0; }
+.inf-llamada h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+.inf-llamada p { color: #cfdcf7; margin-bottom: 24px; }
+.inf-llamada .inf-hero-btns { justify-content: center; }
+
+/* Cabecera de página (Contáctenos / Ayuda) */
+.inf-cabecera { background: #f1f5fb; border-bottom: 1px solid #dbe3f0; padding: 56px 0 44px; text-align: center; }
+.inf-cabecera h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+.inf-cabecera p { font-size: 16px; color: #5f6f8f; max-width: 620px; margin: 0 auto; }
+.inf-buscador { position: relative; max-width: 560px; margin: 26px auto 0; }
+.inf-buscador i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #9aa8c7; }
+.inf-buscador input { width: 100%; padding: 15px 18px 15px 46px; border: 1px solid #dbe3f0; border-radius: 12px; font: inherit; font-size: 15px; color: #0f1b3d; background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+.inf-buscador input:focus { border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12); }
+
+/* Contáctenos */
+.inf-contacto-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.inf-form { position: relative; padding: 30px; border: 1px solid #dbe3f0; border-radius: 16px; background: #fff; box-shadow: 0 2px 10px rgba(15, 27, 61, 0.04); }
+.inf-form h2, .inf-lado h2 { font-size: 20px; margin-bottom: 18px; }
+.inf-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.inf-campo { margin-bottom: 16px; }
+.inf-campo label { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #0f1b3d; }
+.inf-conteo { font-weight: 500; letter-spacing: 0; text-transform: none; color: #9aa8c7; }
+.inf-campo input, .inf-campo select, .inf-campo textarea {
+    width: 100%; padding: 12px 14px; border: 1px solid #dbe3f0; border-radius: 10px; background: #f8faff; font: inherit; font-size: 14.5px;
+    color: #0f1b3d; outline: none; appearance: none; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+.inf-campo textarea { resize: vertical; min-height: 130px; }
+.inf-campo input:focus, .inf-campo select:focus, .inf-campo textarea:focus { border-color: #1e40af; background: #fff; box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.12); }
+.inf-campo ::placeholder { color: #9aa8c7; }
+.inf-select { position: relative; }
+.inf-select i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #5f6f8f; pointer-events: none; }
+.inf-trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.inf-error { margin: 0 0 14px; font-size: 13px; font-weight: 500; color: #b42318; }
+.inf-exito { text-align: center; padding: 34px 10px; }
+.inf-exito .inf-ico { width: 56px; height: 56px; font-size: 1.4rem; margin-bottom: 14px; }
+.inf-exito h3 { font-size: 20px; margin-bottom: 6px; }
+.inf-exito p { color: #5f6f8f; margin-bottom: 14px; }
+
+.inf-lado { display: flex; flex-direction: column; gap: 12px; }
+.inf-lado h2 { margin-bottom: 6px; }
+.inf-canal { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #dbe3f0; border-radius: 12px; text-decoration: none; background: #fff; transition: border-color 0.2s, background-color 0.2s; }
+.inf-canal:hover { border-color: #b9ccff; background: #f8faff; }
+.inf-canal > i { width: 42px; height: 42px; border-radius: 10px; background: #e6edfb; color: #1e40af; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; flex-shrink: 0; }
+.inf-canal > span { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.inf-canal strong { font-size: 14.5px; }
+.inf-canal small { font-size: 13px; color: #5f6f8f; overflow: hidden; text-overflow: ellipsis; }
+.inf-canal > u { text-decoration: none; font-size: 12px; color: #9aa8c7; }
+.inf-nota-caja { margin-top: 6px; padding: 16px; border-radius: 12px; background: #f1f5fb; font-size: 13.5px; color: #475a7a; }
+.inf-nota-caja strong { display: block; color: #0f1b3d; margin-bottom: 4px; }
+
+/* Ayuda */
+.inf-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.inf-chip { border: 1px solid #dbe3f0; background: #fff; padding: 8px 16px; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 600; color: #5f6f8f; cursor: pointer; transition: all 0.2s; }
+.inf-chip:hover { border-color: #b9ccff; color: #1e3a8a; }
+.inf-chip.activo { background: #1e40af; border-color: #1e40af; color: #fff; }
+.inf-faqs { display: flex; flex-direction: column; gap: 10px; }
+.inf-faq { border: 1px solid #dbe3f0; border-radius: 12px; background: #fff; transition: border-color 0.2s, background-color 0.2s; }
+.inf-faq[open] { border-color: #b9ccff; background: #f8faff; }
+.inf-faq summary { list-style: none; cursor: pointer; padding: 16px 48px 16px 18px; font-size: 15px; font-weight: 600; color: #0f1b3d; position: relative; }
+.inf-faq summary::-webkit-details-marker { display: none; }
+.inf-faq summary::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 12px; color: #9aa8c7; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); transition: transform 0.2s; }
+.inf-faq[open] summary::after { transform: translateY(-50%) rotate(180deg); }
+.inf-faq p { padding: 0 18px 18px; font-size: 14.5px; line-height: 1.65; color: #475a7a; }
+.inf-vacio { text-align: center; padding: 28px 12px; color: #5f6f8f; }
+.inf-ayuda-final { margin-top: 40px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 24px 28px; border-radius: 14px; background: #f1f5fb; border: 1px solid #dbe3f0; }
+.inf-ayuda-final h3 { font-size: 17px; margin-bottom: 2px; }
+.inf-ayuda-final p { color: #5f6f8f; font-size: 14px; }
+
+/* Pie */
+.inf-pie { background: #0f1b3d; color: #cfdcf7; }
+.inf-pie-in { max-width: 1120px; margin: 0 auto; padding: 48px 24px 32px; display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 32px; }
+.inf-pie-marca img { height: 36px; width: auto; display: block; margin: 0 0 12px -2px; }
+.inf-pie-marca p { font-size: 13.5px; line-height: 1.6; max-width: 320px; color: #a9b6d3; }
+.inf-pie-col h4 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
+.inf-pie-col a { display: block; text-decoration: none; font-size: 14px; color: #a9b6d3; margin-bottom: 9px; transition: color 0.2s; }
+.inf-pie-col a:hover { color: #fff; }
+.inf-pie-fin { border-top: 1px solid #26334f; text-align: center; padding: 18px 24px; font-size: 12.5px; color: #8e9bb0; }
+
+/* Pantallas pequeñas */
+@media (max-width: 900px) {
+    .inf-funciones { grid-template-columns: repeat(2, 1fr); }
+    .inf-pilares, .inf-pasos { grid-template-columns: 1fr; }
+    .inf-contacto-grid { grid-template-columns: 1fr; }
+    .inf-hero h1 { font-size: 36px; }
+}
+@media (max-width: 760px) {
+    .inf-burger { display: block; }
+    .inf-nav { display: none; position: absolute; top: 80px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 4px; padding: 12px 16px 16px; background: #fff; border-bottom: 1px solid #dbe3f0; }
+    .inf-nav.abierto { display: flex; }
+    .inf-nav a { padding: 12px 14px; }
+    .inf-nav .inf-btn-nav { margin: 6px 0 0; text-align: center; }
+    .inf-pie-in { grid-template-columns: 1fr 1fr; }
+    .inf-pie-marca { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+    .inf-seccion { padding: 52px 0; }
+    .inf-hero-in { padding: 72px 20px 80px; }
+    .inf-hero h1 { font-size: 30px; }
+    .inf-hero p { font-size: 16px; }
+    .inf-funciones, .inf-planes, .inf-fila { grid-template-columns: 1fr; }
+    .inf-cab h2 { font-size: 25px; }
+    .inf-equipo img { width: 132px; height: 132px; }
+    .inf-ayuda-final { flex-direction: column; align-items: flex-start; }
+    .inf-form { padding: 22px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .inf-pasos { animation: none; } }

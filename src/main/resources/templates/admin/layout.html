@@ -1,0 +1,479 @@
+<!doctype html>
+<!-- Molde principal de administración -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:fragment="molde(titulo, descripcion, cssEspecifico, jsEspecifico, menuActivo, contenido)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script th:src="@{/js/tema.js}"></script>
+    <title th:text="${titulo} + ' | LibRed'">
+      LibRed - Panel Administrativo
+    </title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <link rel="stylesheet" th:href="@{/css/layout_admin.css}" />
+    <link rel="stylesheet" th:href="@{/css/suscripcion_plan.css}" />
+    <link rel="stylesheet" th:href="@{/css/membresia.css}" />
+    <link
+      id="dynamic-specific-css"
+      rel="stylesheet"
+      th:if="${cssEspecifico != ''}"
+      th:href="@{/css/{file}(file=${cssEspecifico})}"
+    />
+  </head>
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <img
+          th:src="@{/img/LogoSinFodo.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo logo-claro"
+        />
+        <img
+          th:src="@{/img/LogoModoOscuro.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo logo-oscuro"
+        />
+        <i
+          class="fa-solid fa-outdent toggle-btn"
+          onclick="toggleSidebar()"
+          title="Contraer barra"
+        ></i>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">MENÚ PRINCIPAL</span>
+
+        <!-- Panel de Control -->
+        <a
+          href="/admin/panel"
+          th:class="${menuActivo == 'panel'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-table-columns"></i>
+          <span class="nav-text">Panel de Control</span>
+        </a>
+
+        <a
+          href="/admin/lectores"
+          th:class="${menuActivo == 'lectores'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-users"></i>
+          <span class="nav-text">Lectores</span>
+        </a>
+
+        <a
+          href="/admin/inventario"
+          th:class="${menuActivo == 'inventario'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span class="nav-text">Inventario</span>
+        </a>
+
+        <span class="nav-section-title">CIRCULACIÓN</span>
+
+        <a
+          href="/admin/prestamos"
+          th:class="${menuActivo == 'prestamos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span class="nav-text">Préstamos</span>
+          <span class="nav-badge" th:if="${porEntregarCount != null and porEntregarCount > 0}" th:text="${porEntregarCount}">0</span>
+        </a>
+
+        <a
+          href="/admin/devoluciones"
+          th:class="${menuActivo == 'devoluciones'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-rotate-left"></i>
+          <span class="nav-text">Devoluciones</span>
+        </a>
+
+        <span class="nav-section-title">CONTROL Y MONITOREO</span>
+
+        <a
+          href="/admin/multas"
+          th:class="${menuActivo == 'multas'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span class="nav-text">Multas</span>
+        </a>
+
+        <!-- Movimientos (historial de préstamos, devoluciones y multas) -->
+        <a
+          href="/admin/movimientos"
+          th:class="${menuActivo == 'movimientos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-timeline"></i>
+          <span class="nav-text">Movimientos</span>
+        </a>
+
+        <a
+          href="/admin/ingresos"
+          th:class="${menuActivo == 'ingresos'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-cash-register"></i>
+          <span class="nav-text">Ingresos</span>
+        </a>
+
+        <span class="nav-section-title">MÉTRICAS</span>
+
+        <a
+          href="/admin/reportes"
+          th:class="${menuActivo == 'reportes'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-chart-line"></i>
+          <span class="nav-text">Reportes</span>
+        </a>
+
+        <a
+          href="/admin/estadisticas"
+          th:class="${menuActivo == 'estadisticas'} ? 'nav-item active' : 'nav-item'"
+          onclick="setActive(this)"
+        >
+          <i class="fa-solid fa-chart-pie"></i>
+          <span class="nav-text">Estadísticas</span>
+        </a>
+
+        <span class="nav-section-title">SISTEMA</span>
+        <a href="/admin/ajustes" th:class="${menuActivo == 'ajustes'} ? 'nav-item active' : 'nav-item'" onclick="setActive(this)">
+            <i class="fa-solid fa-gear"></i> <span class="nav-text">Ajustes</span>
+        </a>
+        <a href="/admin/ayuda" th:class="${menuActivo == 'ayuda'} ? 'nav-item active' : 'nav-item'" onclick="setActive(this)">
+            <i class="fa-solid fa-circle-question"></i> <span class="nav-text">Ayuda y Soporte</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div
+            class="avatar"
+            th:text="${session.libreriaNombre != null ? #strings.toUpperCase(#strings.substring(session.libreriaNombre, 0, 1)) : 'A'}"
+          >A</div>
+          <div class="user-info nav-text">
+            <span class="user-name" th:text="${session.libreriaNombre != null ? session.libreriaNombre : 'Administrador'}">Nombre comercial</span>
+            <span class="user-email" th:text="${session.libreriaCodigo}">ADM-000</span>
+          </div>
+        </div>
+        <a href="#" class="nav-item logout-btn" onclick="abrirModalLogout(event)">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-text">Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL (Sin barra de búsqueda en topbar) -->
+    <main class="main-content" id="mainContent" th:classappend="${membresia != null and membresia.suspendida} ? 'mb-suspendida'">
+      <header class="topbar">
+        <div class="topbar-title-area">
+          <h1 th:text="${titulo}">Título</h1>
+          <p th:text="${descripcion}">Descripción</p>
+        </div>
+
+        <div class="topbar-right-actions">
+          <div class="topbar-actions">
+            <button type="button" class="btn-tema" data-tema-toggle title="Modo oscuro" aria-label="Cambiar entre modo claro y oscuro">
+              <i class="fa-solid fa-moon ic-luna"></i><i class="fa-solid fa-sun ic-sol"></i>
+            </button>
+            <button type="button" class="mb-chip" th:if="${membresia != null and membresia.mostrarFranja()}"
+                    th:classappend="${membresia.aviso}" onclick="abrirModalPlan()" title="Ver plan actual">
+              <i class="fa-regular fa-clock" th:if="${membresia.fase == 'ACTIVA'}"></i>
+              <i class="fa-solid fa-triangle-exclamation" th:if="${membresia.fase == 'GRACIA'}"></i>
+              <i class="fa-solid fa-lock" th:if="${membresia.suspendida}"></i>
+              <span th:if="${membresia.fase == 'ACTIVA'}"
+                    th:text="${membresia.diasRestantes <= 1 ? 'Vence hoy' : membresia.diasRestantes + ' días restantes'}">30 días restantes</span>
+              <span th:if="${membresia.fase == 'GRACIA'}"
+                    th:text="${'Gracia: ' + membresia.diasRestantes + (membresia.diasRestantes == 1 ? ' día' : ' días')}">Gracia: 3 días</span>
+              <span th:if="${membresia.suspendida}">Solo lectura</span>
+            </button>
+            <button class="btn-plan" onclick="abrirModalPlan()">
+              <i class="fa-regular fa-user"></i> Ver plan actual
+            </button>
+            <button type="button" class="btn-invite" onclick="abrirModalInvitar()">+ Invitar</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Aquí se inyectará el contenido específico -->
+      <th:block th:replace="${contenido}"></th:block>
+    </main>
+
+    <!-- Modal de suscripción: estado de la membresía -->
+    <div id="modalSuscripcion" class="modal-overlay">
+        <div class="modal-content sus-plan-modal">
+            <button type="button" class="sus-cerrar" onclick="cerrarModalSuscripcion()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+
+            <div class="sus-plan-head">
+                <span class="sus-plan-icon"><i class="fa-solid fa-crown"></i></span>
+                <div>
+                    <h2>Tu membresía</h2>
+                    <p id="susPlanDescripcion">Consultando el estado de tu sede...</p>
+                </div>
+            </div>
+
+            <div id="susPlanCargando" class="sus-plan-cargando"><span class="sus-spinner"></span> Consultando el estado de tu membresía...</div>
+
+            <div id="susPlanContenido" class="sus-plan-contenido" hidden>
+
+                <div class="sus-aviso-vencido" id="susPlanAvisoVencido" hidden>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Tu membresía venció. Renuévala para que tus lectores sigan encontrando tu catálogo.</span>
+                </div>
+
+                <div class="sus-plan-hero sus-anim" style="--d:0">
+                    <div class="sus-hero-fondo"></div>
+                    <div class="sus-hero-fila">
+                        <div class="sus-hero-info">
+                            <span class="sus-hero-etiqueta">Plan activo</span>
+                            <strong class="sus-hero-nombre" id="susPlanNombre">—</strong>
+                            <span class="sus-hero-precio" id="susPlanPrecio">—</span>
+                            <span class="sus-estado ok" id="susPlanEstado">—</span>
+                        </div>
+                        <div class="sus-anillo">
+                            <svg viewBox="0 0 120 120" aria-hidden="true">
+                                <circle class="sus-anillo-pista" cx="60" cy="60" r="52"></circle>
+                                <circle class="sus-anillo-valor" id="susPlanAnillo" cx="60" cy="60" r="52"></circle>
+                            </svg>
+                            <div class="sus-anillo-centro">
+                                <strong id="susPlanDias">—</strong>
+                                <span>días restantes</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sus-linea">
+                        <div><small>Inicio del periodo</small><b id="susPlanInicio">—</b></div>
+                        <div class="sus-linea-barra"><i id="susPlanBarra"></i></div>
+                        <div class="sus-linea-fin"><small id="susPlanFinEtiq">Vence el</small><b id="susPlanFecha">—</b></div>
+                    </div>
+                </div>
+
+                <!-- Datos de la cuenta -->
+                <div class="sus-datos sus-anim" style="--d:1">
+                    <div class="sus-dato">
+                        <span class="sus-dato-icono"><i class="fa-solid fa-store"></i></span>
+                        <small>Sede</small>
+                        <b id="susDatoSede">—</b>
+                        <em id="susDatoCodigo">—</em>
+                    </div>
+                    <div class="sus-dato">
+                        <span class="sus-dato-icono"><i class="fa-regular fa-calendar-check"></i></span>
+                        <small>Miembro desde</small>
+                        <b id="susDatoDesde">—</b>
+                        <em>Red LibRed</em>
+                    </div>
+                    <div class="sus-dato">
+                        <span class="sus-dato-icono"><i class="fa-regular fa-credit-card"></i></span>
+                        <small>Último pago con</small>
+                        <b id="susDatoTarjeta">—</b>
+                        <em id="susDatoMetodoNota">—</em>
+                    </div>
+                    <div class="sus-dato">
+                        <span class="sus-dato-icono"><i class="fa-solid fa-receipt"></i></span>
+                        <small id="susDatoCobroEtiq">Vencimiento</small>
+                        <b id="susDatoCobro">—</b>
+                        <em id="susDatoCobroFecha">—</em>
+                    </div>
+                </div>
+
+                <!-- Lo que incluye -->
+                <div class="sus-incluye sus-anim" style="--d:2">
+                    <h5>Incluido en tu plan</h5>
+                    <div class="sus-chips">
+                        <span><i class="fa-solid fa-check"></i> Inventario</span>
+                        <span><i class="fa-solid fa-check"></i> Lectores</span>
+                        <span><i class="fa-solid fa-check"></i> Préstamos y devoluciones</span>
+                        <span><i class="fa-solid fa-check"></i> Multas e ingresos</span>
+                        <span><i class="fa-solid fa-check"></i> Reportes y estadísticas</span>
+                        <span><i class="fa-solid fa-check"></i> Soporte por correo</span>
+                    </div>
+                </div>
+
+                <!-- Renovación: automática (tarjeta / PayPal), cancelada o manual (Yape) -->
+                <div class="sus-renov sus-anim" id="susRenov" style="--d:3">
+                    <div class="sus-renov-cab">
+                        <span class="sus-renov-icono" id="susRenovIcono"><i class="fa-solid fa-rotate"></i></span>
+                        <div>
+                            <h4 id="susRenovTitulo">Renovación</h4>
+                            <p id="susRenovTexto">—</p>
+                        </div>
+                    </div>
+                    <p class="sus-renov-alerta" id="susRenovAlerta" hidden></p>
+                    <p class="sus-nota-migrar" id="susRenovNota"></p>
+                    <div class="sus-renov-acciones">
+                        <button type="button" class="sus-btn-sec" id="susBtnCancelar" onclick="cancelarRenovacion()" hidden><span id="susBtnCancelarTxt">Cancelar renovación automática</span></button>
+                        <button type="button" class="sus-btn-sec" id="susBtnReactivar" onclick="reactivarRenovacion()" hidden>Reactivar renovación</button>
+                        <button type="button" class="sus-btn-prim" id="susBtnRenovar" onclick="abrirPago('ACTUAL')" hidden>Renovar ahora</button>
+                    </div>
+                </div>
+
+                <!-- Mejora: solo para planes mensuales -->
+                <div class="sus-plan-upgrade sus-anim" id="susPlanMigrar" style="--d:3" hidden>
+                    <div class="sus-upg-cab">
+                        <span class="sus-upg-icono"><i class="fa-solid fa-arrow-trend-up"></i></span>
+                        <div>
+                            <h4>Pásate al Plan Anual</h4>
+                            <p>Pagas una sola vez y tu tiempo restante se conserva: el año se suma al final de tu plan actual.</p>
+                        </div>
+                    </div>
+                    <div class="sus-comparar">
+                        <div class="sus-comp">
+                            <small>Plan Mensual</small>
+                            <b id="susCompMensual">S/ 0.00</b>
+                            <em>12 meses × <span id="susCompPrecioMes">S/ 0.00</span></em>
+                        </div>
+                        <span class="sus-comp-flecha"><i class="fa-solid fa-arrow-right"></i></span>
+                        <div class="sus-comp sus-comp-anual">
+                            <small>Plan Anual</small>
+                            <b><span id="susPlanPrecioAnual">S/ 0.00</span></b>
+                            <em class="sus-ahorro">Ahorras <span id="susPlanAhorro">S/ 0.00</span></em>
+                        </div>
+                    </div>
+                    <button type="button" class="sus-btn-migrar" id="susBtnMigrar" onclick="abrirPago('ANUAL')"><span id="susBtnTexto">Pasar al Plan Anual</span></button>
+                </div>
+
+                <!-- Plan anual: ya tiene el mejor plan -->
+                <div class="sus-plan-top sus-anim" id="susPlanTop" style="--d:3" hidden>
+                    <span class="sus-upg-icono"><i class="fa-solid fa-medal"></i></span>
+                    <div>
+                        <h4>Ya cuentas con el mejor plan</h4>
+                        <p>Con el Plan Anual ahorras <strong id="susPlanTopAhorro">S/ 0.00</strong> al año frente al pago mensual.</p>
+                    </div>
+                </div>
+
+                <p class="sus-plan-msg" id="susPlanMsg"></p>
+            </div>
+
+            <!-- Pago de la renovación / del Plan Anual -->
+            <div class="sus-pago" id="susPago" hidden>
+                <button type="button" class="sus-pago-atras" onclick="cerrarPago()"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+                <h3 id="susPagoTitulo">Renovar plan</h3>
+                <div class="sus-pago-resumen">
+                    <div><span>Plan</span><b id="susPagoPlan">—</b></div>
+                    <div><span>Vigente hasta</span><b id="susPagoHasta">—</b></div>
+                    <div class="total"><span>Total a pagar</span><b id="susPagoTotal">—</b></div>
+                </div>
+
+                <div class="sus-metodos">
+                    <button type="button" class="sus-metodo" data-m="TARJETA">
+                        <span class="sus-m-ico"><i class="fa-solid fa-credit-card sus-m-tarjeta"></i></span><span>Tarjeta</span>
+                    </button>
+                    <button type="button" class="sus-metodo" data-m="YAPE">
+                        <span class="sus-m-ico"><img class="sus-yape-img" th:src="@{/img/yape.webp}" src="/img/yape.webp" alt="" onerror="this.outerHTML='&lt;b class=&quot;sus-yape-txt&quot;&gt;yape&lt;/b&gt;'"></span><span>Yape</span>
+                    </button>
+                    <button type="button" class="sus-metodo" data-m="PAYPAL">
+                        <span class="sus-m-ico"><img class="sus-pp-img" th:src="@{/img/paypal.jpg}" src="/img/paypal.jpg" alt="PayPal" onerror="this.outerHTML='&lt;b class=&quot;sus-pp-txt&quot;&gt;PayPal&lt;/b&gt;'"></span><span>PayPal</span>
+                    </button>
+                </div>
+
+                <div class="sus-mpanel" data-mp="TARJETA" hidden>
+                    <div class="sus-campo"><label for="susNum" class="sus-etq" data-t="Número de tarjeta"></label>
+                        <input type="text" id="susNum" name="sus-n1" inputmode="numeric" placeholder="•••• •••• •••• ••••" autocomplete="off" data-campo="numero"></div>
+                    <div class="sus-campo"><label for="susTit" class="sus-etq" data-t="Titular"></label>
+                        <input type="text" id="susTit" name="sus-n2" placeholder="Nombre y apellido" maxlength="100" autocomplete="off" data-campo="titular"></div>
+                    <div class="sus-doble">
+                        <div class="sus-campo"><label for="susVen" class="sus-etq" data-t="Vence (MM/AA)"></label>
+                            <input type="text" id="susVen" name="sus-n3" inputmode="numeric" placeholder="••/••" maxlength="5" autocomplete="off" data-campo="vence"></div>
+                        <div class="sus-campo"><label for="susCvv" class="sus-etq" data-t="CVV"></label>
+                            <input type="text" id="susCvv" name="sus-n4" class="sus-secreto" inputmode="numeric" placeholder="•••" maxlength="3" autocomplete="off" data-campo="cvv"></div>
+                    </div>
+                </div>
+
+                <div class="sus-mpanel" data-mp="YAPE" hidden>
+                    <div class="sus-campo"><label for="susCel">Celular con Yape</label>
+                        <input type="text" id="susCel" inputmode="numeric" placeholder="999 999 999" maxlength="11" autocomplete="off" data-campo="celular"></div>
+                    <button type="button" class="sus-btn-sec ancho" id="susYapeSolicitar" disabled>Obtener código de aprobación</button>
+                    <div class="sus-yape-app" id="susYapeApp" hidden>
+                        <div class="sus-yape-cab"><b>yape</b><small>ahora</small></div>
+                        <p>Código de aprobación para pagar a LibRed</p>
+                        <strong id="susYapeCodigo">000 000</strong>
+                        <small>Vence en 5 minutos</small>
+                    </div>
+                    <div class="sus-campo" id="susYapeIngreso" hidden><label for="susCod">Código de aprobación</label>
+                        <input type="text" id="susCod" inputmode="numeric" placeholder="6 dígitos" maxlength="6" autocomplete="off" data-campo="codigo"></div>
+                </div>
+
+                <div class="sus-mpanel" data-mp="PAYPAL" hidden>
+                    <div class="sus-campo"><label for="susPpCorreo">Correo de PayPal</label>
+                        <input type="email" id="susPpCorreo" placeholder="tucorreo@ejemplo.com" autocomplete="off" data-campo="paypal"></div>
+                    <div class="sus-campo"><label for="susPpClave">Contraseña de PayPal</label>
+                        <div class="sus-clave-caja">
+                            <input type="password" id="susPpClave" autocomplete="off" data-campo="paypalClave">
+                            <button type="button" class="sus-ojo" id="susOjo" tabindex="-1" aria-label="Mostrar u ocultar contraseña"><i class="fa-regular fa-eye"></i></button>
+                        </div></div>
+                    <p class="sus-pp-usd">El cobro se hace en dólares: <b id="susPpUsd">US$ 0.00</b></p>
+                </div>
+
+                <label class="sus-auto" id="susAutoCaja" hidden>
+                    <input type="checkbox" id="susAuto" checked>
+                    <span id="susAutoTxt">Renovar automáticamente. Puedes cancelarlo cuando quieras.</span>
+                </label>
+                <p class="sus-auto-nota" id="susAutoNotaYape" hidden>Yape no permite cobros automáticos: te avisaremos por correo antes de que venza.</p>
+
+                <p class="sus-pago-error" id="susPagoError" hidden></p>
+                <button type="button" class="sus-btn-pagar" id="susBtnPagar" disabled><span id="susBtnPagarTxt">Pagar</span></button>
+            </div>
+
+            <!-- Pantalla de éxito tras migrar -->
+            <div class="sus-exito" id="susExito" aria-live="polite">
+                <svg class="sus-check" viewBox="0 0 52 52" aria-hidden="true">
+                    <circle class="sus-check-circulo" cx="26" cy="26" r="24"></circle>
+                    <path class="sus-check-marca" d="M14 27 l8 8 l16 -17"></path>
+                </svg>
+                <h3 id="susExitoTitulo">¡Plan Anual activado!</h3>
+                <p id="susExitoTexto">Tu nueva fecha de renovación se actualizó.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para invitar a otra librería -->
+    <div id="modalInvitar" class="modal-overlay">
+        <div class="modal-content modal-invitar">
+            <button type="button" class="sus-cerrar" onclick="cerrarModalInvitar()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+            <span class="invitar-icono"><i class="fa-solid fa-user-plus"></i></span>
+            <h3>Invita a otra librería a LibRed</h3>
+            <p class="invitar-sub">Comparte este mensaje con otro dueño de librería para que la sume a la red.</p>
+            <textarea id="invitarTexto" class="invitar-texto" rows="5" readonly></textarea>
+            <div class="invitar-acciones">
+                <button type="button" class="btn-copiar" id="invitarCopiar" onclick="copiarInvitacion()"><i class="fa-regular fa-copy"></i> <span id="invitarCopiarTxt">Copiar mensaje</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de cierre de sesión -->
+    <div id="modalLogout" class="modal-overlay">
+        <div class="modal-content modal-sm">
+            <div class="logout-box">
+                <div class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                <h3>¿Deseas cerrar sesión?</h3>
+                <p>Estás a punto de salir del panel administrativo de LibRed.</p>
+                <div class="logout-actions">
+                    <button type="button" class="btn-volver" onclick="cerrarModalLogout()">Volver</button>
+                    <a href="/login-admin" class="btn-confirmar-salir">Sí, confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script th:src="@{/js/layout_admin.js}"></script>
+<script th:src="@{/js/suscripcion_plan.js}"></script>
+<script id="dynamic-specific-js" th:if="${jsEspecifico != ''}" th:src="@{/js/__${jsEspecifico}__}"></script>
+  </body>
+</html>

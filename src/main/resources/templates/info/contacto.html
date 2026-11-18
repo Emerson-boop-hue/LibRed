@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contáctenos | LibRed</title>
+    <script th:src="@{/js/tema.js}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/info.css}" href="/css/info.css">
+    <link rel="stylesheet" th:href="@{/css/tema_publico.css}" href="/css/tema_publico.css">
+</head>
+<body class="inf-body">
+
+<div th:replace="~{info/partes :: cabecera('contacto')}"></div>
+
+<main>
+    <section class="inf-cabecera">
+        <div class="inf-cont">
+            <h1>Contáctenos</h1>
+            <p>¿Tienes una duda, quieres sumar tu librería o necesitas ayuda con tu cuenta? Escríbenos y te respondemos lo antes posible.</p>
+        </div>
+    </section>
+
+    <section class="inf-seccion inf-sin-arriba">
+        <div class="inf-cont inf-contacto-grid">
+
+            <form class="inf-form" id="ctForm" novalidate autocomplete="off">
+                <h2>Envíanos un mensaje</h2>
+
+                <div class="inf-fila">
+                    <div class="inf-campo">
+                        <label for="ctNombre">Nombre</label>
+                        <input type="text" id="ctNombre" maxlength="80" placeholder="Tu nombre" autocomplete="name">
+                    </div>
+                    <div class="inf-campo">
+                        <label for="ctCorreo">Correo</label>
+                        <input type="email" id="ctCorreo" maxlength="120" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="inf-campo">
+                    <label for="ctMotivo">Motivo</label>
+                    <div class="inf-select">
+                        <select id="ctMotivo">
+                            <option th:each="m : ${motivos}" th:value="${m}" th:text="${m}">Motivo</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <div class="inf-campo">
+                    <label for="ctMensaje">Mensaje <span class="inf-conteo"><span id="ctConteo">0</span>/1000</span></label>
+                    <textarea id="ctMensaje" rows="6" maxlength="1000" placeholder="Cuéntanos en qué podemos ayudarte"></textarea>
+                </div>
+
+                <!-- Campo trampa para robots: las personas no lo ven -->
+                <div class="inf-trampa" aria-hidden="true"><label>Web <input type="text" id="ctWeb" tabindex="-1" autocomplete="off"></label></div>
+
+                <p class="inf-error" id="ctError" role="alert" hidden></p>
+                <button type="submit" class="inf-btn inf-btn-pri inf-ancho" id="ctEnviar">Enviar mensaje</button>
+
+                <div class="inf-exito" id="ctExito" hidden>
+                    <span class="inf-ico"><i class="fa-solid fa-check"></i></span>
+                    <h3>¡Mensaje enviado!</h3>
+                    <p>Gracias por escribirnos. Te responderemos al correo que indicaste.</p>
+                    <button type="button" class="inf-link" id="ctOtro">Enviar otro mensaje</button>
+                </div>
+            </form>
+
+            <aside class="inf-lado">
+                <h2>Otras formas de contactarnos</h2>
+                <a class="inf-canal" th:if="${correoSoporte != ''}" target="_blank" rel="noopener"
+                   th:href="${'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=' + correoSoporte + '&amp;su=Consulta%20sobre%20LibRed'}">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span><strong>Correo</strong><small th:text="${correoSoporte}">correo@ejemplo.com</small></span>
+                    <u class="fa-solid fa-arrow-up-right-from-square"></u>
+                </a>
+                <a class="inf-canal" th:if="${whatsapp != ''}" target="_blank" rel="noopener"
+                   th:href="${'https://wa.me/' + whatsapp + '?text=Hola%2C%20quisiera%20informaci%C3%B3n%20sobre%20LibRed.'}">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span><strong>WhatsApp</strong><small>Consultas rápidas</small></span>
+                    <u class="fa-solid fa-arrow-up-right-from-square"></u>
+                </a>
+                <a class="inf-canal" th:href="@{/ayuda}" href="/ayuda">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span><strong>Preguntas frecuentes</strong><small>Respuestas inmediatas</small></span>
+                    <u class="fa-solid fa-chevron-right"></u>
+                </a>
+                <div class="inf-nota-caja">
+                    <strong>¿Ya eres administrador de una librería?</strong>
+                    <p>Dentro del panel, en Ayuda y Soporte, puedes enviar una solicitud con seguimiento y ver sus respuestas.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{info/partes :: pie}"></div>
+<script th:src="@{/js/info.js}" src="/js/info.js"></script>
+</body>
+</html>

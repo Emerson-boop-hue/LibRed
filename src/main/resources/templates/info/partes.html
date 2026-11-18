@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Cabecera de las páginas públicas (Conócenos / Contáctenos / Ayuda). Parámetro: la página activa. -->
+<header class="inf-top" th:fragment="cabecera(activo)">
+    <div class="inf-top-in">
+        <a class="inf-marca" th:href="@{/login}" href="/login" aria-label="LibRed, ir al acceso">
+            <img class="logo-claro" th:src="@{/img/LogoSinFodo.png}" src="/img/LogoSinFodo.png" alt="LibRed">
+            <img class="logo-oscuro" th:src="@{/img/LogoModoOscuro.png}" src="/img/LogoModoOscuro.png" alt="" aria-hidden="true">
+        </a>
+        <button type="button" class="tema-btn inf-tema" data-tema-toggle title="Modo oscuro" aria-label="Cambiar entre modo claro y oscuro">
+            <i class="fa-solid fa-moon ic-luna"></i><i class="fa-solid fa-sun ic-sol"></i>
+        </button>
+        <button type="button" class="inf-burger" id="infBurger" aria-label="Abrir menú" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+        <nav class="inf-nav" id="infNav">
+            <a th:href="@{/conocenos}" href="/conocenos" th:classappend="${activo == 'conocenos'} ? 'activo'">Conócenos</a>
+            <a th:href="@{/contacto}" href="/contacto" th:classappend="${activo == 'contacto'} ? 'activo'">Contáctenos</a>
+            <a th:href="@{/ayuda}" href="/ayuda" th:classappend="${activo == 'ayuda'} ? 'activo'">Ayuda</a>
+            <a class="inf-btn-nav" th:href="@{/login}" href="/login">Ingresar</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Pie de las páginas públicas -->
+<footer class="inf-pie" th:fragment="pie">
+    <div class="inf-pie-in">
+        <div class="inf-pie-marca">
+            <img th:src="@{/img/LogoModoOscuro.png}" src="/img/LogoModoOscuro.png" alt="LibRed">
+            <p>La red de librerías de tu distrito: consulta, pide prestado y gestiona todo desde la web.</p>
+        </div>
+        <div class="inf-pie-col">
+            <h4>Plataforma</h4>
+            <a th:href="@{/login}" href="/login">Ingresar como lector</a>
+            <a th:href="@{/login-admin}" href="/login-admin">Acceso para librerías</a>
+            <a th:href="@{/registro}" href="/registro">Registrar mi librería</a>
+        </div>
+        <div class="inf-pie-col">
+            <h4>Ayuda</h4>
+            <a th:href="@{/conocenos}" href="/conocenos">Conócenos</a>
+            <a th:href="@{/ayuda}" href="/ayuda">Preguntas frecuentes</a>
+            <a th:href="@{/contacto}" href="/contacto">Contáctenos</a>
+        </div>
+    </div>
+    <div class="inf-pie-fin">© <span data-anio>2026</span> LibRed. Todos los derechos reservados.</div>
+</footer>
+
+</body>
+</html>
