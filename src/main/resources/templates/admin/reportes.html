@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: molde('Reportes', 'Informes de la librería en PDF y Excel', 'reportes.css', 'reportes.js', 'reportes', ~{:: .dashboard-container})}">
+<head><title>Reportes | LibRed</title></head>
+<body>
+    <div class="dashboard-container" th:data-hoy="${hoy}">
+
+        <!-- BARRA: informe + periodo + descargas -->
+        <div class="rp-barra">
+          <div class="rp-tabs">
+            <a class="rp-tab" th:classappend="${doc.tipo() == 'cierre'} ? 'activo'"
+               th:href="@{/admin/reportes(tipo='cierre',desde=${doc.desde()},hasta=${doc.hasta()})}">
+              <i class="fa-solid fa-cash-register"></i> Cierre de caja
+            </a>
+            <a class="rp-tab" th:classappend="${doc.tipo() == 'prestamos'} ? 'activo'"
+               th:href="@{/admin/reportes(tipo='prestamos',desde=${doc.desde()},hasta=${doc.hasta()})}">
+              <i class="fa-solid fa-book-open-reader"></i> Préstamos y artículos
+            </a>
+            <a class="rp-tab" th:classappend="${doc.tipo() == 'lectores'} ? 'activo'"
+               th:href="@{/admin/reportes(tipo='lectores',desde=${doc.desde()},hasta=${doc.hasta()})}">
+              <i class="fa-solid fa-users"></i> Lectores
+            </a>
+          </div>
+
+          <form class="rp-periodo" id="rpForm" method="get" th:action="@{/admin/reportes}">
+            <input type="hidden" name="tipo" th:value="${doc.tipo()}" />
+            <select class="rp-select" id="rpPeriodo" aria-label="Periodo">
+              <option value="hoy">Hoy</option>
+              <option value="semana">Esta semana</option>
+              <option value="mes">Este mes</option>
+              <option value="anterior">Mes anterior</option>
+              <option value="personalizado">Personalizado</option>
+            </select>
+            <label class="rp-fecha" for="rpDesde"><span>Desde</span>
+              <input type="date" id="rpDesde" name="desde" th:value="${doc.desde()}" th:max="${hoy}" />
+            </label>
+            <label class="rp-fecha" for="rpHasta"><span>Hasta</span>
+              <input type="date" id="rpHasta" name="hasta" th:value="${doc.hasta()}" th:max="${hoy}" />
+            </label>
+            <button type="button" class="rp-limpiar" id="rpLimpiar"><i class="fa-solid fa-rotate-left"></i> Limpiar</button>
+          </form>
+
+          <div class="rp-descargas">
+            <a class="rp-btn" th:href="@{/admin/reportes/pdf(tipo=${doc.tipo()},desde=${doc.desde()},hasta=${doc.hasta()})}">
+              <i class="fa-solid fa-file-pdf"></i> Descargar PDF
+            </a>
+            <a class="rp-btn rp-btn-excel" th:href="@{/admin/reportes/excel(tipo=${doc.tipo()},desde=${doc.desde()},hasta=${doc.hasta()})}">
+              <i class="fa-solid fa-file-excel"></i> Descargar Excel
+            </a>
+          </div>
+        </div>
+
+        <!-- VISTA PREVIA (es lo mismo que sale en el PDF y en el Excel) -->
+        <div class="rp-scroll">
+          <div class="rp-hoja">
+            <div class="rp-cabecera">
+              <img class="rp-logo" th:src="@{/img/LogoSinFodo.png}" alt="LibRed" />
+              <div class="rp-libreria">
+                <strong th:text="${doc.cabecera().nombre()}">Librería</strong>
+                <span th:if="${doc.cabecera().ruc() != ''}" th:text="${doc.cabecera().ruc()}"></span>
+                <span th:if="${doc.cabecera().direccion() != ''}" th:text="${doc.cabecera().direccion()}"></span>
+                <span th:if="${doc.cabecera().contacto() != ''}" th:text="${doc.cabecera().contacto()}"></span>
+              </div>
+            </div>
+
+            <h2 class="rp-titulo" th:text="${doc.titulo()}">Informe</h2>
+            <p class="rp-sub"><span th:text="${doc.periodo()}">Periodo</span> · <span th:text="${doc.generado()}">Generado</span></p>
+
+            <section class="rp-seccion" th:each="s : ${doc.secciones()}">
+              <h3 th:text="${s.titulo()}">Sección</h3>
+
+              <div class="rp-datos" th:if="${s.esResumen()}">
+                <div class="rp-dato" th:each="d : ${s.resumen()}">
+                  <strong th:text="${d.texto()}">0</strong>
+                  <span th:text="${d.etiqueta()}">Etiqueta</span>
+                </div>
+              </div>
+
+              <p class="rp-vacio" th:if="${!s.esResumen() and #lists.isEmpty(s.filas())}" th:text="${s.vacio()}">Sin datos.</p>
+
+              <div class="rp-tabla-caja" th:if="${!s.esResumen() and !#lists.isEmpty(s.filas())}">
+                <table class="rp-tabla">
+                  <thead>
+                    <tr>
+                      <th th:each="c : ${s.columnas()}" th:text="${c.titulo()}" th:classappend="${c.derecha()} ? 'der'">Col</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="fila, it : ${s.filas()}" th:classappend="${s.totalFinal() and it.last} ? 'total'">
+                      <td th:each="celda, ci : ${fila}" th:text="${s.texto(ci.index, celda)}"
+                          th:classappend="${s.columnas().get(ci.index).derecha()} ? 'der'">dato</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </div>
+    </div>
+</body>
+</html>

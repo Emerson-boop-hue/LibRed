@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda | LibRed</title>
+    <script th:src="@{/js/tema.js}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/info.css}" href="/css/info.css">
+    <link rel="stylesheet" th:href="@{/css/tema_publico.css}" href="/css/tema_publico.css">
+</head>
+<body class="inf-body">
+
+<div th:replace="~{info/partes :: cabecera('ayuda')}"></div>
+
+<main>
+    <section class="inf-cabecera">
+        <div class="inf-cont">
+            <h1>Centro de ayuda</h1>
+            <p>Encuentra respuestas rápidas sobre tu cuenta, tus préstamos y el uso de LibRed.</p>
+            <div class="inf-buscador">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="ayBuscar" placeholder="Busca tu duda, por ejemplo: contraseña, multa, préstamo" autocomplete="off" aria-label="Buscar en la ayuda">
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion inf-sin-arriba">
+        <div class="inf-cont inf-angosto">
+            <div class="inf-chips" id="ayChips">
+                <button type="button" class="inf-chip activo" data-cat="todas">Todas</button>
+                <button type="button" class="inf-chip" data-cat="inicio">Primeros pasos</button>
+                <button type="button" class="inf-chip" data-cat="cuenta">Cuenta y acceso</button>
+                <button type="button" class="inf-chip" data-cat="prestamos">Préstamos</button>
+                <button type="button" class="inf-chip" data-cat="multas">Multas y bloqueos</button>
+                <button type="button" class="inf-chip" data-cat="red">Red de librerías</button>
+                <button type="button" class="inf-chip" data-cat="libreria">Para librerías</button>
+            </div>
+
+            <div class="inf-faqs" id="ayLista">
+                <details class="inf-faq" data-cat="inicio">
+                    <summary>¿Qué es LibRed?</summary>
+                    <p>Es una plataforma web que conecta las librerías de un distrito. Los lectores piden prestados libros, mangas, cómics y más, y las librerías gestionan su inventario, préstamos, devoluciones y multas desde un panel.</p>
+                </details>
+                <details class="inf-faq" data-cat="inicio">
+                    <summary>¿Cómo creo mi cuenta de lector?</summary>
+                    <p>En el acceso de lectores pulsa «Regístrate aquí», elige tu librería e ingresa tus nombres, tu celular y una contraseña de 6 a 20 caracteres, sin espacios. Te enviaremos un código por SMS para confirmar tu celular.</p>
+                </details>
+                <details class="inf-faq" data-cat="inicio">
+                    <summary>¿Dónde veo mi código de lector?</summary>
+                    <p>Aparece debajo de tu nombre en el menú lateral, con el formato LEC-1001. Es el que usas, junto con tu contraseña, para iniciar sesión.</p>
+                </details>
+                <details class="inf-faq" data-cat="cuenta">
+                    <summary>Olvidé mi contraseña</summary>
+                    <p>En el acceso de lectores pulsa «¿Olvidaste tu contraseña?». Recibirás un código por SMS en el celular con el que te registraste y podrás crear una nueva.</p>
+                </details>
+                <details class="inf-faq" data-cat="cuenta">
+                    <summary>Mi código de verificación no llega o venció</summary>
+                    <p>Espera 30 segundos antes de pedir uno nuevo. El código vale 10 minutos y tienes 5 intentos para escribirlo. Revisa también que tu celular esté bien escrito (9 dígitos, empieza con 9).</p>
+                </details>
+                <details class="inf-faq" data-cat="cuenta">
+                    <summary>¿Cómo cambio mi contraseña?</summary>
+                    <p>Dentro de tu panel entra a Ajustes. Allí puedes actualizar tu contraseña en cualquier momento.</p>
+                </details>
+                <details class="inf-faq" data-cat="cuenta">
+                    <summary>¿Puedo usar el mismo celular en dos cuentas?</summary>
+                    <p>No. Cada celular se asocia a una sola cuenta de lector.</p>
+                </details>
+                <details class="inf-faq" data-cat="prestamos">
+                    <summary>¿Cómo pido un préstamo?</summary>
+                    <p>Entra a Préstamos, elige la categoría y el artículo, indica por cuántos días lo necesitas y revisa el comprobante, que muestra el servicio y la fecha de devolución. Luego confirma tu solicitud.</p>
+                </details>
+                <details class="inf-faq" data-cat="prestamos">
+                    <summary>¿Cuántos días y cuántos préstamos puedo tener?</summary>
+                    <p>Depende de cada librería. En la pantalla de Préstamos ves el máximo de días que presta esa librería y cuántos préstamos activos tienes, por ejemplo «1 de 3 activos».</p>
+                </details>
+                <details class="inf-faq" data-cat="prestamos">
+                    <summary>¿Cuándo pago el servicio?</summary>
+                    <p>El servicio se cancela en la librería al recoger el artículo.</p>
+                </details>
+                <details class="inf-faq" data-cat="prestamos">
+                    <summary>¿Qué pasa si devuelvo después del plazo?</summary>
+                    <p>Si devuelves después del último día de devolución, se aplica mora. Mientras tengas multas pendientes, tu cuenta puede quedar bloqueada.</p>
+                </details>
+                <details class="inf-faq" data-cat="prestamos">
+                    <summary>¿Cómo califico un préstamo?</summary>
+                    <p>Después de devolver un artículo, en la Vista General aparece el aviso «Tienes préstamos por calificar». Pulsa «Calificar ahora» y cuéntanos cómo te fue.</p>
+                </details>
+                <details class="inf-faq" data-cat="multas">
+                    <summary>¿Por qué mi cuenta aparece bloqueada?</summary>
+                    <p>Una cuenta se bloquea en una librería cuando tienes multas pendientes. Mientras esté bloqueada no puedes solicitar nuevos préstamos en esa librería.</p>
+                </details>
+                <details class="inf-faq" data-cat="multas">
+                    <summary>¿Cómo desbloqueo mi cuenta?</summary>
+                    <p>Regulariza tus multas pagándolas en la librería. Cuando se registre el pago, podrás volver a solicitar préstamos.</p>
+                </details>
+                <details class="inf-faq" data-cat="red">
+                    <summary>¿Puedo usar mi cuenta en otra librería?</summary>
+                    <p>Sí. Desde Red Global puedes entrar a otra librería de la red con tu misma cuenta, sin cerrar sesión.</p>
+                </details>
+                <details class="inf-faq" data-cat="red">
+                    <summary>¿Qué es Red Global?</summary>
+                    <p>Es la sección donde ves las librerías de la red, cuál es tu librería actual y puedes pasar a otra para explorar su catálogo.</p>
+                </details>
+                <details class="inf-faq" data-cat="libreria">
+                    <summary>¿Cómo registro mi librería?</summary>
+                    <p>Entra a «Registrar mi librería», elige el Plan Mensual o el Plan Anual y completa el pago. Al terminar recibes tu código de administrador para ingresar al panel.</p>
+                </details>
+                <details class="inf-faq" data-cat="libreria">
+                    <summary>¿Qué incluye la membresía?</summary>
+                    <p>Los dos planes incluyen todos los módulos, sin límites. Cambia solo la duración y el precio; puedes ver los valores actuales en la página Conócenos.</p>
+                </details>
+                <details class="inf-faq" data-cat="libreria">
+                    <summary>No puedo ingresar o olvidé mi acceso de administrador</summary>
+                    <p>En el acceso para administradores usa «Recuperar acceso» para restablecer tu contraseña.</p>
+                </details>
+                <details class="inf-faq" data-cat="libreria">
+                    <summary>¿Los datos de mi librería se mezclan con los de otras?</summary>
+                    <p>No. Aunque todas comparten la plataforma, cada librería ve y gestiona únicamente sus propios datos.</p>
+                </details>
+                <details class="inf-faq" data-cat="libreria">
+                    <summary>¿Cómo contacto a soporte siendo administrador?</summary>
+                    <p>Dentro del panel, en Ayuda y Soporte, puedes enviar una solicitud con seguimiento, escribir por WhatsApp o usar el correo directo.</p>
+                </details>
+            </div>
+            <p class="inf-vacio" id="ayVacio" hidden>No encontramos resultados para tu búsqueda. Prueba con otras palabras o escríbenos.</p>
+
+            <div class="inf-ayuda-final">
+                <div>
+                    <h3>¿No encontraste lo que buscabas?</h3>
+                    <p>Cuéntanos tu caso y te ayudamos.</p>
+                </div>
+                <a class="inf-btn inf-btn-pri" th:href="@{/contacto}" href="/contacto">Contáctenos</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{info/partes :: pie}"></div>
+<script th:src="@{/js/info.js}" src="/js/info.js"></script>
+</body>
+</html>

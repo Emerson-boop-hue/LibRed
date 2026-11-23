@@ -1,0 +1,52 @@
+/* Franja de estado de la membresía (administrador) y aviso de sede sin pedidos (lector) */
+.mb-franja {
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    margin: 0 30px 12px; padding: 10px 16px; border: 1px solid; border-radius: 10px; font-size: .88rem;
+}
+.mb-franja > i { font-size: 1rem; }
+.mb-franja p { flex: 1; margin: 0; line-height: 1.4; }
+.mb-franja a, .mb-franja button {
+    border: 0; border-radius: 8px; padding: 7px 14px; font: inherit; font-size: .82rem; font-weight: 600;
+    cursor: pointer; text-decoration: none; white-space: nowrap; color: #fff;
+}
+.mb-franja.info  { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+.mb-franja.ambar { background: #fffbeb; border-color: #fde68a; color: #78350f; }
+.mb-franja.rojo  { background: #fef2f2; border-color: #fecaca; color: #7f1d1d; }
+.mb-franja.info a, .mb-franja.info button   { background: #1e40af; }
+.mb-franja.ambar a, .mb-franja.ambar button { background: #b45309; }
+.mb-franja.rojo a, .mb-franja.rojo button   { background: #b91c1c; }
+
+:root[data-tema="oscuro"] .mb-franja.info  { background: #172554; border-color: #1e3a8a; color: #bfdbfe; }
+:root[data-tema="oscuro"] .mb-franja.ambar { background: #3b2a0a; border-color: #78510f; color: #fde68a; }
+:root[data-tema="oscuro"] .mb-franja.rojo  { background: #3a1517; border-color: #7f1d1d; color: #fecaca; }
+
+/* Etiqueta de la membresía en la cabecera del administrador (junto a «Ver plan actual») */
+.mb-chip {
+    display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; border-radius: 8px; border: 1px solid;
+    font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: filter .2s;
+}
+.mb-chip:hover { filter: brightness(.96); }
+.mb-chip.info  { background: var(--surface-strong); border-color: var(--sidebar-border); color: var(--text-body); }
+.mb-chip.ambar { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+.mb-chip.rojo  { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+:root[data-tema="oscuro"] .mb-chip.ambar { background: #3b2a0a; border-color: #78510f; color: #fcd34d; }
+:root[data-tema="oscuro"] .mb-chip.rojo  { background: #3a1517; border-color: #7f1d1d; color: #fca5a5; }
+@media (max-width: 700px) { .mb-chip span { display: none; } }
+
+/* Con la membresía suspendida, las acciones que modifican datos se ven apagadas y abren el plan */
+.mb-suspendida :is(.btn-nuevo-articulo, .btn-portadas, .btn-nuevo-lector, [onclick^="abrirModalEditar"],
+    [onclick^="abrirModalEliminar"], #btnSubmitPrestamo, #btnEntregar, [data-requiere-membresia]) {
+    opacity: .5; filter: grayscale(.5); cursor: not-allowed;
+}
+.mb-suspendida :is(.btn-nuevo-articulo, .btn-portadas, .btn-nuevo-lector, #btnSubmitPrestamo, #btnEntregar,
+    [data-requiere-membresia])::after {
+    content: "\f023"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: .75em; margin-left: 8px;
+}
+
+/* Tarjeta de Red Global: librería sin pedidos */
+.rg-badge.sin-pedidos { background: #fef2f2; color: #b91c1c; }
+:root[data-tema="oscuro"] .rg-badge.sin-pedidos { background: #3a1517; color: #fecaca; }
+
+@media (max-width: 700px) {
+    .mb-franja { margin: 0 16px 12px; flex-wrap: wrap; }
+}

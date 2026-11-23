@@ -1,0 +1,589 @@
+/* Reset y variables */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+:root {
+    --bg-main: #f8fafc;
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e2e8f0;
+    --sidebar-text: #475569;
+    --sidebar-hover-bg: #f1f5f9;
+    --active-bg: #334155;      /* plomo grafito: menú activo, botones, avatar */
+    --active-deep: #1e293b;    /* plomo profundo: cajas de énfasis (p. ej. Servicio total) y hover */
+    --active-text: #ffffff;
+    --text-dark: #0f172a;
+    --text-muted: #64748b;
+    --card-bg: #ffffff;
+
+    /* Colores semánticos: cada módulo usa estos nombres, así el modo oscuro solo cambia sus valores aquí */
+    --surface-soft: #f8fafc;      /* relleno suave: píldoras, tarjeta seleccionada */
+    --surface-icon: #f1f5f9;      /* cajas de íconos, pistas */
+    --surface-strong: #e2e8f0;    /* hover y relleno marcado */
+    --line-strong: #cbd5e1;       /* borde de tarjeta seleccionada / controles */
+    --line-hover: #94a3b8;        /* borde al pasar el cursor */
+    --text-body: #475569;         /* texto de etiquetas */
+    --accent-text: #334155;       /* texto/íconos de acento */
+    --accent-text-strong: #1e293b;
+    --bar: #334155;               /* barra lateral de la tarjeta seleccionada */
+    --focus-ring: rgba(51, 65, 85, 0.12);
+    --danger-text: #b91c1c;
+    --danger-soft: #fee2e2;
+    --danger-line: #fecaca;
+    --dot-slate: #64748b;
+    --tone-ambar: #b45309;
+    --tone-verde: #15803d;
+    --tone-azul: #1d4ed8;
+    --scroll-thumb: rgba(0, 0, 0, 0.1);
+    --chart-prest: #334155;
+    --chart-dev: #0d9488;
+    --chart-serv: #475569;
+    --chart-mora: #d97706;
+    --chart-multa: #dc2626;
+    --chart-1: #334155; --chart-2: #2563eb; --chart-3: #0d9488; --chart-4: #d97706; --chart-5: #7c3aed; --chart-6: #dc2626; --chart-7: #64748b;
+    --heat-rgb: 51, 65, 85;
+    color-scheme: light;
+}
+
+/* Modo oscuro */
+:root[data-tema="oscuro"] {
+    --bg-main: #0b1220;
+    --sidebar-bg: #0f1729;
+    --sidebar-border: #25324a;
+    --sidebar-text: #a9b4c7;
+    --sidebar-hover-bg: #1a2640;
+    --active-bg: #4b5b75;
+    --active-deep: #5b6c88;
+    --text-dark: #e6eaf2;
+    --text-muted: #8e9bb0;
+    --card-bg: #141d30;
+
+    --surface-soft: #192339;
+    --surface-icon: #1e2b46;
+    --surface-strong: #273754;
+    --line-strong: #3a4b69;
+    --line-hover: #55678a;
+    --text-body: #b6c0d1;
+    --accent-text: #cbd5e1;
+    --accent-text-strong: #f1f5f9;
+    --bar: #94a3b8;
+    --focus-ring: rgba(148, 163, 184, 0.28);
+    --danger-text: #fca5a5;
+    --danger-soft: #3a1a1f;
+    --danger-line: #5b2a31;
+    --dot-slate: #94a3b8;
+    --tone-ambar: #fbbf24;
+    --tone-verde: #4ade80;
+    --tone-azul: #93c5fd;
+    --scroll-thumb: rgba(255, 255, 255, 0.14);
+    --chart-prest: #cbd5e1;
+    --chart-dev: #2dd4bf;
+    --chart-serv: #94a3b8;
+    --chart-mora: #fbbf24;
+    --chart-multa: #f87171;
+    --chart-1: #cbd5e1; --chart-2: #60a5fa; --chart-3: #2dd4bf; --chart-4: #fbbf24; --chart-5: #a78bfa; --chart-6: #f87171; --chart-7: #94a3b8;
+    --heat-rgb: 100, 116, 139;
+    color-scheme: dark;
+}
+
+body {
+    background-color: var(--bg-main);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Barra lateral */
+.sidebar {
+    width: 270px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: width 0.3s ease;
+    z-index: 100;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 75px;
+    padding: 0 16px;
+    border-bottom: none;
+    overflow: hidden;
+}
+
+.sidebar-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar.collapsed .sidebar-logo {
+    display: none;
+}
+
+/* El logo cambia según el tema (la imagen clara tiene letras oscuras que no se verían en el fondo oscuro) */
+/* Los dos logos se ven del mismo tamaño: la imagen clara trae márgenes transparentes, por eso es más alta */
+.sidebar-logo.logo-claro { height: 67px; margin-left: -9px; }
+.sidebar-logo.logo-oscuro { display: none; height: 36px; }
+:root[data-tema="oscuro"] .sidebar-logo.logo-claro { display: none; }
+:root[data-tema="oscuro"] .sidebar-logo.logo-oscuro { display: block; }
+:root[data-tema="oscuro"] .sidebar.collapsed .sidebar-logo.logo-oscuro { display: none; }
+
+.toggle-btn {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.toggle-btn:hover {
+    color: var(--text-dark);
+}
+
+.sidebar.collapsed .toggle-btn {
+    margin: 0 auto;
+}
+
+/* Navegación lateral */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 12px;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--scroll-thumb);
+    border-radius: 4px;
+}
+
+.nav-section-title {
+    display: block;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 15px 12px 6px 12px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .nav-section-title {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 11px 14px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.nav-badge {
+    margin-left: auto;
+    min-width: 20px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background-color: var(--surface-strong);
+    color: var(--accent-text);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.5;
+}
+.nav-item.active .nav-badge { background-color: rgba(255, 255, 255, 0.2); color: #ffffff; }
+.sidebar.collapsed .nav-badge { display: none; }
+
+.nav-item i {
+    font-size: 1.05rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.nav-text {
+    margin-left: 12px;
+    transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .nav-text,
+.sidebar.collapsed .arrow,
+.sidebar.collapsed .nav-group .dropdown-menu {
+    opacity: 0;
+    display: none;
+    pointer-events: none;
+}
+
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .nav-item i {
+    margin: 0;
+}
+
+.nav-item:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+}
+
+.nav-item.active {
+    background-color: var(--active-bg);
+    color: var(--active-text);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);
+}
+
+/* Menús desplegables */
+.nav-group .dropdown-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 38px;
+}
+
+.nav-group.open .dropdown-menu {
+    max-height: 150px;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 8px 10px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    margin-top: 2px;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+}
+
+.dropdown-item.active-sub {
+    background-color: var(--active-bg);
+    color: var(--active-text);
+    font-weight: 600;
+}
+
+.arrow {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.nav-group.open .arrow {
+    transform: rotate(180deg);
+}
+
+/* Footer del sidebar */
+.sidebar-footer {
+    padding: 15px 12px;
+    border-top: 1px solid var(--sidebar-border);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: var(--sidebar-hover-bg);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    background-color: var(--active-bg);
+    color: #ffffff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    min-width: 34px;
+    font-size: 0.9rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+    overflow: hidden;
+    transition: opacity 0.2s;
+}
+
+.user-name {
+    color: var(--text-dark);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.user-email {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .user-profile {
+    justify-content: center;
+    padding: 10px 0;
+    background: transparent;
+}
+
+.sidebar.collapsed .user-info {
+    opacity: 0;
+    display: none;
+    pointer-events: none;
+}
+
+.sidebar.collapsed .logout-btn {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .logout-btn .nav-text {
+    display: none;
+}
+
+.logout-btn {
+    color: var(--sidebar-text) !important;
+}
+/* Cerrar sesión se ve como el resto del menú (plomo); el rojo aparece solo al pasar el cursor */
+.logout-btn:hover {
+    background-color: var(--danger-soft) !important;
+    color: var(--danger-text) !important;
+}
+
+/* Ventana de cierre de sesión en la paleta plomo grafito */
+.logout-box { text-align: center; padding: 10px; }
+.logout-icon {
+    width: 55px; height: 55px; margin: 0 auto 15px auto; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    background-color: var(--surface-icon); color: var(--accent-text);
+}
+.logout-box h3 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 8px; }
+.logout-box p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 25px; }
+.logout-actions { display: flex; gap: 10px; justify-content: center; }
+.btn-volver {
+    padding: 9px 18px; border-radius: 8px; border: 1px solid var(--sidebar-border);
+    background-color: var(--card-bg); color: var(--text-dark); font-weight: 500; cursor: pointer; font-size: 0.88rem;
+    font-family: inherit; transition: background-color 0.2s, border-color 0.2s;
+}
+.btn-volver:hover { background-color: var(--sidebar-hover-bg); border-color: var(--line-strong); }
+.btn-confirmar-salir {
+    padding: 9px 18px; border-radius: 8px; border: none; background-color: var(--active-bg); color: var(--active-text);
+    font-weight: 600; text-decoration: none; display: inline-block; font-size: 0.88rem; transition: background-color 0.2s;
+}
+.btn-confirmar-salir:hover { background-color: var(--active-deep); }
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Cabecera superior (tamaño fijo y estable) */
+.topbar {
+    height: 75px;
+    min-height: 75px;
+    background-color: var(--bg-main);
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    flex-shrink: 0;
+}
+
+.topbar-title-area h1 {
+    font-size: 1.4rem;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.topbar-title-area p {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin-top: 2px;
+}
+
+.topbar-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.shortcut {
+    background-color: var(--surface-strong);
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-plan {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-plan:hover {
+    background-color: var(--surface-strong);
+}
+
+/* Botón de modo oscuro (cabecera) */
+.btn-tema {
+    width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--sidebar-border); background-color: var(--card-bg);
+    color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 0.9rem;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.btn-tema:hover { border-color: var(--line-hover); color: var(--text-dark); }
+.btn-tema .ic-sol { display: none; }
+:root[data-tema="oscuro"] .btn-tema .ic-luna { display: none; }
+:root[data-tema="oscuro"] .btn-tema .ic-sol { display: inline; color: #fbbf24; }
+
+.notification-icon {
+    font-size: 1rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+}
+.notification-icon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 6px;
+    background-color: #ef4444;
+    border-radius: 50%;
+}
+
+.btn-invite {
+    background-color: var(--active-bg);
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-invite:hover {
+    opacity: 0.9;
+}
+
+/* Modal de suscripción */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(15, 23, 42, 0.75); 
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: overlayIn 0.18s ease-out;
+}
+.modal-overlay.active > .modal-content {
+    animation: modalIn 0.22s ease-out;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    width: 80%; 
+    max-width: 1000px;
+    height: 75vh; 
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal:hover {
+    color: #dc2626;
+}
+
+/* El fondo solo cambia de opacidad (sin zoom ni desenfoque, que producían un destello en toda la pantalla); el cuadro sí entra con un zoom leve */
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Modal compacto para confirmaciones */
+.modal-content.modal-sm {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    padding: 25px;
+}

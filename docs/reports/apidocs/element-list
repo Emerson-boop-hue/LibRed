@@ -1,0 +1,7 @@
+com.libred.sistema
+com.libred.sistema.config
+com.libred.sistema.controller
+com.libred.sistema.model
+com.libred.sistema.repository
+com.libred.sistema.service
+com.libred.sistema.util

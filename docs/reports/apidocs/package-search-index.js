@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.libred.sistema"},{"l":"com.libred.sistema.config"},{"l":"com.libred.sistema.controller"},{"l":"com.libred.sistema.model"},{"l":"com.libred.sistema.repository"},{"l":"com.libred.sistema.service"},{"l":"com.libred.sistema.util"}];updateSearchResults();

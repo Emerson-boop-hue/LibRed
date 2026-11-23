@@ -1,0 +1,187 @@
+<!doctype html>
+<!-- Molde principal del panel del LECTOR (equivalente a admin/layout.html) -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:fragment="molde(titulo, descripcion, cssEspecifico, jsEspecifico, menuActivo, contenido)"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${titulo} + ' | LibRed'">LibRed - Panel del Lector</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script th:src="@{/js/tema.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/layout_lector.css}" />
+    <link rel="stylesheet" th:href="@{/css/membresia.css}" />
+    <link
+      id="dynamic-specific-css"
+      rel="stylesheet"
+      th:if="${cssEspecifico != ''}"
+      th:href="@{/css/{file}(file=${cssEspecifico})}"
+    />
+  </head>
+  <body>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <!-- Dos versiones del logo: el CSS muestra una u otra según el tema (claro / oscuro) -->
+        <img
+          th:src="@{/img/LogoSinFodo.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo logo-claro"
+          width="109"
+          height="48"
+        />
+        <img
+          th:src="@{/img/LogoModoOscuro.png}"
+          alt="LibRed Logo"
+          class="sidebar-logo logo-oscuro"
+          width="109"
+          height="48"
+        />
+        <i
+          class="fa-solid fa-outdent toggle-btn"
+          onclick="toggleSidebar()"
+          title="Contraer barra"
+        ></i>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-title">MENÚ PRINCIPAL</span>
+
+        <a href="/lector/panel" th:classappend="${menuActivo == 'panel'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-house"></i>
+          <span class="nav-text">Vista General</span>
+        </a>
+
+        <a href="/lector/catalogo" th:classappend="${menuActivo == 'catalogo'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-book-open"></i>
+          <span class="nav-text">Catálogo</span>
+        </a>
+
+        <a href="/lector/prestamos" th:classappend="${menuActivo == 'prestamos'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-book-open-reader"></i>
+          <span class="nav-text">Préstamos</span>
+        </a>
+
+        <a href="/lector/historial" th:classappend="${menuActivo == 'historial'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span class="nav-text">Historial</span>
+        </a>
+
+        <span class="nav-section-title">EXPLORAR</span>
+
+        <a href="/lector/red-global" th:classappend="${menuActivo == 'red-global'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-globe"></i>
+          <span class="nav-text">Red Global</span>
+        </a>
+
+        <span class="nav-section-title">CONFIGURACIÓN</span>
+
+        <a href="/lector/ajustes" th:classappend="${menuActivo == 'ajustes'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-gear"></i>
+          <span class="nav-text">Ajustes</span>
+          <!-- Punto de aviso: contraseña temporal puesta por el administrador -->
+          <span class="nav-alerta" th:if="${session.lectorCambiarPassword != null}" title="Cambia tu contraseña"></span>
+        </a>
+
+        <a href="/lector/ayuda" th:classappend="${menuActivo == 'ayuda'} ? 'active'" class="nav-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span class="nav-text">Ayuda y Soporte</span>
+        </a>
+      </nav>
+
+      <!-- Parte inferior: datos del lector que inició sesión (vienen de la sesión) -->
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div
+            class="avatar"
+            th:text="${session.lectorNombre != null ? #strings.toUpperCase(#strings.substring(session.lectorNombre, 0, 1)) : 'L'}"
+          >L</div>
+          <div class="user-info nav-text">
+            <span class="user-name" th:text="${session.lectorNombre}">Nombre del lector</span>
+            <span class="user-email" th:text="${session.lectorCodigo}">LEC-0000</span>
+          </div>
+        </div>
+        <a href="#" class="nav-item logout-btn" onclick="abrirModalLogout(event)">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="nav-text">Cerrar Sesión</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <header class="topbar">
+        <div class="topbar-title-area">
+          <h1 th:text="${titulo}">Título</h1>
+          <p th:text="${descripcion}">Descripción</p>
+        </div>
+
+        <div class="topbar-actions">
+          <!-- Modo claro / oscuro -->
+          <button type="button" class="btn-tema" data-tema-toggle title="Modo oscuro" aria-label="Cambiar entre modo claro y oscuro">
+            <i class="fa-solid fa-moon ic-luna"></i><i class="fa-solid fa-sun ic-sol"></i>
+          </button>
+          <button type="button" class="btn-invite" onclick="abrirModalInvitar()">+ Invitar</button>
+        </div>
+      </header>
+
+      <div th:if="${sedeSuspendida}" class="mb-franja rojo" role="status">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>Esta librería no está recibiendo pedidos por ahora. Puedes ver tu historial y explorar otras librerías de la red.</p>
+        <a href="/lector/red-global">Ver Red Global</a>
+      </div>
+
+      <!-- Aviso: entró con una contraseña temporal del administrador (se quita al cambiarla en Ajustes) -->
+      <div class="aviso-pass" id="avisoPass" th:if="${session.lectorCambiarPassword != null}">
+        <i class="fa-solid fa-shield-halved aviso-pass-icono"></i>
+        <div class="aviso-pass-texto">
+          <strong>Cambia tu contraseña temporal</strong>
+          <span>Ingresaste con una contraseña asignada por la librería. Por tu seguridad, define una propia que solo tú conozcas.</span>
+        </div>
+        <a href="/lector/ajustes#formPassword" class="aviso-pass-btn">Cambiar ahora</a>
+      </div>
+
+      <!-- Aquí se inyecta el contenido específico de cada módulo -->
+      <th:block th:replace="${contenido}"></th:block>
+    </main>
+
+    <!-- Modal de cierre de sesión -->
+    <div id="modalLogout" class="modal-overlay">
+      <div class="modal-content modal-sm">
+        <div class="logout-box">
+          <div class="logout-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+          <h3>¿Deseas cerrar sesión?</h3>
+          <p>Estás a punto de salir de tu panel de lector de LibRed.</p>
+          <div class="logout-actions">
+            <button type="button" class="btn-volver" onclick="cerrarModalLogout()">Volver</button>
+            <a href="/lector/logout" class="btn-confirmar-salir">Sí, cerrar sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para invitar a un amigo -->
+    <div id="modalInvitar" class="modal-overlay">
+      <div class="modal-content modal-invitar">
+        <button type="button" class="invitar-cerrar" onclick="cerrarModalInvitar()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="invitar-icono"><i class="fa-solid fa-user-plus"></i></div>
+        <h3>Invita a un amigo a LibRed</h3>
+        <p class="invitar-sub">Comparte este mensaje. Para usar LibRed, tu amigo solo debe registrarse en su librería.</p>
+        <textarea id="invitarTexto" class="invitar-texto" rows="5" readonly></textarea>
+        <div class="invitar-acciones">
+          <button type="button" class="btn-copiar" onclick="copiarInvitacion()"><i class="fa-regular fa-copy"></i> <span id="invitarCopiarTxt">Copiar mensaje</span></button>
+        </div>
+      </div>
+    </div>
+
+    <script th:src="@{/js/layout_lector.js}"></script>
+    <script id="dynamic-specific-js" th:if="${jsEspecifico != ''}" th:src="@{/js/__${jsEspecifico}__}"></script>
+  </body>
+</html>

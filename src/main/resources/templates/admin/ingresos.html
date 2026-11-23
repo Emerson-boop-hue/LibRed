@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: molde('Ingresos', 'Recaudación por servicios, mora y multas', 'ingresos.css', 'ingresos.js', 'ingresos', ~{:: .dashboard-container})}">
+<head><title>Ingresos | LibRed</title></head>
+<body>
+    <div class="dashboard-container" th:data-hoy="${hoy}">
+
+        <!-- RESUMEN: hoy / semana / mes (clic = filtra la tabla) + servicio por cobrar -->
+        <div class="ig-kpis">
+          <button type="button" class="ig-kpi ig-kpi-hoy" data-periodo="hoy" title="Ver solo los cobros de hoy">
+            <span class="ig-kpi-titulo">Hoy</span>
+            <strong class="ig-kpi-valor" id="kpiHoy">S/. 0.00</strong>
+            <span class="ig-kpi-sub" id="kpiHoyDetalle">Servicio S/. 0.00 · Mora S/. 0.00 · Multas S/. 0.00</span>
+          </button>
+          <button type="button" class="ig-kpi" data-periodo="semana" title="Ver desde el lunes hasta hoy">
+            <span class="ig-kpi-titulo">Esta semana</span>
+            <strong class="ig-kpi-valor" id="kpiSemana">S/. 0.00</strong>
+            <span class="ig-kpi-sub">Desde el lunes</span>
+          </button>
+          <button type="button" class="ig-kpi" data-periodo="mes" title="Ver desde el día 1 hasta hoy">
+            <span class="ig-kpi-titulo">Este mes</span>
+            <strong class="ig-kpi-valor" id="kpiMes">S/. 0.00</strong>
+            <span class="ig-kpi-sub">Desde el día 1</span>
+          </button>
+          <a class="ig-kpi ig-kpi-cobrar" th:href="@{/admin/prestamos(tab='por-entregar')}" title="Ir a Préstamos &rsaquo; Por entregar">
+            <span class="ig-kpi-titulo">Servicio por cobrar</span>
+            <strong class="ig-kpi-valor" th:text="${'S/. ' + m.porCobrar()}">S/. 0.00</strong>
+            <span class="ig-kpi-sub" th:text="${m.pedidosPorCobrar() + (m.pedidosPorCobrar() == 1 ? ' pedido por entregar' : ' pedidos por entregar')}">0 pedidos por entregar</span>
+          </a>
+        </div>
+
+        <div class="ig-filtros">
+          <div class="ig-buscador">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="igBuscar" placeholder="Buscar por lector, artículo o código..." autocomplete="off" />
+          </div>
+
+          <div class="ig-fechas">
+            <label class="ig-fecha" for="igDesde">
+              <span>Desde</span>
+              <input type="date" id="igDesde" th:max="${hoy}" />
+            </label>
+            <label class="ig-fecha" for="igHasta">
+              <span>Hasta</span>
+              <input type="date" id="igHasta" th:max="${hoy}" />
+            </label>
+          </div>
+
+          <select id="igConcepto" class="ig-select">
+            <option value="">Todos los conceptos</option>
+            <option value="SERVICIO">Servicio</option>
+            <option value="MORA">Mora</option>
+            <option value="MULTA">Multas</option>
+          </select>
+
+          <button type="button" class="ig-btn-limpiar inactivo" id="igLimpiar">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+
+          <span class="ig-resumen" id="igResumen"></span>
+        </div>
+
+        <div class="ig-cuerpo">
+
+          <!-- Tabla de cobros -->
+          <div class="ig-tabla-caja">
+            <table class="ig-tabla">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Concepto</th>
+                  <th>Lector</th>
+                  <th>Artículo</th>
+                  <th>Detalle</th>
+                  <th class="ig-der">Monto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(m.filas())}">
+                  <td colspan="6" class="ig-vacio">Todavía no hay ingresos registrados.</td>
+                </tr>
+                <tr th:each="f : ${m.filas()}" class="ig-fila"
+                    th:data-dia="${f.dia()}" th:data-concepto="${f.concepto()}" th:data-monto="${f.monto()}"
+                    th:data-lector="${f.lector()}" th:data-cod="${f.codLector()}"
+                    th:data-titulo="${f.titulo()}" th:data-codigo="${f.codigo()}">
+                  <td class="ig-nowrap" th:text="${f.fecha()}">11/11/2026 10:00</td>
+                  <td><span class="ig-concepto" th:classappend="${'c-' + #strings.toLowerCase(f.concepto())}" th:text="${f.conceptoTexto()}">Servicio</span></td>
+                  <td>
+                    <div class="ig-principal" th:text="${f.lector()}">Lector</div>
+                    <div class="ig-sub" th:text="${f.codLector()}">LEC-1001</div>
+                  </td>
+                  <td>
+                    <div class="ig-principal" th:text="${f.titulo()}">Título</div>
+                    <div class="ig-sub" th:text="${f.codigo()}">LIB-001</div>
+                  </td>
+                  <td th:text="${f.detalle()}">3 días de préstamo</td>
+                  <td class="ig-der ig-nowrap"><strong th:text="${'S/. ' + f.monto()}">S/. 0.00</strong></td>
+                </tr>
+                <tr id="igSinResultados" hidden><td colspan="6" class="ig-vacio">Sin resultados</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- COLUMNA DERECHA: desglose + gráfico -->
+          <aside class="ig-lateral">
+            <div class="ig-card">
+              <div class="ig-card-cab">
+                <h3>Total del filtro</h3>
+                <strong id="igTotal">S/. 0.00</strong>
+              </div>
+              <div class="ig-desglose" id="igDesglose"></div>
+            </div>
+
+            <div class="ig-card ig-card-grafico">
+              <div class="ig-card-cab">
+                <h3 id="igTituloGrafico">Ingresos por día</h3>
+                <span id="igRangoGrafico"></span>
+              </div>
+              <div class="ig-grafico" id="igGrafico"></div>
+              <div class="ig-leyenda">
+                <span><i class="c-servicio"></i> Servicio</span>
+                <span><i class="c-mora"></i> Mora</span>
+                <span><i class="c-multa"></i> Multas</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+    </div>
+</body>
+</html>

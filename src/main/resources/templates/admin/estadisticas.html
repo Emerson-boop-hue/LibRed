@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: molde('Estadísticas', 'Tendencias, comparaciones y uso de tu librería', 'estadisticas.css', 'estadisticas.js', 'estadisticas', ~{:: .dashboard-container})}">
+<head><title>Estadísticas | LibRed</title></head>
+<body>
+    <div class="dashboard-container es-comparar" th:data-hoy="${hoy}">
+
+        <!-- FILTRO: periodo + comparación -->
+        <div class="es-barra">
+          <select class="es-select" id="esPeriodo" aria-label="Periodo">
+            <option value="7">Últimos 7 días</option>
+            <option value="30">Últimos 30 días</option>
+            <option value="mes">Este mes</option>
+            <option value="anterior">Mes anterior</option>
+            <option value="personalizado">Personalizado</option>
+          </select>
+          <label class="es-fecha" for="esDesde"><span>Desde</span>
+            <input type="date" id="esDesde" th:value="${e.desde()}" th:max="${hoy}" />
+          </label>
+          <label class="es-fecha" for="esHasta"><span>Hasta</span>
+            <input type="date" id="esHasta" th:value="${e.hasta()}" th:max="${hoy}" />
+          </label>
+          <button type="button" class="es-limpiar" id="esLimpiar"><i class="fa-solid fa-rotate-left"></i> Limpiar</button>
+          <label class="es-switch" for="esComparar">
+            <input type="checkbox" id="esComparar" checked />
+            <span class="es-switch-pista"></span>
+            <span>Comparar con el periodo anterior</span>
+          </label>
+        </div>
+
+        <div class="es-scroll" id="esScroll">
+          <p class="es-periodo"><strong th:text="${e.periodo()}">Periodo</strong>
+            <span class="es-comp"> · comparado con <span th:text="${e.periodoAnterior()}">periodo anterior</span></span></p>
+
+          <div class="es-kpis">
+            <div class="es-kpi" th:each="k : ${e.kpis()}">
+              <span class="es-kpi-titulo"><i class="fa-solid" th:classappend="${k.icono()}"></i> <span th:text="${k.titulo()}">Indicador</span></span>
+              <strong class="es-kpi-valor" th:text="${k.valor()}">0</strong>
+              <span class="es-comp es-kpi-comp">
+                <span class="es-delta" th:classappend="${k.tendencia()}" th:if="${k.tendencia() != 'na' and k.variacion() != ''}">
+                  <i class="fa-solid" th:classappend="${k.tendencia() == 'sube' ? 'fa-arrow-trend-up' : (k.tendencia() == 'baja' ? 'fa-arrow-trend-down' : 'fa-minus')}"></i>
+                  <span th:text="${k.variacion()}">+0 %</span>
+                </span>
+                <span class="es-delta igual" th:if="${k.tendencia() == 'igual' and k.variacion() == ''}"><i class="fa-solid fa-minus"></i> igual</span>
+                <span class="es-prev" th:text="${'antes: ' + k.anterior()}">antes: 0</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="es-grid">
+            <section class="es-card es-ancho">
+              <h3>Préstamos y devoluciones <small id="esLineaAgrupa"></small></h3>
+              <div id="esLinea" class="es-lienzo"></div>
+              <div class="es-leyenda"><span><i style="background:var(--chart-prest)"></i>Préstamos</span><span><i style="background:var(--chart-dev)"></i>Devoluciones</span></div>
+            </section>
+            <section class="es-card">
+              <h3>Préstamos por categoría</h3>
+              <div id="esCat" class="es-dona-caja"></div>
+            </section>
+
+            <section class="es-card es-ancho">
+              <h3>Ingresos <small id="esIngAgrupa"></small></h3>
+              <div id="esIng" class="es-lienzo"></div>
+              <div class="es-leyenda"><span><i style="background:var(--chart-serv)"></i>Servicio</span><span><i style="background:var(--chart-mora)"></i>Mora</span><span><i style="background:var(--chart-multa)"></i>Multas</span></div>
+            </section>
+            <section class="es-card">
+              <h3>En circulación hoy</h3>
+              <div id="esEstado" class="es-dona-caja"></div>
+            </section>
+
+            <section class="es-card es-ancho">
+              <h3>Horarios con más movimiento <small>préstamos por día y hora</small></h3>
+              <div id="esHeat" class="es-heat"></div>
+            </section>
+            <section class="es-card">
+              <h3>Calificaciones <small id="esCalifResumen"></small></h3>
+              <div id="esCalif" class="es-barras"></div>
+            </section>
+
+            <section class="es-card es-ancho">
+              <h3>Los 10 artículos más prestados</h3>
+              <div id="esTop" class="es-barras"></div>
+            </section>
+            <section class="es-card">
+              <h3>Inventario hoy <small>por estado de stock</small></h3>
+              <div id="esStock" class="es-stock"></div>
+            </section>
+          </div>
+
+          <script type="application/json" id="esDatos" th:utext="${e.datosJson()}"></script>
+        </div>
+    </div>
+</body>
+</html>

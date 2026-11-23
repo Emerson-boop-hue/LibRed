@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Ventanas del login del lector: registro, recuperar acceso y notificación de SMS (simulada). -->
+<div th:fragment="acceso">
+
+    <div id="regOverlay" class="al-overlay" hidden>
+        <div class="al-card ancha" role="dialog" aria-modal="true" aria-labelledby="regTitulo">
+            <button type="button" class="al-cerrar" id="regCerrar" aria-label="Cerrar">&times;</button>
+
+            <form id="regForm" class="al-paso" autocomplete="off" novalidate>
+                <h2 id="regTitulo">Crea tu cuenta de lector</h2>
+                <p class="al-sub">Regístrate en la librería que prefieras y entra a toda la red.</p>
+
+                <div class="al-fila">
+                    <div class="al-campo">
+                        <label for="regNombres">Nombres</label>
+                        <div class="al-input"><input type="text" id="regNombres" name="al-r1" maxlength="100" placeholder="Ej: Juan Carlos" autocomplete="off"></div>
+                        <small class="al-err" id="regNombresErr"></small>
+                    </div>
+                    <div class="al-campo">
+                        <label for="regApellidos">Apellidos</label>
+                        <div class="al-input"><input type="text" id="regApellidos" name="al-r2" maxlength="100" placeholder="Ej: Pérez Gómez" autocomplete="off"></div>
+                        <small class="al-err" id="regApellidosErr"></small>
+                    </div>
+                </div>
+                <small class="al-err" id="regNombreErr"></small>
+
+                <div class="al-campo">
+                    <label for="regCelular">Celular</label>
+                    <div class="al-input"><input type="text" id="regCelular" name="al-r3" inputmode="numeric" maxlength="11" placeholder="987 654 321" autocomplete="off"></div>
+                    <small class="al-err" id="regCelularErr"></small>
+                </div>
+
+                <div class="al-campo">
+                    <label for="regLibreria">Librería</label>
+                    <div class="al-input">
+                        <select id="regLibreria" name="al-r4">
+                            <option value="" selected disabled>Selecciona tu librería</option>
+                            <option th:each="lib : ${librerias}" th:value="${lib.id}" th:text="${lib.nombreComercial}">Librería</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down al-flecha"></i>
+                    </div>
+                    <small class="al-err" id="regLibreriaErr"></small>
+                </div>
+
+                <div class="al-campo">
+                    <label for="regClave">Contraseña</label>
+                    <div class="al-input con-ojo">
+                        <input type="password" id="regClave" name="al-r5" maxlength="20" placeholder="6 a 20 caracteres" autocomplete="new-password">
+                        <button type="button" class="al-ojo" data-ojo="regClave" aria-label="Mostrar u ocultar contraseña"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="al-fuerza" id="regFuerza"><i></i><i></i><i></i><i></i></div>
+                    <small class="al-err" id="regClaveErr"></small>
+                </div>
+
+                <div class="al-error" id="regError" role="alert" hidden></div>
+                <button type="submit" class="al-btn" id="regEnviar" disabled>Crear cuenta</button>
+                <button type="button" class="al-link" id="regYaTengo">Ya tengo una cuenta</button>
+            </form>
+
+            <div id="regOk" class="al-paso al-ok" hidden>
+                <div class="al-ok-ico"><i class="fa-solid fa-check"></i></div>
+                <h2>Cuenta creada</h2>
+                <div class="al-ficha">
+                    <small>Tu código de lector</small>
+                    <strong id="regCodigo">LEC-0000</strong>
+                    <span id="regLibNombre"></span>
+                </div>
+                <button type="button" class="al-btn" id="regIr">Iniciar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="recOverlay" class="al-overlay" hidden>
+        <div class="al-card" role="dialog" aria-modal="true" aria-labelledby="recTitulo">
+            <button type="button" class="al-cerrar" id="recCerrar" aria-label="Cerrar">&times;</button>
+
+            <form id="recP1" class="al-paso" autocomplete="off" novalidate>
+                <h2 id="recTitulo">Recuperar acceso</h2>
+                <p class="al-sub">Ingresa el celular con el que te registraste y te enviaremos un código por SMS.</p>
+                <div class="al-campo">
+                    <label for="recCelular">Celular</label>
+                    <div class="al-input"><input type="text" id="recCelular" name="al-c1" inputmode="numeric" maxlength="11" placeholder="987 654 321" autocomplete="off"></div>
+                </div>
+                <div class="al-error" id="recError1" role="alert" hidden></div>
+                <button type="submit" class="al-btn" id="recEnviar" disabled>Enviar código</button>
+            </form>
+
+            <form id="recP2" class="al-paso" autocomplete="off" novalidate hidden>
+                <h2>Ingresa el código</h2>
+                <p class="al-sub">Si el celular está registrado, recibirás un SMS con un código de 6 dígitos.</p>
+                <div class="al-campo">
+                    <label for="recCodigo">Código</label>
+                    <div class="al-input al-codigo-input"><input type="text" id="recCodigo" name="al-c2" inputmode="numeric" maxlength="6" autocomplete="off"></div>
+                </div>
+                <div class="al-error" id="recError2" role="alert" hidden></div>
+                <button type="submit" class="al-btn" id="recVerificar" disabled>Verificar código</button>
+                <button type="button" class="al-link" id="recReenviar" disabled>Reenviar código</button>
+                <button type="button" class="al-link" id="recOtro">Usar otro celular</button>
+            </form>
+
+            <form id="recP3" class="al-paso" autocomplete="off" novalidate hidden>
+                <h2>Crea una nueva contraseña</h2>
+                <div class="al-cuentas" id="recCuentas" hidden></div>
+                <div class="al-campo">
+                    <label for="recClave">Nueva contraseña</label>
+                    <div class="al-input con-ojo">
+                        <input type="password" id="recClave" name="al-c3" maxlength="20" placeholder="6 a 20 caracteres" autocomplete="new-password">
+                        <button type="button" class="al-ojo" data-ojo="recClave" aria-label="Mostrar u ocultar contraseña"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <div class="al-fuerza" id="recFuerza"><i></i><i></i><i></i><i></i></div>
+                </div>
+                <div class="al-error" id="recError3" role="alert" hidden></div>
+                <button type="submit" class="al-btn" id="recGuardar" disabled>Cambiar contraseña</button>
+            </form>
+
+            <div id="recP4" class="al-paso al-ok" hidden>
+                <div class="al-ok-ico"><i class="fa-solid fa-check"></i></div>
+                <h2>Contraseña actualizada</h2>
+                <div class="al-ficha">
+                    <small>Tu código de lector</small>
+                    <strong id="recCodigoLector">LEC-0000</strong>
+                </div>
+                <button type="button" class="al-btn" id="recIr">Iniciar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificación de sms (simulada) -->
+    <div id="alSms" class="al-sms" role="status" aria-live="polite" hidden>
+        <div class="al-sms-cab">
+            <span class="al-sms-ico"><i class="fa-solid fa-comment-sms"></i></span>
+            <span>MENSAJES</span><span class="al-sms-sim">SIMULADO</span>
+            <span class="al-sms-hora">ahora</span>
+        </div>
+        <strong id="alSmsRemitente">LibRed</strong>
+        <p id="alSmsTexto"></p>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,371 @@
+/* Contenedor principal idéntico al inventario */
+.dashboard-container {
+    padding: 24px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 75px);
+}
+
+/* BARRA SUPERIOR: buscador + fechas + registrar */
+.lectores-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    gap: 10px;
+    width: 100%;
+}
+
+.lectores-filtros {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.search-box-lectores {
+    display: flex;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    flex: 1 1 260px;
+    min-width: 220px;
+    max-width: 420px;
+}
+
+.search-box-lectores i {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.search-box-lectores input {
+    border: none;
+    background: transparent;
+    margin-left: 8px;
+    outline: none;
+    width: 100%;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+/* Filtro por fechas */
+.filtro-fechas-lec {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.fecha-campo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 5px 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.fecha-campo:focus-within {
+    border-color: var(--active-bg);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.fecha-campo span {
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.fecha-campo input[type="date"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    cursor: pointer;
+}
+
+/* Limpiar: quita todos los filtros. Se ve atenuado cuando no hay ninguno activo */
+.btn-limpiar-lec {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    padding: 6px 11px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-limpiar-lec:hover {
+    border-color: var(--active-bg);
+    color: var(--accent-text);
+}
+.btn-limpiar-lec.inactivo {
+    opacity: 0.45;
+    cursor: default;
+}
+.btn-limpiar-lec.inactivo:hover {
+    border-color: var(--sidebar-border);
+    color: var(--text-muted);
+}
+
+.btn-nuevo-lector {
+    background-color: var(--active-bg);
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+    margin-left: auto;
+}
+
+.btn-nuevo-lector:hover {
+    opacity: 0.9;
+    color: #ffffff;
+}
+
+/* Kpis de lectores (2 en fila, funcionan como filtro) */
+.lectores-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+.kpi-card-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    width: 100%;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
+}
+.kpi-card-lec:hover {
+    border-color: var(--line-hover);
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.08);
+}
+.kpi-card-lec:focus-visible {
+    outline: 2px solid var(--active-bg);
+    outline-offset: 2px;
+}
+/* Tarjeta seleccionada (filtro activo): fondo suave y barra grafito a la izquierda, sin aros ni contornos fuertes */
+.kpi-card-lec.activo {
+    border-color: var(--line-strong);
+    background-color: var(--surface-soft);
+    box-shadow: inset 4px 0 0 var(--bar);
+}
+
+.kpi-icon-box-lec {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+/* Íconos en la misma gama grafito del panel (sin colores intensos) */
+.kpi-icon-box-lec.azul,
+.kpi-icon-box-lec.rojo { background-color: var(--surface-icon); color: var(--accent-text); }
+.kpi-card-lec.activo .kpi-icon-box-lec { background-color: var(--surface-strong); }
+
+.kpi-info-lec {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-label-lec {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value-lec {
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 2px;
+    color: var(--text-dark);
+}
+.text-danger-lec { color: var(--text-dark); }
+
+/* RESULTADO: tabla */
+#lectoresResultado {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Tabla de lectores con scroll fijo */
+.tabla-contenedor-fijo-lec {
+    background-color: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.tabla-contenedor-fijo-lec::-webkit-scrollbar {
+    width: 5px;
+}
+.tabla-contenedor-fijo-lec::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.tabla-lectores {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.tabla-lectores th {
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.tabla-lectores td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--sidebar-border);
+    color: var(--text-dark);
+    vertical-align: middle;
+}
+
+.fila-sin-resultados {
+    text-align: center;
+    padding: 40px 16px !important;
+    color: var(--text-muted) !important;
+}
+
+.lector-avatar {
+    width: 36px;
+    height: 36px;
+    background-color: var(--sidebar-hover-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.lector-nombre {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.lector-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.lector-codigo {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ESTADO DE CUENTA: etiqueta neutra con un punto de color pequeño (el color solo acompaña, no domina) */
+.estado-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--sidebar-border);
+    background-color: var(--surface-soft);
+    color: var(--text-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+.estado-pill i { display: none; }
+.estado-pill::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.estado-pill.habilitado::before { background-color: #4ade80; }
+.estado-pill.bloqueado::before { background-color: #f87171; }
+
+/* Botones de acción */
+.btn-accion-lec {
+    background: transparent;
+    border: 1px solid var(--sidebar-border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 5px;
+}
+.btn-accion-lec:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--text-dark);
+}
+.btn-accion-lec.eliminar:hover {
+    background-color: var(--surface-soft);
+    color: var(--danger-text);
+    border-color: var(--line-strong);
+}
+
+/* Pantallas angostas: los KPIs se apilan */
+@media (max-width: 900px) {
+    .lectores-kpis { grid-template-columns: 1fr; }
+}

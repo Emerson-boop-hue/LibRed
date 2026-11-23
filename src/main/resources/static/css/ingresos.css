@@ -1,0 +1,134 @@
+/* Ingresos */
+.dashboard-container {
+    padding: 22px 30px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: calc(100vh - 75px);
+}
+.dashboard-container [hidden] { display: none !important; }
+
+/* Resumen */
+.ig-kpis { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 14px; flex-shrink: 0; }
+.ig-kpi {
+    display: flex; flex-direction: column; gap: 4px; text-align: left; text-decoration: none;
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px;
+    padding: 14px 18px; font-family: inherit; cursor: pointer; color: var(--text-dark);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02); transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ig-kpi:hover { border-color: var(--line-hover); box-shadow: 0 4px 12px rgba(30, 41, 59, 0.08); }
+.ig-kpi-titulo { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+.ig-kpi-valor { font-size: 1.5rem; color: var(--accent-text-strong); line-height: 1.2; }
+.ig-kpi-sub { font-size: 0.76rem; color: var(--text-muted); }
+/* "Hoy" destaca con fondo suave y barra grafito (antes era un bloque oscuro) */
+.ig-kpi-hoy { border-color: var(--line-strong); background-color: var(--surface-soft); box-shadow: inset 4px 0 0 var(--bar); }
+.ig-kpi-hoy .ig-kpi-valor { font-size: 1.75rem; }
+.ig-kpi-hoy:hover { box-shadow: inset 4px 0 0 var(--bar), 0 4px 12px rgba(30, 41, 59, 0.08); }
+
+/* Filtros */
+.ig-filtros { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; flex-shrink: 0; }
+.ig-buscador {
+    display: flex; align-items: center; flex: 1 1 240px; max-width: 360px;
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 8px; padding: 8px 14px;
+}
+.ig-buscador i { color: var(--text-muted); font-size: 0.85rem; }
+.ig-buscador input { border: none; background: transparent; margin-left: 10px; outline: none; width: 100%; font-size: 0.85rem; color: var(--text-dark); }
+.ig-fechas { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.ig-fecha {
+    display: flex; align-items: center; gap: 6px;
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 8px; padding: 5px 8px;
+    cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ig-fecha:focus-within { border-color: var(--active-bg); box-shadow: 0 0 0 3px var(--focus-ring); }
+.ig-fecha span { font-size: 0.64rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+.ig-fecha input[type="date"] { border: none; background: transparent; outline: none; font-family: inherit; font-size: 0.8rem; color: var(--text-dark); cursor: pointer; }
+.ig-select {
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 8px;
+    padding: 8px 12px; font-family: inherit; font-size: 0.85rem; color: var(--text-dark); outline: none; cursor: pointer;
+}
+.ig-btn-limpiar {
+    display: inline-flex; align-items: center; gap: 7px;
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 8px;
+    padding: 8px 14px; font-family: inherit; font-size: 0.85rem; font-weight: 600; color: var(--text-dark);
+    cursor: pointer; transition: all 0.2s;
+}
+.ig-btn-limpiar:hover { border-color: var(--active-bg); color: var(--accent-text); }
+.ig-btn-limpiar.inactivo { opacity: 0.5; }
+.ig-resumen { margin-left: auto; font-size: 0.82rem; color: var(--text-muted); }
+.ig-resumen strong { color: var(--text-dark); }
+
+/* Cuerpo: tabla + lateral */
+.ig-cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.5fr 1fr; grid-template-rows: minmax(0, 1fr); gap: 18px; }
+.ig-tabla-caja {
+    min-height: 0; overflow-y: auto;
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.ig-tabla-caja::-webkit-scrollbar { width: 5px; }
+.ig-tabla-caja::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 4px; }
+.ig-tabla { width: 100%; border-collapse: collapse; text-align: left; }
+.ig-tabla th {
+    position: sticky; top: 0; z-index: 2;
+    padding: 12px 14px; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
+    color: var(--text-muted); background-color: var(--bg-main); border-bottom: 1px solid var(--sidebar-border);
+}
+.ig-tabla td { padding: 10px 14px; font-size: 0.84rem; border-bottom: 1px solid var(--sidebar-border); color: var(--text-dark); vertical-align: middle; }
+.ig-fila:hover { background-color: var(--sidebar-hover-bg); }
+.ig-der { text-align: right !important; }
+.ig-nowrap { white-space: nowrap; }
+.ig-principal { font-weight: 600; color: var(--text-dark); }
+.ig-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+.ig-vacio { text-align: center; color: var(--text-muted); padding: 30px !important; }
+
+/* Concepto: etiqueta neutra con un punto del mismo color que su barra en el gráfico */
+.ig-concepto {
+    display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--sidebar-border); background: var(--surface-soft);
+    color: var(--text-body); font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+}
+.ig-concepto::before { content: ""; width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.ig-concepto.c-servicio, .ig-concepto.c-mora, .ig-concepto.c-multa { background: var(--surface-soft); }
+.ig-concepto.c-servicio::before { background: var(--chart-serv); }
+.ig-concepto.c-mora::before { background: var(--chart-mora); }
+.ig-concepto.c-multa::before { background: var(--chart-multa); }
+
+/* Lateral */
+.ig-lateral { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.ig-card {
+    background-color: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px;
+    padding: 16px 18px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02); box-sizing: border-box;
+}
+.ig-card-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ig-card-cab h3 { margin: 0; font-size: 0.95rem; color: var(--accent-text-strong); }
+.ig-card-cab strong { font-size: 1.2rem; color: var(--accent-text-strong); }
+.ig-card-cab span { font-size: 0.76rem; color: var(--text-muted); }
+
+.ig-desglose { display: flex; flex-direction: column; gap: 10px; }
+.ig-linea-cab { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; }
+.ig-linea-cab span { color: var(--text-muted); font-weight: 600; }
+.ig-linea-cab strong { color: var(--text-dark); }
+.ig-barra { height: 7px; border-radius: 999px; background: var(--sidebar-hover-bg); overflow: hidden; }
+.ig-barra i { display: block; height: 100%; border-radius: 999px; transition: width 0.25s; }
+
+.c-servicio { background: var(--chart-serv); }
+.c-mora { background: var(--chart-mora); }
+.c-multa { background: var(--chart-multa); }
+
+.ig-card-grafico { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.ig-grafico { flex: 1; min-height: 120px; display: flex; align-items: flex-end; gap: 4px; padding-top: 6px; }
+.ig-col { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.ig-pila { width: 100%; max-width: 34px; flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+.ig-pila i { display: block; width: 100%; }
+.ig-pila i:first-child { border-radius: 4px 4px 0 0; }
+.ig-col-etiqueta { font-size: 0.64rem; color: var(--text-muted); height: 12px; white-space: nowrap; }
+.ig-leyenda { display: flex; gap: 14px; justify-content: center; margin-top: 10px; font-size: 0.74rem; color: var(--text-muted); flex-shrink: 0; }
+.ig-leyenda i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; }
+
+@media (max-width: 1100px) {
+    .dashboard-container { height: auto; overflow-y: auto; }
+    .ig-kpis { grid-template-columns: 1fr 1fr; }
+    .ig-cuerpo { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .ig-tabla-caja { max-height: 420px; }
+    .ig-grafico { min-height: 160px; }
+}

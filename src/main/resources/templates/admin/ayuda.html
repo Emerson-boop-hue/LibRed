@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/layout :: molde('Ayuda y Soporte', 'Guías y contacto con soporte', 'ayuda.css', 'ayuda.js', 'ayuda', ~{:: .dashboard-container})}">
+<head><title>Ayuda y Soporte | LibRed</title></head>
+<body>
+    <div class="dashboard-container" th:data-tab="${tab}">
+
+        <div class="ay-tabs">
+          <button type="button" class="ay-tab" data-tab="guias" th:classappend="${tab == 'guias'} ? 'activo'"><i class="fa-solid fa-book-open"></i> Guías y preguntas</button>
+          <button type="button" class="ay-tab" data-tab="soporte" th:classappend="${tab == 'soporte'} ? 'activo'">
+            <i class="fa-solid fa-headset"></i> Soporte
+          </button>
+          <button type="button" class="ay-tab" data-tab="solicitudes" th:classappend="${tab == 'solicitudes'} ? 'activo'">
+            <i class="fa-solid fa-clock-rotate-left"></i> Mis solicitudes
+            <span class="ay-contador" th:if="${a.abiertas() > 0}" th:text="${a.abiertas()}">0</span>
+          </button>
+        </div>
+
+        <!-- Guías y preguntas -->
+        <div class="ay-panel" id="ayPanelGuias" th:hidden="${tab != 'guias'}">
+
+          <div class="ay-rapidos">
+            <a class="ay-rapido" th:href="@{/admin/prestamos}"><i class="fa-solid fa-hand-holding"></i><span><strong>Registrar préstamo</strong><small>En el mostrador</small></span></a>
+            <a class="ay-rapido" th:href="@{/admin/prestamos(tab='por-entregar')}"><i class="fa-solid fa-box-open"></i><span><strong>Entregar pedido</strong><small>Reservado por un lector</small></span></a>
+            <a class="ay-rapido" th:href="@{/admin/devoluciones}"><i class="fa-solid fa-rotate-left"></i><span><strong>Registrar devolución</strong><small>Con o sin retraso</small></span></a>
+            <a class="ay-rapido" th:href="@{/admin/multas}"><i class="fa-solid fa-file-invoice-dollar"></i><span><strong>Cobrar multa</strong><small>Y desbloquear al lector</small></span></a>
+          </div>
+
+          <div class="ay-tarjeta ay-faq">
+            <div class="ay-faq-cab"><i class="fa-solid fa-circle-question"></i> Preguntas frecuentes</div>
+            <div class="ay-buscador">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="ayBuscar" placeholder="Escribe tu duda, por ejemplo: mora, bloqueado, stock..." autocomplete="off" />
+            </div>
+            <div class="ay-chips">
+              <button type="button" class="ay-chip activo" data-cat="todas">Todas</button>
+              <button type="button" class="ay-chip" data-cat="prestamos">Préstamos</button>
+              <button type="button" class="ay-chip" data-cat="devoluciones">Devoluciones</button>
+              <button type="button" class="ay-chip" data-cat="multas">Multas y bloqueos</button>
+              <button type="button" class="ay-chip" data-cat="inventario">Inventario</button>
+              <button type="button" class="ay-chip" data-cat="lectores">Lectores</button>
+              <button type="button" class="ay-chip" data-cat="estados">Estados</button>
+              <button type="button" class="ay-chip" data-cat="ajustes">Ajustes y reportes</button>
+            </div>
+
+            <div class="ay-lista" id="ayLista">
+
+              <details class="ay-item" data-cat="prestamos" data-buscar="registrar préstamo mostrador lector artículo días comprobante">
+                <summary>¿Cómo registro un préstamo en el mostrador?</summary>
+                <ol>
+                  <li>Entra a <a th:href="@{/admin/prestamos}">Préstamos</a> y abre <b>Nuevo préstamo en mostrador</b>.</li>
+                  <li>Elige el <b>lector</b> y el <b>artículo</b> (solo aparecen los que tienen stock).</li>
+                  <li>Indica los <b>días</b>. No pueden pasar del máximo de tu política (lo ves en Ajustes). El servicio se calcula solo: días × tarifa de la categoría.</li>
+                  <li>Confirma. El préstamo nace <b>Activo</b>, con el servicio ya cobrado.</li>
+                </ol>
+              </details>
+
+              <details class="ay-item" data-cat="prestamos" data-buscar="entregar pedido por entregar confirmar entrega cancelar lector recoger cobrar servicio">
+                <summary>¿Cómo entrego o cancelo un pedido de un lector?</summary>
+                <ol>
+                  <li>En <a th:href="@{/admin/prestamos(tab='por-entregar')}">Préstamos &rsaquo; Por entregar</a> están los pedidos pendientes.</li>
+                  <li>Cuando el lector llega, pulsa <b>Confirmar entrega</b>: se cobra el servicio, pasa a <b>Activo</b> y el plazo empieza ese día.</li>
+                  <li>Si no viene, pulsa <b>Cancelar pedido</b>: el artículo vuelve al stock y no se cobra nada.</li>
+                </ol>
+              </details>
+
+              <details class="ay-item" data-cat="prestamos" data-buscar="cómo se calcula servicio costo tarifa días categoría">
+                <summary>¿Cómo se calcula el servicio de un préstamo?</summary>
+                <p>Es el número de días × la tarifa por día de la categoría del artículo. Se guarda al registrar el préstamo, así que cambiar la tarifa después no lo modifica.</p>
+              </details>
+
+              <details class="ay-item" data-cat="prestamos multas" data-buscar="no puedo prestar entregar lector bloqueado multas pendientes máximo activos">
+                <summary>¿Por qué no puedo prestarle o entregarle a un lector?</summary>
+                <p>Lo más probable es que esté bloqueado por multas pendientes: cóbralas en Multas y quedará habilitado. También puede haber llegado a su máximo de préstamos activos.</p>
+              </details>
+
+              <details class="ay-item" data-cat="prestamos" data-buscar="pedido nunca recogido cancelar por entregar stock reservado">
+                <summary>¿Qué hago con un pedido que nadie recoge?</summary>
+                <p>Cancélalo en Préstamos &rsaquo; Por entregar. El artículo vuelve al stock.</p>
+              </details>
+
+              <details class="ay-item" data-cat="devoluciones" data-buscar="devolución devolver mora tarifa diaria retraso procesar confirmar">
+                <summary>¿Cómo registro una devolución?</summary>
+                <ol>
+                  <li>Entra a <a th:href="@{/admin/devoluciones}">Devoluciones</a> y busca el préstamo por lector, artículo o código.</li>
+                  <li>Pulsa <b>Procesar devolución</b>. Verás los días de retraso, si los hay.</li>
+                  <li>Si hay retraso, escribe la <b>tarifa de mora diaria (S/.)</b>.</li>
+                  <li>Pulsa <b>Confirmar devolución</b>: el stock sube y el préstamo queda <b>Devuelto</b>.</li>
+                </ol>
+                <p>Si el artículo vuelve dañado, registra la multa en el módulo Multas.</p>
+              </details>
+
+              <details class="ay-item" data-cat="devoluciones" data-buscar="cómo se calcula mora retraso tarifa diaria devolución vencido">
+                <summary>¿Cómo se calcula la mora?</summary>
+                <p>Al devolver: los días de retraso × la tarifa de mora diaria que escribes en ese momento. Por eso no se sabe de antemano cuánto debe un préstamo vencido; los reportes solo cuentan cuántos hay.</p>
+              </details>
+
+              <details class="ay-item" data-cat="multas" data-buscar="multa multas registrar cobro pagar pendiente bloqueado desbloquear daño perdido comprobante">
+                <summary>¿Cómo registro y cobro una multa?</summary>
+                <ol>
+                  <li>En <a th:href="@{/admin/multas}">Multas</a> pulsa <b>Registrar multa</b>: lector, préstamo o artículo, motivo y monto.</li>
+                  <li>Mientras esté <b>pendiente</b>, el lector queda bloqueado en tu librería.</li>
+                  <li>Cuando pague, pulsa <b>Confirmar cobro</b>: se genera el comprobante y, si no tiene otras multas pendientes, vuelve a estar habilitado.</li>
+                </ol>
+              </details>
+
+              <details class="ay-item" data-cat="multas lectores estados" data-buscar="lector habilitado bloqueado multa pendiente cuenta estado">
+                <summary>¿Cuándo un lector está bloqueado?</summary>
+                <p>Cuando tiene multas pendientes en tu librería. No puede recibir préstamos ni pedidos hasta pagarlas. El estado se calcula solo; no se cambia a mano.</p>
+              </details>
+
+              <details class="ay-item" data-cat="inventario" data-buscar="inventario artículo registrar stock total disponible categoría código imagen">
+                <summary>¿Cómo agrego artículos?</summary>
+                <ol>
+                  <li>En <a th:href="@{/admin/inventario}">Inventario</a> pulsa <b>Registrar nuevo artículo</b>: categoría, código, título, autor, stock y, si quieres, una imagen.</li>
+                  <li>El código solo debe ser único dentro de tu librería.</li>
+                </ol>
+                <p>Las categorías disponibles son las que tienes activas en Ajustes &rsaquo; Política de préstamos.</p>
+              </details>
+
+              <details class="ay-item" data-cat="inventario estados" data-buscar="stock crítico agotado normal estado artículo disponible">
+                <summary>¿Por qué un artículo aparece Crítico o Agotado?</summary>
+                <p>Depende de cuántos ejemplares quedan disponibles: más de 2 es Normal, 1 o 2 es Crítico y 0 es Agotado. Los pedidos por entregar también reservan stock.</p>
+              </details>
+
+              <details class="ay-item" data-cat="lectores" data-buscar="lectores registrar nuevo lector código contraseña teléfono">
+                <summary>¿Cómo registro un lector?</summary>
+                <p>En <a th:href="@{/admin/lectores}">Lectores</a> pulsa <b>Registrar nuevo lector</b>: código, nombres, apellidos, teléfono y una contraseña inicial de 6 a 20 caracteres.</p>
+              </details>
+
+              <details class="ay-item" data-cat="lectores" data-buscar="lector varias librerías mismo código red global bloqueo">
+                <summary>¿Un lector puede estar en varias librerías?</summary>
+                <p>Sí. Usa el mismo código y contraseña en todas, pero cada librería tiene su propio estado: si lo bloquean en otra, en la tuya sigue habilitado.</p>
+              </details>
+
+              <details class="ay-item" data-cat="estados" data-buscar="estados por entregar activo vencido devuelto cancelado recorrido préstamo">
+                <summary>¿Qué significa cada estado de un préstamo?</summary>
+                <dl>
+                  <dt>Por entregar</dt><dd>El lector pidió el artículo desde su cuenta. Está reservado, pero aún sin plazo ni cobro.</dd>
+                  <dt>Activo</dt><dd>El lector ya lo tiene. El plazo corre desde la entrega y el servicio ya está cobrado.</dd>
+                  <dt>Vencido</dt><dd>No es un estado guardado: es un préstamo activo cuya fecha límite ya pasó.</dd>
+                  <dt>Devuelto</dt><dd>El artículo ya volvió y se registró en Devoluciones.</dd>
+                  <dt>Cancelado</dt><dd>El pedido no se recogió y se canceló. El artículo vuelve al stock.</dd>
+                </dl>
+              </details>
+
+              <details class="ay-item" data-cat="ajustes" data-buscar="ajustes política préstamos máximo días tarifas categoría contraseña membresía plan método de pago datos librería">
+                <summary>¿Dónde cambio las reglas de mi librería y mi plan?</summary>
+                <p>En <a th:href="@{/admin/ajustes}">Ajustes</a>: datos de la librería, política de préstamos (máximo de días, préstamos activos y tarifas por categoría), contraseña y membresía. Tu plan actual también está en el botón <b>Ver plan actual</b> de arriba.</p>
+              </details>
+
+              <details class="ay-item" data-cat="ajustes" data-buscar="ingresos cuenta cobrado dinero servicio mora multa fecha">
+                <summary>¿Qué cuenta como ingreso y cuándo?</summary>
+                <p>El servicio, el día que se cobra (al registrar en mostrador o al entregar un pedido); la mora, el día de la devolución; y las multas, el día que se pagan. Una multa pendiente todavía no es ingreso.</p>
+              </details>
+
+              <details class="ay-item" data-cat="ajustes" data-buscar="reportes descargar pdf excel periodo estadísticas movimientos">
+                <summary>¿Cómo descargo un reporte?</summary>
+                <p>En <a th:href="@{/admin/reportes}">Reportes</a> elige el informe y el periodo, y pulsa Descargar PDF o Descargar Excel. Para ver gráficos usa <a th:href="@{/admin/estadisticas}">Estadísticas</a>, y para el historial, <a th:href="@{/admin/movimientos}">Movimientos</a>.</p>
+              </details>
+
+              <div class="ay-sin-resultados" id="ayVacio" hidden>
+                <p>No encontramos nada con eso.</p>
+                <button type="button" class="ay-boton-claro" data-ir="soporte">Escríbenos en Soporte</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ay-panel" id="ayPanelSoporte" th:hidden="${tab != 'soporte'}">
+          <div class="ay-centro">
+            <div class="ay-tarjeta ay-asistente" id="ayAsistente"
+                 th:attr="data-paso=${errorSolicitud != null} ? 'form' : 'tema', data-tema=${solTema}, data-nombre=${a.nombre()}, data-codigo=${a.codigoAdmin()}">
+
+              <div class="ay-pasos">
+                <div class="ay-paso" data-p="1"><b>1</b><span>Tema</span></div>
+                <i class="ay-paso-linea"></i>
+                <div class="ay-paso" data-p="2"><b>2</b><span>Ayuda rápida</span></div>
+                <i class="ay-paso-linea"></i>
+                <div class="ay-paso" data-p="3"><b>3</b><span>Canal</span></div>
+              </div>
+
+              <div class="ay-pane" data-pane="tema">
+                <div class="ay-pane-titulo">¿Sobre qué necesitas ayuda?</div>
+                <div class="ay-temas">
+                  <button type="button" class="ay-tema" data-tema="prestamos"><i class="fa-solid fa-hand-holding"></i><span><strong>Préstamos</strong><small>Registrar, entregar o cancelar</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema" data-tema="devoluciones"><i class="fa-solid fa-rotate-left"></i><span><strong>Devoluciones</strong><small>Retrasos y mora</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema" data-tema="multas"><i class="fa-solid fa-file-invoice-dollar"></i><span><strong>Multas y bloqueos</strong><small>Cobros y desbloqueo</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema" data-tema="inventario"><i class="fa-solid fa-boxes-stacked"></i><span><strong>Inventario</strong><small>Artículos y stock</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema" data-tema="lectores"><i class="fa-solid fa-users"></i><span><strong>Lectores</strong><small>Cuentas y estados</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema" data-tema="plan"><i class="fa-solid fa-credit-card"></i><span><strong>Plan y pagos</strong><small>Membresía y cobros</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                  <button type="button" class="ay-tema ay-tema-ancho" data-tema="otro"><i class="fa-solid fa-ellipsis"></i><span><strong>No está en mi lista</strong><small>Describe tu consulta</small></span><u class="fa-solid fa-chevron-right"></u></button>
+                </div>
+              </div>
+
+              <div class="ay-pane" data-pane="ayuda" hidden>
+                <div class="ay-pane-titulo">Esto podría resolverlo <span class="ay-etiqueta" id="ayTemaNombre"></span></div>
+                <div class="ay-sug" id="aySug"></div>
+                <div class="ay-acciones">
+                  <button type="button" class="ay-boton-claro" data-ir-paso="tema">Cambiar tema</button>
+                  <span class="ay-espacio"></span>
+                  <button type="button" class="ay-boton-claro" id="ayResuelto">Esto resolvió mi duda</button>
+                  <button type="button" class="ay-boton" data-ir-paso="canal">Aún necesito ayuda</button>
+                </div>
+              </div>
+
+              <div class="ay-pane" data-pane="canal" hidden>
+                <div class="ay-pane-titulo">¿Cómo prefieres que te ayudemos?</div>
+                <div class="ay-canales">
+                  <button type="button" class="ay-canal" data-ir-paso="form">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span><strong>Enviar una solicitud</strong><small>Consulta detallada con seguimiento</small></span>
+                    <u class="fa-solid fa-chevron-right"></u>
+                  </button>
+                  <a class="ay-canal" id="ayWhatsapp" target="_blank" rel="noopener" th:href="${whatsapp != ''} ? ${'https://wa.me/' + whatsapp} : '#'"
+                     th:classappend="${whatsapp == ''} ? 'apagado'" th:attr="data-numero=${whatsapp}">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span><strong>Consultas rápidas</strong><small>Atención directa por WhatsApp</small></span>
+                    <u class="fa-solid fa-arrow-up-right-from-square"></u>
+                  </a>
+                  <a class="ay-canal" id="ayCorreo" target="_blank" rel="noopener" th:if="${correoSoporte != ''}"
+                     th:href="${'https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=' + correoSoporte}" th:attr="data-correo=${correoSoporte}">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span><strong>Correo directo</strong><small>Escríbenos desde tu correo electrónico</small></span>
+                    <u class="fa-solid fa-arrow-up-right-from-square"></u>
+                  </a>
+                  <div class="ay-canal apagado" aria-disabled="true" th:unless="${correoSoporte != ''}">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span><strong>Correo directo</strong><small>Escríbenos desde tu correo electrónico</small></span>
+                    <em>Próximamente</em>
+                  </div>
+                </div>
+                <div class="ay-acciones">
+                  <button type="button" class="ay-boton-claro" data-ir-paso="ayuda">Volver</button>
+                </div>
+              </div>
+
+              <!-- PASO 3b: formulario -->
+              <form class="ay-pane ay-form" data-pane="form" method="post" th:action="@{/admin/ayuda/solicitud}" id="ayForm" hidden>
+                <div class="ay-pane-titulo">Cuéntanos tu caso</div>
+                <div class="ay-error" th:if="${errorSolicitud}" th:text="${errorSolicitud}">Error</div>
+                <input type="hidden" name="tema" id="ayTema" th:value="${solTema}" />
+
+                <div class="ay-fila">
+                  <div class="ay-campo">
+                    <label for="ayCategoria">Tipo de solicitud</label>
+                    <select id="ayCategoria" name="categoria" required>
+                      <option th:each="c : ${categorias}" th:value="${c.key}" th:text="${c.value}"
+                              th:selected="${solCategoria != null and solCategoria == c.key}">Tengo una duda</option>
+                    </select>
+                  </div>
+                  <div class="ay-campo ay-campo-ancho">
+                    <label for="ayAsunto">Asunto</label>
+                    <input type="text" id="ayAsunto" name="asunto" required th:minlength="${asuntoMin}" th:maxlength="${asuntoMax}"
+                           th:value="${solAsunto}" placeholder="Resume tu caso en una línea" autocomplete="off" />
+                  </div>
+                </div>
+
+                <div class="ay-campo">
+                  <label for="ayMensaje">Cuéntanos qué pasó</label>
+                  <textarea id="ayMensaje" name="mensaje" rows="6" required th:maxlength="${mensajeMax}"
+                            placeholder="Qué estabas haciendo, qué esperabas y qué ocurrió" th:text="${solMensaje}"></textarea>
+                  <div class="ay-contador-texto"><span id="ayConteo">0</span> / <span th:text="${mensajeMax}">1000</span></div>
+                </div>
+
+                <div class="ay-acciones">
+                  <button type="button" class="ay-boton-claro" data-ir-paso="canal">Volver</button>
+                  <span class="ay-espacio"></span>
+                  <button type="submit" class="ay-boton"><i class="fa-solid fa-paper-plane"></i> Enviar solicitud</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="ay-panel" id="ayPanelSolicitudes" th:hidden="${tab != 'solicitudes'}">
+          <div class="ay-centro">
+            <div class="ay-tarjeta ay-historial">
+              <div class="ay-hist-cab">
+                <div class="ay-faq-cab"><i class="fa-solid fa-clock-rotate-left"></i> Mis solicitudes</div>
+                <button type="button" class="ay-boton-claro" data-ir="soporte"><i class="fa-solid fa-plus"></i> Nueva consulta</button>
+              </div>
+              <div class="ay-tickets" id="ayTickets">
+                <p class="ay-vacio" th:if="${#lists.isEmpty(a.tickets())}">Todavía no has enviado ninguna.</p>
+                <article class="ay-ticket" th:each="t : ${a.tickets()}">
+                  <header>
+                    <span class="ay-ticket-num" th:text="${t.numero()}">#0001</span>
+                    <span class="ay-ticket-estado" th:classappend="${t.estado()}" th:text="${t.estadoTexto()}">Abierta</span>
+                  </header>
+                  <strong th:text="${t.asunto()}">Asunto</strong>
+                  <small th:text="${t.categoria() + ' · ' + t.fecha()}">Categoría · fecha</small>
+                  <p th:text="${t.mensaje()}">Mensaje</p>
+                  <div class="ay-respuesta" th:if="${t.tieneRespuesta()}">
+                    <b><i class="fa-solid fa-reply"></i> Respuesta de LibRed</b> <small th:text="${t.fechaRespuesta()}">fecha</small>
+                    <p th:text="${t.respuesta()}">Respuesta</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ay-modal" id="ayModal" hidden>
+          <div class="ay-modal-caja ay-modal-exito" role="dialog" aria-modal="true" aria-labelledby="ayModalTitulo">
+            <i class="fa-solid fa-circle-check"></i>
+            <h4 id="ayModalTitulo">Solicitud enviada</h4>
+            <p>La solicitud <b id="ayModalNum">#0000</b> se envió con éxito.</p>
+            <div class="ay-modal-botones">
+              <button type="button" class="ay-boton-claro" data-ir="solicitudes">Ver mis solicitudes</button>
+              <button type="button" class="ay-boton" id="ayModalCerrar" data-accion="cerrar">Entendido</button>
+            </div>
+          </div>
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="recuperar" id="rcOverlay" class="rc-overlay" hidden>
+    <div class="rc-card" role="dialog" aria-modal="true" aria-labelledby="rcTitulo">
+        <button type="button" class="rc-cerrar" id="rcCerrar" aria-label="Cerrar">&times;</button>
+
+        <form id="rcPaso1" class="rc-paso" autocomplete="off" novalidate>
+            <h2 id="rcTitulo">Recuperar acceso</h2>
+            <p class="rc-sub">Ingresa el correo con el que registraste tu librería y te enviaremos un código.</p>
+            <label for="rcCorreo">Correo electrónico</label>
+            <input type="email" id="rcCorreo" name="rc_correo" autocomplete="off" inputmode="email">
+            <div class="rc-error" id="rcError1" role="alert" hidden></div>
+            <button type="submit" class="rc-btn" id="rcEnviar" disabled>Enviar código</button>
+        </form>
+
+        <form id="rcPaso2" class="rc-paso" autocomplete="off" novalidate hidden>
+            <h2>Crea una nueva contraseña</h2>
+            <p class="rc-sub">Si el correo está registrado, recibirás un código de 6 dígitos. Ingrésalo junto con tu nueva contraseña.</p>
+            <label for="rcCodigo">Código</label>
+            <input type="text" id="rcCodigo" name="rc_codigo" maxlength="6" inputmode="numeric" autocomplete="off" class="rc-codigo">
+            <label for="rcClave">Nueva contraseña</label>
+            <div class="rc-clave">
+                <input type="password" id="rcClave" name="rc_clave" maxlength="20" autocomplete="new-password" placeholder="8 a 20 caracteres">
+                <button type="button" class="rc-ojo" id="rcOjo" aria-label="Mostrar u ocultar contraseña" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+            </div>
+            <div class="rc-fuerza" id="rcFuerza" data-n="0"><i></i><i></i><i></i><i></i></div>
+            <div class="rc-error" id="rcError2" role="alert" hidden></div>
+            <button type="submit" class="rc-btn" id="rcGuardar" disabled>Cambiar contraseña</button>
+            <button type="button" class="rc-link" id="rcAtras">Usar otro correo</button>
+        </form>
+
+        <div id="rcPaso3" class="rc-paso" hidden>
+            <h2>Contraseña actualizada</h2>
+            <p class="rc-sub">Ya puedes iniciar sesión con tu nueva contraseña.</p>
+            <button type="button" class="rc-btn" id="rcListo">Entendido</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
