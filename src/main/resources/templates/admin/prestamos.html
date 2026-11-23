@@ -1,0 +1,186 @@
+<!doctype html>
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: molde(
+        'Módulo de Préstamos',
+        'Gestión de circulación y entrega de material bibliográfico',
+        'prestamos.css',
+        'prestamos.js',
+        'prestamos',
+        ~{:: .dashboard-container}
+    )}"
+>
+  <head>
+    <title>Préstamos | LibRed</title>
+  </head>
+  <body>
+    <div class="dashboard-container" data-css="prestamos.css">
+
+      <form th:action="@{/admin/prestamos/guardar}" method="post" id="formPrestamo" class="pr-panel"
+            th:attr="data-max-dias=${maxDias}, data-max-activos=${maxActivos != null ? maxActivos : ''}">
+
+        <!-- Encabezado de la tarjeta -->
+        <div class="pr-head">
+          <div class="pr-head-icono"><i class="fa-solid fa-hand-holding-hand"></i></div>
+          <div class="pr-head-texto">
+            <h3>Nuevo préstamo en mostrador</h3>
+            <p>Elige al lector, la categoría y el artículo. El servicio se calcula con la tarifa de tu librería.</p>
+          </div>
+          <div class="pr-politica">
+            <span><i class="fa-regular fa-clock"></i> Plazo máx.
+              <strong th:text="${maxDias + (maxDias == 1 ? ' día' : ' días')}">7 días</strong></span>
+            <span th:if="${maxActivos != null}"><i class="fa-solid fa-layer-group"></i> Límite
+              <strong th:text="${maxActivos + (maxActivos == 1 ? ' activo' : ' activos')}">3 activos</strong></span>
+            <span th:unless="${maxActivos != null}"><i class="fa-solid fa-infinity"></i> Activos
+              <strong>sin límite</strong></span>
+          </div>
+        </div>
+
+        <div class="pr-grid">
+
+          <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+          <div class="pr-col-form">
+
+            <div class="pr-campo">
+              <label for="selectLector"><span class="pr-num">1</span> Lector</label>
+              <select id="selectLector" name="lectorId" class="pr-control" required>
+                <option value="" disabled selected>Seleccione un lector</option>
+                <option th:each="l : ${lectores}"
+                        th:value="${l.id}"
+                        th:data-nombre="${l.nombres + ' ' + l.apellidos}"
+                        th:data-codigo="${l.codigoLector}"
+                        th:data-estado="${l.estadoCuenta}"
+                        th:data-activos="${enCursoPorLector[l.id] != null ? enCursoPorLector[l.id] : 0}"
+                        th:classappend="${l.estadoCuenta == 'SANCIONADO'} ? 'op-sancionado'"
+                        th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + (l.estadoCuenta == 'SANCIONADO' ? ' (SANCIONADO)' : '')}">
+                </option>
+              </select>
+              <div id="lectorChip" class="pr-chip" hidden></div>
+            </div>
+
+            <div class="pr-fila-2">
+              <div class="pr-campo">
+                <label for="selectCategoria"><span class="pr-num">2</span> Categoría</label>
+                <select id="selectCategoria" class="pr-control" required>
+                  <option value="" disabled selected>Seleccione una categoría</option>
+                  <option th:each="c : ${categorias}"
+                          th:value="${c.valor}"
+                          th:data-tarifa="${c.tarifa}"
+                          th:data-etiqueta="${c.etiqueta}"
+                          th:text="${c.etiqueta + ' · S/ ' + #numbers.formatDecimal(c.tarifa, 1, 2) + ' por día'}">
+                  </option>
+                </select>
+              </div>
+
+              <div class="pr-campo">
+                <label for="selectRecurso"><span class="pr-num">3</span> Artículo</label>
+                <select id="selectRecurso" name="recursoId" class="pr-control" required disabled>
+                  <option value="" disabled selected>Seleccione primero una categoría</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="pr-campo">
+              <label for="selectDias"><span class="pr-num">4</span> Plazo de devolución</label>
+              <select id="selectDias" class="pr-control" required>
+                <option value="" disabled selected>Seleccione el plazo de devolución</option>
+                <option th:each="d : ${#numbers.sequence(1, maxDias)}"
+                        th:value="${d}"
+                        th:text="${d + (d == 1 ? ' día' : ' días')}"></option>
+              </select>
+              <input type="hidden" id="inputFechaDevolucion" name="fechaDevolucionLimite" />
+              <small class="pr-hint">
+                <i class="fa-regular fa-calendar-check"></i>
+                Plazo máximo establecido: <strong th:text="${maxDias + (maxDias == 1 ? ' día' : ' días')}">7 días</strong>.
+                Para modificarlo, diríjase a <a th:href="@{/admin/ajustes}">Ajustes &rsaquo; Política de préstamos</a>.
+              </small>
+            </div>
+
+            <!-- Datos calculados (solo lectura) -->
+            <div class="pr-calculo">
+              <div class="pr-calc-card"><span>Tarifa por día</span><strong id="calcTarifa">--</strong></div>
+              <div class="pr-calc-card"><span>Fecha de préstamo</span><strong id="calcHoy">--</strong></div>
+              <div class="pr-calc-card"><span>Último día</span><strong id="calcLimite">--</strong></div>
+              <div class="pr-calc-card pr-calc-total"><span>Servicio total</span><strong id="calcTotal">--</strong></div>
+            </div>
+
+            <!-- Alertas -->
+            <div class="pr-alertas">
+              <div id="alertaValidacion" class="pr-alerta" hidden></div>
+              <div th:if="${error}" class="pr-alerta pr-alerta-error" th:text="${error}"></div>
+            </div>
+
+            <div class="pr-botones">
+              <button type="button" class="pr-btn-limpiar" id="btnLimpiar">
+                <i class="fa-solid fa-eraser"></i> Limpiar
+              </button>
+              <button type="submit" id="btnSubmitPrestamo" class="pr-btn-confirmar" disabled>
+                <i class="fa-solid fa-check"></i> Confirmar y registrar
+              </button>
+            </div>
+          </div>
+
+          <!-- COLUMNA DERECHA: COMPROBANTE -->
+          <div class="pr-col-ticket">
+            <div class="ticket-container">
+              <div class="ticket-header">
+                <i class="fa-solid fa-receipt"></i>
+                <h4>Comprobante de préstamo</h4>
+                <span>Se actualiza mientras completas los datos</span>
+              </div>
+              <div class="ticket-body">
+                <div class="ticket-seccion">Lector</div>
+                <div class="ticket-row"><span>Nombre</span><span id="resumenLectorNombre">--</span></div>
+                <div class="ticket-row"><span>Código</span><span id="resumenLectorCodigo">--</span></div>
+
+                <div class="ticket-seccion">Artículo</div>
+                <div class="ticket-row"><span>Título</span><span id="resumenArticuloTitulo">--</span></div>
+                <div class="ticket-row"><span>Código</span><span id="resumenArticuloCodigo">--</span></div>
+                <div class="ticket-row"><span>Categoría</span><span id="resumenCategoria">--</span></div>
+
+                <div class="ticket-seccion">Plazo y servicio</div>
+                <div class="ticket-row"><span>F. préstamo</span><span id="resumenFechaPrestamo">--</span></div>
+                <div class="ticket-row"><span>F. límite</span><span id="resumenFechaLimite" class="ticket-resalte">--</span></div>
+                <div class="ticket-row"><span>Días</span><span id="resumenDias">--</span></div>
+                <div class="ticket-row"><span>Tarifa por día</span><span id="resumenTarifa">--</span></div>
+                <div class="ticket-row ticket-total"><span>Servicio a cobrar</span><span id="resumenTotal">--</span></div>
+                <p class="ticket-nota"><i class="fa-solid fa-circle-info"></i> El servicio se cancela en la librería al entregar el artículo.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Base de artículos disponibles (la usa el JS para filtrar por categoría) -->
+        <ul id="prBase" hidden>
+          <li th:each="a : ${articulos}"
+              th:data-id="${a.id}"
+              th:data-categoria="${a.categoria}"
+              th:data-titulo="${a.titulo}"
+              th:data-codigo="${a.codigo}"
+              th:data-autor="${a.autor}"
+              th:data-stock="${a.stock}"></li>
+        </ul>
+      </form>
+
+      <!-- VENTANA DE CONFIRMACIÓN (tras registrar) -->
+      <div th:if="${prestamoOk != null}" class="pr-modal" id="prModalOk">
+        <div class="pr-modal-caja">
+          <div class="pr-modal-icono"><i class="fa-solid fa-circle-check"></i></div>
+          <h3>¡Préstamo registrado!</h3>
+          <p class="pr-modal-sub">Comprobante <strong th:text="${prestamoOk['numero']}">#1</strong></p>
+          <div class="pr-modal-lista">
+            <div><span>Lector</span><strong th:text="${prestamoOk['lector']}">--</strong></div>
+            <div><span>Artículo</span><strong th:text="${prestamoOk['articulo']}">--</strong></div>
+            <div><span>Plazo</span><strong th:text="${prestamoOk['dias']}">--</strong></div>
+            <div><span>Devolver hasta</span><strong th:text="${prestamoOk['fechaLimite']}">--</strong></div>
+            <div class="pr-modal-total"><span>Servicio a cobrar</span><strong th:text="${prestamoOk['monto']}">S/ 0.00</strong></div>
+          </div>
+          <button type="button" class="pr-btn-confirmar" id="prModalCerrar"><i class="fa-solid fa-check"></i> Entendido</button>
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

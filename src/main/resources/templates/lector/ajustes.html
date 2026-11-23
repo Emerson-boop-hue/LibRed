@@ -1,0 +1,141 @@
+<!doctype html>
+<!-- Módulo AJUSTES del lector: datos personales y contraseña -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{lector/layout_lector :: molde(
+          'Ajustes',
+          'Administra tus datos personales y la seguridad de tu cuenta',
+          'lector_ajustes.css',
+          'lector_ajustes.js',
+          'ajustes',
+          ~{:: .lector-container}
+      )}"
+>
+  <head>
+    <title>Ajustes | LibRed</title>
+  </head>
+  <body>
+    <div class="lector-container">
+      <div class="aj-layout">
+
+        <!-- COLUMNA PRINCIPAL: formularios -->
+        <div class="aj-main">
+
+          <!-- DATOS PERSONALES -->
+          <form class="aj-card" id="formPerfil" novalidate>
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-regular fa-id-card"></i></div>
+              <div>
+                <h3>Datos personales</h3>
+                <p>Mantén tu información al día. Se actualiza en todas las librerías donde estás registrado.</p>
+              </div>
+            </div>
+
+            <div class="aj-grid">
+              <div class="aj-campo">
+                <label for="ajCodigo">Código de lector</label>
+                <input type="text" id="ajCodigo" th:value="${lector.codigoLector}" readonly />
+              </div>
+              <div class="aj-campo">
+                <label for="ajTelefono">Teléfono</label>
+                <input type="text" id="ajTelefono" name="telefono" data-campo="telefono"
+                       th:value="${lector.telefono}" maxlength="11" inputmode="numeric" placeholder="987 654 321" autocomplete="off" />
+              </div>
+              <div class="aj-campo">
+                <label for="ajNombres">Nombres</label>
+                <input type="text" id="ajNombres" name="nombres" data-campo="nombres"
+                       th:value="${lector.nombres}" maxlength="100" autocomplete="off" />
+              </div>
+              <div class="aj-campo">
+                <label for="ajApellidos">Apellidos</label>
+                <input type="text" id="ajApellidos" name="apellidos" data-campo="apellidos"
+                       th:value="${lector.apellidos}" maxlength="100" autocomplete="off" />
+              </div>
+            </div>
+
+            <p class="aj-error-campo" id="errorPerfil" hidden></p>
+            <p class="aj-ok" id="okPerfil" hidden></p>
+
+            <div class="aj-acciones">
+              <button type="submit" class="btn-primario"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+            </div>
+          </form>
+
+          <!-- CONTRASEÑA -->
+          <form class="aj-card" id="formPassword" novalidate>
+            <div class="aj-card-head">
+              <div class="aj-icono"><i class="fa-solid fa-lock"></i></div>
+              <div>
+                <h3>Cambiar contraseña</h3>
+                <p>Usa entre 6 y 20 caracteres, sin espacios. Será la misma en todas las librerías.</p>
+              </div>
+            </div>
+
+            <div class="aj-grid una-columna">
+              <div class="aj-campo">
+                <label for="ajPassActual">Contraseña actual</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassActual" name="passwordActual" data-campo="passwordActual" autocomplete="current-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+              <div class="aj-campo">
+                <label for="ajPassNueva">Nueva contraseña</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassNueva" name="passwordNueva" data-campo="passwordNueva" maxlength="20" autocomplete="new-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+              <div class="aj-campo">
+                <label for="ajPassConfirmar">Confirmar nueva contraseña</label>
+                <div class="aj-password">
+                  <input type="password" id="ajPassConfirmar" name="passwordConfirmar" data-campo="passwordConfirmar" maxlength="20" autocomplete="new-password" />
+                  <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <p class="aj-error-campo" id="errorPassword" hidden></p>
+            <p class="aj-ok" id="okPassword" hidden></p>
+
+            <div class="aj-acciones">
+              <button type="submit" class="btn-primario"><i class="fa-solid fa-key"></i> Cambiar contraseña</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- COLUMNA LATERAL: resumen de la cuenta -->
+        <aside class="aj-side">
+          <div class="aj-card aj-cuenta">
+            <div class="aj-avatar-grande" id="ajAvatar"
+                 th:text="${#strings.toUpperCase(#strings.substring(lector.nombres, 0, 1))}">N</div>
+            <h3 id="ajNombreCompleto" th:text="${lector.nombres + ' ' + lector.apellidos}">Nombre Apellido</h3>
+            <p class="aj-codigo" th:text="${lector.codigoLector}">LEC-0000</p>
+
+            <ul class="aj-datos">
+              <li>
+                <span>Librería actual</span>
+                <strong th:text="${sede != null} ? ${sede.nombreComercial} : '—'">Librería</strong>
+              </li>
+              <li>
+                <span>Estado en esta librería</span>
+                <strong class="aj-estado" th:classappend="${lector.estadoCuenta == 'HABILITADO'} ? 'ok' : 'alerta'"
+                        th:text="${lector.estadoCuenta}">HABILITADO</strong>
+              </li>
+              <li>
+                <span>Registrado desde</span>
+                <strong th:text="${lector.fechaRegistro != null ? #temporals.format(lector.fechaRegistro, 'dd/MM/yyyy') : '—'}">01/01/2026</strong>
+              </li>
+            </ul>
+
+            <p class="aj-nota">
+              <i class="fa-solid fa-circle-info"></i>
+              Tu nombre, teléfono y contraseña son los mismos en toda la red. El estado de tu cuenta es propio de cada librería.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </body>
+</html>

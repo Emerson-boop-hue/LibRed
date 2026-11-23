@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{admin/layout :: molde(
+          'Panel de Control', 
+          'Resumen operativo general de la librería', 
+          'panel_admin.css', 
+          '', 
+          'panel',
+          ~{:: .dashboard-container}
+      )}">
+<head>
+    <title>Panel de Control</title>
+</head>
+<body>
+
+    <!-- Dashboard Visual Ajustado -->
+    <div class="dashboard-container" data-css="panel_admin.css">
+        
+        <!-- 4 Tarjetas Superiores con Iconos Estilizados -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title-area">
+                    <div class="metric-icon-box icon-recursos">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+                    <span class="metric-title">RECURSOS</span>
+                </div>
+                <h2>3,842</h2>
+                <span class="metric-sub text-dark">+124 este mes</span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-title-area">
+                    <div class="metric-icon-box icon-usuarios">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <span class="metric-title">USUARIOS</span>
+                </div>
+                <h2>5,126</h2>
+                <span class="metric-sub text-dark">+45 nuevos este mes</span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-title-area">
+                    <div class="metric-icon-box icon-prestamos">
+                        <i class="fa-solid fa-right-left"></i>
+                    </div>
+                    <span class="metric-title">PRÉSTAMOS</span>
+                </div>
+                <h2>284</h2>
+                <span class="metric-sub text-dark">+12% esta semana</span>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-title-area">
+                    <div class="metric-icon-box icon-vencidos">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <span class="metric-title">VENCIDOS</span>
+                </div>
+                <h2>17</h2>
+                <span class="metric-sub text-dark">Requieren acción</span>
+            </div>
+        </div>
+
+        <!-- Rejilla Inferior de 2 Columnas -->
+        <div class="dashboard-grid">
+            
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="dashboard-col-left">
+                <div class="content-card resources-card">
+                    <div class="card-header-title">
+                        <h3>Recursos Más Solicitados</h3>
+                    </div>
+                    <div class="table-scroll-container">
+                        <table class="styled-table">
+                           <thead>
+                               <tr>
+                                   <th>RECURSO</th>
+                                   <th>TIPO</th>
+                                   <th>PRÉSTAMOS</th>
+                               </tr>
+                           </thead>
+                           <tbody>
+                               <tr>
+                                   <td class="font-semibold">Patrones de Diseño (GoF)</td>
+                                   <td><span class="badge-tipo">Libro</span></td>
+                                   <td>
+                                       <div class="progress-info">
+                                           <span>142</span>
+                                           <div class="progress-bar"><div class="progress-fill fill-dark" style="width: 85%;"></div></div>
+                                       </div>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td class="font-semibold">IA en la Educación</td>
+                                   <td><span class="badge-tipo">Tesis</span></td>
+                                   <td>
+                                       <div class="progress-info">
+                                           <span>89</span>
+                                           <div class="progress-bar"><div class="progress-fill fill-green" style="width: 55%;"></div></div>
+                                       </div>
+                                   </td>
+                               </tr>
+                               <tr>
+                                   <td class="font-semibold">Clean Architecture</td>
+                                   <td><span class="badge-tipo">Libro</span></td>
+                                   <td>
+                                       <div class="progress-info">
+                                           <span>64</span>
+                                           <div class="progress-bar"><div class="progress-fill fill-blue" style="width: 40%;"></div></div>
+                                       </div>
+                                   </td>
+                               </tr>
+                           </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA -->
+            <div class="dashboard-col-right">
+                <!-- Actividad Reciente -->
+                <div class="content-card activity-card">
+                    <h3>Actividad Reciente</h3>
+                    <div class="activity-scroll-container">
+                        <ul class="activity-list">
+                            <li>
+                                <span class="dot green"></span>
+                                <div class="activity-content">
+                                    <strong>3 consultas en red</strong>
+                                    <p>Lectores de otras librerías revisando nuestro catálogo local</p>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="dot blue"></span>
+                                <div class="activity-content">
+                                    <strong>Nuevos Lectores</strong>
+                                    <p>5 Usuarios nuevos se registraron hoy</p>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="dot purple"></span>
+                                <div class="activity-content">
+                                    <strong>Devoluciones</strong>
+                                    <p>15 lectores tienen devoluciones programadas para hoy</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Multas Pendientes -->
+                <div class="content-card fine-card">
+                    <div class="card-header-warning">
+                        <h3>Multas Pendientes</h3>
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h2>S/ 842.50</h2>
+                    <p>Saldo total sin pagar de 45 usuarios.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

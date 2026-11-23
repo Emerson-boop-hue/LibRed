@@ -1,0 +1,161 @@
+<!doctype html>
+<!-- Módulo AYUDA Y SOPORTE del lector: guía rápida, datos y reglas de su librería, y preguntas frecuentes -->
+<html
+  lang="es"
+  xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{lector/layout_lector :: molde(
+          'Ayuda y Soporte',
+          'Resuelve tus dudas sobre LibRed',
+          'lector_ayuda.css',
+          'lector_ayuda.js',
+          'ayuda',
+          ~{:: .lector-container}
+      )}"
+>
+  <head>
+    <title>Ayuda y Soporte | LibRed</title>
+  </head>
+  <body>
+    <div class="lector-container">
+
+      <!-- GUÍA RÁPIDA: mapa de los módulos -->
+      <div class="ay-guia">
+        <a class="ay-tile" href="/lector/catalogo"><span class="ay-tile-ico"><i class="fa-solid fa-book-open"></i></span><span><strong>Catálogo</strong><small>Busca artículos de tu librería</small></span></a>
+        <a class="ay-tile" href="/lector/prestamos"><span class="ay-tile-ico"><i class="fa-solid fa-file-circle-plus"></i></span><span><strong>Préstamos</strong><small>Solicita y consulta tu préstamo</small></span></a>
+        <a class="ay-tile" href="/lector/historial"><span class="ay-tile-ico"><i class="fa-solid fa-clock-rotate-left"></i></span><span><strong>Historial</strong><small>Préstamos, multas y calificaciones</small></span></a>
+        <a class="ay-tile" href="/lector/red-global"><span class="ay-tile-ico"><i class="fa-solid fa-globe"></i></span><span><strong>Red Global</strong><small>Conoce y entra a otras librerías</small></span></a>
+        <a class="ay-tile" href="/lector/ajustes"><span class="ay-tile-ico"><i class="fa-solid fa-gear"></i></span><span><strong>Ajustes</strong><small>Tus datos y tu contraseña</small></span></a>
+      </div>
+
+      <div class="ay-layout">
+
+        <!-- LATERAL: datos y reglas de la librería actual (tiene su propio scroll si no cabe) -->
+        <aside class="ay-lateral">
+
+          <section class="ay-card">
+            <div class="ay-card-titulo"><i class="fa-solid fa-store"></i> Tu librería</div>
+            <h3 class="ay-lib-nombre" th:text="${a.nombre != null ? a.nombre : 'Sin librería asignada'}">Biblioteca</h3>
+            <ul class="ay-datos" th:if="${a.nombre != null}">
+              <li><i class="fa-solid fa-location-dot"></i><span th:text="${a.direccion != null and !#strings.isEmpty(a.direccion) ? a.direccion : 'Dirección no indicada'}">Dirección</span></li>
+              <li><i class="fa-regular fa-clock"></i><span th:text="${a.horario != null and !#strings.isEmpty(a.horario) ? a.horario : 'Horario no indicado'}">Horario</span></li>
+              <li><i class="fa-solid fa-phone"></i><span th:text="${a.telefono != null and !#strings.isEmpty(a.telefono) ? a.telefono : 'Teléfono no indicado'}">Teléfono</span></li>
+              <li><i class="fa-regular fa-envelope"></i><span th:text="${a.correo != null and !#strings.isEmpty(a.correo) ? a.correo : 'Correo no indicado'}">Correo</span></li>
+            </ul>
+            <p class="ay-nota">Para dudas sobre tu cuenta, multas o devoluciones, acércate a la librería o escríbele con estos datos.</p>
+          </section>
+
+          <section class="ay-card" th:if="${a.nombre != null}">
+            <div class="ay-card-titulo"><i class="fa-solid fa-scale-balanced"></i> Reglas de tu librería</div>
+            <div class="ay-reglas">
+              <div class="ay-regla">
+                <span>Plazo máximo</span>
+                <strong th:text="${a.maxDias + (a.maxDias == 1 ? ' día' : ' días')}">7 días</strong>
+              </div>
+              <div class="ay-regla">
+                <span>Préstamos activos</span>
+                <strong th:text="${a.limitado ? 'Hasta ' + a.maxActivos : 'Sin límite'}">Hasta 3</strong>
+              </div>
+            </div>
+            <div class="ay-tarifas-titulo">Tarifa de servicio por día</div>
+            <ul class="ay-tarifas">
+              <li th:each="t : ${a.tarifas}">
+                <span th:text="${t.etiqueta}">Libros</span>
+                <strong th:text="${'S/ ' + #numbers.formatDecimal(t.tarifa, 1, 'POINT', 2, 'POINT')}">S/ 0.00</strong>
+              </li>
+              <li class="ay-vacio" th:if="${#lists.isEmpty(a.tarifas)}"><span>Sin categorías activas por ahora.</span></li>
+            </ul>
+          </section>
+
+        </aside>
+
+        <!-- PREGUNTAS FRECUENTES (con buscador y categorías; la lista tiene su propio scroll) -->
+        <section class="ay-faq">
+          <div class="ay-faq-cabecera">
+            <div class="ay-card-titulo"><i class="fa-solid fa-circle-question"></i> Preguntas frecuentes</div>
+            <div class="ay-buscador">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="ayBuscar" placeholder="Escribe tu duda, por ejemplo: multa, contraseña, devolver…" autocomplete="off" />
+            </div>
+            <div class="ay-chips" id="ayChips">
+            <button type="button" class="ay-chip activo" data-cat="todas">Todas</button>
+            <button type="button" class="ay-chip" data-cat="prestamos">Préstamos</button>
+            <button type="button" class="ay-chip" data-cat="multas">Multas y cuenta</button>
+            <button type="button" class="ay-chip" data-cat="red">Red Global</button>
+            <button type="button" class="ay-chip" data-cat="calificaciones">Calificaciones</button>
+            <button type="button" class="ay-chip" data-cat="cuenta">Mi cuenta</button>
+            </div>
+          </div>
+
+          <div class="ay-lista" id="ayLista">
+            <details class="ay-item" data-cat="prestamos">
+              <summary><span>¿Cómo solicito un préstamo?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Entra a <strong>Préstamos</strong>, elige la categoría y el artículo, indica por cuántos días lo necesitas y pulsa <em>Solicitar préstamo</em>. El servicio total y la fecha límite se calculan automáticamente y se te muestra un comprobante.</div>
+            </details>
+            <details class="ay-item" data-cat="prestamos">
+              <summary><span>¿Por cuántos días y cuántos artículos puedo llevar?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Depende de cada librería. En <strong th:text="${a.nombre}">tu librería</strong> el plazo máximo es de <strong th:text="${a.maxDias + (a.maxDias == 1 ? ' día' : ' días')}">7 días</strong> y <span th:if="${a.limitado}">puedes tener hasta <strong th:text="${a.maxActivos + (a.maxActivos == 1 ? ' préstamo activo' : ' préstamos activos')}">3</strong> a la vez.</span><span th:unless="${a.limitado}">no hay límite de préstamos activos.</span></div>
+            </details>
+            <details class="ay-item" data-cat="prestamos">
+              <summary><span>¿Cuánto cuesta el servicio?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">El costo es la <strong>tarifa por día de la categoría</strong> multiplicada por los días que elijas. Las tarifas de tu librería están en el cuadro <em>Reglas de tu librería</em>, a la izquierda.</div>
+            </details>
+            <details class="ay-item" data-cat="prestamos">
+              <summary><span>¿Cómo devuelvo un artículo?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">La devolución se hace <strong>en la librería</strong>: entrega el artículo al administrador y él la registra. Luego verás el préstamo como devuelto en tu <strong>Historial</strong>.</div>
+            </details>
+            <details class="ay-item" data-cat="prestamos">
+              <summary><span>¿Por qué no me deja solicitar un préstamo?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Puede ser porque tu cuenta está sancionada en esa librería, porque tienes un préstamo vencido, porque llegaste al límite de préstamos activos o porque no hay artículos con stock. El aviso que aparece arriba en <em>Préstamos</em> te indica el motivo exacto.</div>
+            </details>
+            <details class="ay-item" data-cat="multas">
+              <summary><span>¿Por qué mi cuenta aparece como sancionada?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Una cuenta se sanciona cuando tiene multas pendientes de pago <strong>en esa librería</strong>. Mientras esté sancionada no puedes solicitar nuevos préstamos allí. En <strong>Historial → Multas</strong> puedes ver el detalle.</div>
+            </details>
+            <details class="ay-item" data-cat="multas">
+              <summary><span>¿Cómo vuelvo a estar habilitado?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Regulariza tus multas pagándolas en la librería. Cuando el administrador registre el pago, tu cuenta vuelve a estar <strong>HABILITADA</strong> en esa librería.</div>
+            </details>
+            <details class="ay-item" data-cat="multas">
+              <summary><span>Si me sancionan en una librería, ¿me afecta en las demás?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">No. El estado de tu cuenta es <strong>propio de cada librería</strong>. Una sanción en una sede no te impide solicitar préstamos en otra.</div>
+            </details>
+            <details class="ay-item" data-cat="red">
+              <summary><span>¿Cómo cambio de librería?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Ve a <strong>Red Global</strong>, abre la librería que quieras y pulsa <em>Ingresar</em>. No necesitas cerrar sesión ni volver a escribir tu contraseña.</div>
+            </details>
+            <details class="ay-item" data-cat="red">
+              <summary><span>¿Por qué me dice que está creando mi cuenta?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Es tu primera vez en esa librería. Se crea automáticamente una cuenta <strong>con tus mismos datos</strong> (código, nombre, teléfono y contraseña), sin sanciones ni préstamos previos.</div>
+            </details>
+            <details class="ay-item" data-cat="red">
+              <summary><span>¿Qué significa «Eres miembro»?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Que ya tienes cuenta en esa librería. Las librerías donde todavía no te registraste aparecen sin esa etiqueta, y tu sede actual aparece primero y destacada.</div>
+            </details>
+            <details class="ay-item" data-cat="calificaciones">
+              <summary><span>¿Cuándo puedo calificar una librería?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Cuando <strong>devuelves</strong> un préstamo. En <strong>Historial</strong> verás el botón <em>Calificar</em> en ese préstamo: elige de 1 a 5 estrellas. Esa puntuación se suma al promedio de la librería.</div>
+            </details>
+            <details class="ay-item" data-cat="calificaciones">
+              <summary><span>¿Puedo cambiar mi calificación?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Sí, <strong>una sola vez</strong>. Puedes hacerlo desde la pestaña <em>Calificaciones</em> del Historial. Después de ese cambio ya no se puede modificar.</div>
+            </details>
+            <details class="ay-item" data-cat="cuenta">
+              <summary><span>¿Cómo cambio mi contraseña o mi teléfono?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">En <strong>Ajustes</strong>. Tu nombre, teléfono y contraseña son los mismos en toda la red, así que al cambiarlos se actualizan en todas las librerías donde estás registrado.</div>
+            </details>
+            <details class="ay-item" data-cat="cuenta">
+              <summary><span>Olvidé mi contraseña, ¿qué hago?</span><i class="fa-solid fa-chevron-down"></i></summary>
+              <div class="ay-resp">Por seguridad, ni los administradores pueden ver ni cambiar tu contraseña. Comunícate con la librería con los datos del cuadro <em>Tu librería</em> para que te orienten.</div>
+            </details>
+            <div class="ay-sin-resultados" id="aySinResultados" hidden>
+              <i class="fa-regular fa-face-frown"></i>
+              <p>No encontramos preguntas con esa búsqueda.</p>
+              <small>Prueba con otra palabra o consulta directamente en tu librería.</small>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </body>
+</html>
