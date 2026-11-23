@@ -1,9 +1,5 @@
-// =====================================================================
-// MÓDULO PRÉSTAMOS DEL LECTOR
-// Categoría -> Artículo -> Días. La tarifa, la fecha límite y el total se calculan solos y se
-// muestran en el comprobante. El servidor vuelve a validar y a calcular todo (esto es solo vista previa).
-// Se ejecuta cada vez que el layout carga el módulo (navegación AJAX), por eso es una función autocontenida.
-// =====================================================================
+// Módulo préstamos del lector: categoría -> Artículo -> Días. La tarifa, la fecha límite y el total se calculan solos
+// y se muestran en el comprobante.
 (function () {
   const form = document.getElementById("plForm");
   if (!form) return;
@@ -19,7 +15,6 @@
 
   const maxDias = parseInt(root.dataset.maxDias || "7", 10);
 
-  // ---------- utilidades ----------
   const moneda = (n) => "S/ " + Number(n).toFixed(2);
   const dosDig = (n) => String(n).padStart(2, "0");
   const formatoFecha = (f) => dosDig(f.getDate()) + "/" + dosDig(f.getMonth() + 1) + "/" + f.getFullYear();
@@ -78,7 +73,6 @@
     form.querySelectorAll(".con-error").forEach((e) => e.classList.remove("con-error"));
   }
 
-  // ---------- desplegables ----------
   function llenarDias() {
     selDias.innerHTML = "";
     for (let d = 1; d <= maxDias; d++) {
@@ -115,7 +109,6 @@
     if (preseleccion) selArticulo.value = String(preseleccion);
   }
 
-  // ---------- comprobante en vivo ----------
   function recalcular() {
     const cat = selCategoria.value;
     const idArt = selArticulo.value;
@@ -131,7 +124,6 @@
     ponerTexto("plFechaLimite", limite ? formatoFecha(limite) : "--");
     ponerTexto("plTotal", tarifa !== null && dias > 0 ? moneda(tarifa * dias) : "--");
 
-    // Comprobante
     ponerTexto("tkArticulo", art ? art.titulo : "--");
     ponerTexto("tkCodigoArticulo", art ? art.codigo : "--");
     ponerTexto("tkCategoria", cat ? etiquetaDeCategoria(cat) : "--");
@@ -151,7 +143,6 @@
     recalcular();
   }
 
-  // ---------- envío ----------
   async function enviar(e) {
     e.preventDefault();
     if (btnEnviar.disabled) return;
@@ -174,6 +165,8 @@
 
       if (r.ok) {
         ponerTexto("okNumero", "#" + r.numero);
+        const dl = document.getElementById("okDescargar");
+        if (dl) dl.href = "/lector/prestamos/" + r.numero + "/comprobante.pdf";
         ponerTexto("okArticulo", r.articulo);
         ponerTexto("okFechaLimite", r.fechaLimite);
         ponerTexto("okMonto", moneda(r.monto));
@@ -220,7 +213,6 @@
     }
   }
 
-  // ---------- eventos ----------
   selCategoria.addEventListener("change", () => {
     limpiarError();
     llenarArticulos();
@@ -245,7 +237,6 @@
     if (e.target === modal) modal.classList.remove("active");
   });
 
-  // ---------- arranque ----------
   llenarDias();
   const pre = root.dataset.pre; // artículo elegido desde "Solicitar" del catálogo
   if (pre) {

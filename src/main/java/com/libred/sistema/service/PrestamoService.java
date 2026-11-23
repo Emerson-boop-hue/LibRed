@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/** Registro y entrega de préstamos. */
 @Service
 public class PrestamoService {
 
@@ -38,14 +39,12 @@ public class PrestamoService {
         return prestamoRepository.findByLibreriaId(libreriaId);
     }
 
-    // NUEVO MÉTODO HELPER PARA OBTENER PRÉSTAMOS ACTIVOS POR LIBRERÍA
     public List<Prestamo> obtenerPrestamosActivosPorLibreria(Integer libreriaId) {
         return prestamoRepository.findByLibreriaIdAndEstadoPrestamo(libreriaId, "ACTIVO");
     }
 
     @Transactional
     public Prestamo registrarPrestamo(Integer libreriaId, Prestamo prestamo) throws Exception {
-        // 1. Validar que el lector exista, pertenezca a la librería y esté habilitado
         Lector lector = lectorRepository.findById(prestamo.getLector().getId())
                 .orElseThrow(() -> new Exception("El lector seleccionado no existe."));
 
@@ -53,21 +52,19 @@ public class PrestamoService {
             throw new Exception("El lector seleccionado no pertenece a tu librería.");
         }
 
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            throw new Exception("No se puede realizar el préstamo. El lector se encuentra SANCIONADO.");
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            throw new Exception("No se puede realizar el préstamo. El lector se encuentra BLOQUEADO.");
         }
 
         // Límite de préstamos activos por lector (opcional, lo define cada librería en Ajustes)
         Integer maxActivos = politicaService.obtenerMaxActivos(libreriaId);
         if (maxActivos != null && prestamoRepository.countByLectorIdAndEstadoPrestamoIn(
-                lector.getId(), List.of("ACTIVO", "VENCIDO")) >= maxActivos) {
+                lector.getId(), List.of("ACTIVO", "VENCIDO", "POR_ENTREGAR")) >= maxActivos) {
             throw new Exception("El lector ya tiene " + maxActivos
                     + (maxActivos == 1 ? " préstamo activo" : " préstamos activos")
                     + ", que es el máximo permitido por tu librería.");
         }
 
-        // 2. Validar que el recurso exista, sea de esta librería y tenga stock disponible
-        // (se bloquea la fila del artículo mientras se descuenta el stock)
         Recurso recurso = recursoRepository.bloquearPorId(prestamo.getRecurso().getId())
                 .orElseThrow(() -> new Exception("El recurso seleccionado no existe en el inventario."));
 
@@ -83,7 +80,6 @@ public class PrestamoService {
             throw new Exception("No hay stock disponible de este artículo para préstamo.");
         }
 
-        // 3. Validar el plazo según la política de la librería y calcular el servicio (días x tarifa de la categoría)
         LocalDate hoy = LocalDate.now();
         LocalDate limite = prestamo.getFechaDevolucionLimite();
         if (limite == null) {
@@ -100,16 +96,24 @@ public class PrestamoService {
         }
         BigDecimal tarifa = politicaService.tarifaDe(libreriaId, recurso.getTipoRecurso());
 
-        // 4. Asignar metadatos, librería y datos del servicio
         prestamo.setLector(lector);
         prestamo.setRecurso(recurso);
         prestamo.setLibreriaId(libreriaId);
-        prestamo.setEstadoPrestamo("ACTIVO");
+        // Pedido del lector: queda POR_ENTREGAR (el stock ya se reserva). En mostrador: ACTIVO
+        prestamo.setEstadoPrestamo("LECTOR".equals(prestamo.getOrigen()) ? "POR_ENTREGAR" : "ACTIVO");
         prestamo.setDiasPrestamo((int) dias);
         prestamo.setTarifaDia(tarifa);
         prestamo.setMontoServicio(tarifa.multiply(BigDecimal.valueOf(dias)).setScale(2, RoundingMode.HALF_UP));
 
-        // 5. Descontar stock disponible del recurso usando setters correctos
+        // El servicio se cobra al registrar solo cuando el préstamo se hace en mostrador
+        if ("LECTOR".equals(prestamo.getOrigen())) {
+            prestamo.setServicioCobrado(false);
+            prestamo.setFechaCobroServicio(null);
+        } else {
+            prestamo.setServicioCobrado(true);
+            prestamo.setFechaCobroServicio(LocalDateTime.now());
+        }
+
         recurso.setStockDisponible(recurso.getStockDisponible() - 1);
         if (recurso.getStockDisponible() == 0) {
             recurso.setEstado("AGOTADO");
@@ -118,32 +122,73 @@ public class PrestamoService {
         }
         recursoRepository.save(recurso);
 
-        // 6. Guardar el préstamo
         return prestamoRepository.save(prestamo);
     }
 
-    @Transactional
-    public void registrarDevolucion(Integer prestamoId) throws Exception {
+    // POR ENTREGAR (pedidos que hizo el lector)
+
+    /** Pedidos de lectores de ESTA librería que esperan ser entregados (los más antiguos primero). */
+    @Transactional(readOnly = true)
+    public List<Prestamo> listarPorEntregar(Integer libreriaId) {
+        List<Prestamo> lista = new java.util.ArrayList<>(
+                prestamoRepository.findByLibreriaIdAndEstadoPrestamo(libreriaId, "POR_ENTREGAR"));
+        lista.sort(java.util.Comparator.comparing(Prestamo::getFechaPrestamo,
+                java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder())));
+        return lista;
+    }
+
+    public long contarPorEntregar(Integer libreriaId) {
+        return prestamoRepository.countByLibreriaIdAndEstadoPrestamo(libreriaId, "POR_ENTREGAR");
+    }
+
+    private Prestamo pedidoPorEntregar(Integer libreriaId, Integer prestamoId) throws Exception {
         Prestamo prestamo = prestamoRepository.findById(prestamoId)
-                .orElseThrow(() -> new Exception("El registro de préstamo no existe."));
-
-        if ("DEVUELTO".equalsIgnoreCase(prestamo.getEstadoPrestamo())) {
-            throw new Exception("Este préstamo ya fue devuelto anteriormente.");
+                .orElseThrow(() -> new Exception("El pedido ya no existe."));
+        if (!libreriaId.equals(prestamo.getLibreriaId())) {
+            throw new Exception("El pedido no pertenece a tu librería.");
         }
+        if (!"POR_ENTREGAR".equalsIgnoreCase(prestamo.getEstadoPrestamo())) {
+            throw new Exception("Este pedido ya fue entregado o cancelado.");
+        }
+        return prestamo;
+    }
 
-        prestamo.setEstadoPrestamo("DEVUELTO");
-        prestamo.setFechaDevolucionReal(LocalDateTime.now());
+    /**
+     * Entrega el artículo y cobra el servicio: el préstamo pasa a ACTIVO y el plazo empieza hoy (hoy + los días que
+     * pidió el lector).
+     */
+    @Transactional
+    public Prestamo confirmarEntrega(Integer libreriaId, Integer prestamoId) throws Exception {
+        Prestamo prestamo = pedidoPorEntregar(libreriaId, prestamoId);
+        Lector lector = prestamo.getLector();
+        if (lector != null && "BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            throw new Exception("El lector está BLOQUEADO por multas pendientes. Regulariza su cuenta antes de entregarle el artículo.");
+        }
+        int dias = prestamo.getDiasPrestamo() != null && prestamo.getDiasPrestamo() > 0 ? prestamo.getDiasPrestamo() : 1;
+        prestamo.setFechaDevolucionLimite(LocalDate.now().plusDays(dias));
+        prestamo.setEstadoPrestamo("ACTIVO");
+        prestamo.setServicioCobrado(true);
+        prestamo.setFechaCobroServicio(LocalDateTime.now());
+        return prestamoRepository.save(prestamo);
+    }
+
+    /** Cancela un pedido que nadie recogió: el artículo vuelve al stock. */
+    @Transactional
+    public Prestamo cancelarPedido(Integer libreriaId, Integer prestamoId) throws Exception {
+        Prestamo prestamo = pedidoPorEntregar(libreriaId, prestamoId);
+        prestamo.setEstadoPrestamo("CANCELADO");
         prestamoRepository.save(prestamo);
 
-        // Retornar el stock al recurso
         Recurso recurso = prestamo.getRecurso();
-        recurso.setStockDisponible(recurso.getStockDisponible() + 1);
-        
-        if (recurso.getStockDisponible() > 2) {
-            recurso.setEstado("NORMAL");
-        } else if (recurso.getStockDisponible() > 0) {
-            recurso.setEstado("CRITICO");
+        if (recurso != null) {
+            recurso.setStockDisponible(Math.min(recurso.getStockTotal(), recurso.getStockDisponible() + 1));
+            if (recurso.getStockDisponible() > 2) {
+                recurso.setEstado("NORMAL");
+            } else if (recurso.getStockDisponible() > 0) {
+                recurso.setEstado("CRITICO");
+            }
+            recursoRepository.save(recurso);
         }
-        recursoRepository.save(recurso);
+        return prestamo;
     }
 }

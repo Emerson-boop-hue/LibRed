@@ -1,9 +1,8 @@
 package com.libred.sistema.model;
 
 /**
- * Categorías de artículo (se guardan en la columna recurso.tipo_recurso).
- * Son las mismas que usa el inventario del administrador. Aquí se les da un nombre
- * legible y un icono para mostrarlas al lector.
+ * Categorías de artículo (se guardan en la columna recurso.tipo_recurso). Son las mismas que usa el inventario del
+ * administrador.
  */
 public enum CategoriaRecurso {
 

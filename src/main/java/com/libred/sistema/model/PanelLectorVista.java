@@ -6,13 +6,12 @@ import java.util.List;
 /** Datos de la Vista General del lector (su resumen en la librería donde está). */
 public class PanelLectorVista {
 
-    // ---- Cabecera (va en el título de la página) ----
+    // Cabecera (va en el título de la página)
     private final String saludo;          // "Buenas noches"
     private final String nombre;          // primer nombre
     private final String fechaHoy;        // "Lunes, 2 de noviembre"
-    private final String estadoCuenta;    // HABILITADO / SANCIONADO
+    private final String estadoCuenta;    // HABILITADO / BLOQUEADO
 
-    // ---- Números ----
     private final long activos;
     private final Integer maxActivos;     // null = sin límite
     private final String proximaNivel;    // ninguna | ok | pronto | vencido
@@ -29,13 +28,13 @@ public class PanelLectorVista {
     private final long porCalificar;      // préstamos devueltos que todavía no calificó (recordatorio flotante)
     private final List<EnCurso> enCurso;
 
-    // ---- Gráficos de "Tu actividad" ----
+    // Gráficos de "Tu actividad"
     private final List<Mes> meses;             // préstamos por mes (últimos 6)
     private final List<Categoria> categorias;  // préstamos por categoría (de mayor a menor)
     private final long totalPrestamos;
     private final int puntualidad;             // % de devoluciones a tiempo; -1 si todavía no hay devoluciones
 
-    // ---- Su librería y su red ----
+    // Su librería y su red
     private final String sedeNombre;
     private final String sedeIniciales;
     private final String sedeHorario;
@@ -66,7 +65,7 @@ public class PanelLectorVista {
     public String getNombre() { return nombre; }
     public String getFechaHoy() { return fechaHoy; }
     public String getEstadoCuenta() { return estadoCuenta; }
-    public boolean isSancionado() { return "SANCIONADO".equalsIgnoreCase(estadoCuenta); }
+    public boolean isBloqueado() { return "BLOQUEADO".equalsIgnoreCase(estadoCuenta); }
     public long getActivos() { return activos; }
     public Integer getMaxActivos() { return maxActivos; }
     public boolean isLimitado() { return maxActivos != null; }

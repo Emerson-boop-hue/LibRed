@@ -34,8 +34,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 /**
- * Módulo HISTORIAL del lector (solo lectura): sus préstamos, devoluciones y multas en la librería
- * a la que entró. Cada librería tiene su propio registro del lector, así que el historial nunca mezcla librerías.
+ * Módulo HISTORIAL del lector (solo lectura): sus préstamos, devoluciones y multas en la librería a la que entró.
  */
 @Service
 public class HistorialLectorService {
@@ -114,7 +113,7 @@ public class HistorialLectorService {
                 if (fila.getCalificacion() == 0) {
                     porCalificar++;
                 }
-            } else {
+            } else if (!"CANCELADO".equals(fila.getEstado())) {
                 enCurso++;
             }
         }
@@ -148,7 +147,15 @@ public class HistorialLectorService {
         String estado;
         String texto;
         String detalle;
-        if (devuelto) {
+        if ("CANCELADO".equalsIgnoreCase(p.getEstadoPrestamo())) {
+            estado = "CANCELADO";
+            texto = "Cancelado";
+            detalle = "";
+        } else if ("POR_ENTREGAR".equalsIgnoreCase(p.getEstadoPrestamo())) {
+            estado = "POR_ENTREGAR";
+            texto = "Por recoger";
+            detalle = "Recógelo en la librería";
+        } else if (devuelto) {
             estado = "DEVUELTO";
             texto = "Devuelto";
             detalle = "";

@@ -7,15 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import com.libred.sistema.util.PasswordUtil;
 
-/**
- * Ajustes del lector: datos personales y contraseña.
- *
- * Recuerda que un lector tiene UNA FILA POR LIBRERÍA (misma persona = mismo código).
- * Como son sus datos personales, los cambios se aplican a TODAS sus filas, para que sus datos
- * y su contraseña sean los mismos en cualquier librería de la red. El estado (HABILITADO/SANCIONADO)
- * NO se toca: es propio de cada librería.
- */
+/** Ajustes del lector: datos personales y contraseña. */
 @Service
 public class AjustesLectorService {
 
@@ -66,7 +60,7 @@ public class AjustesLectorService {
     public void cambiarPassword(Integer lectorId, String actualPassword, String nueva, String confirmar) {
         Lector actual = obtener(lectorId);
 
-        if (actualPassword == null || !actualPassword.equals(actual.getPassword())) {
+        if (!PasswordUtil.coincide(actualPassword, actual.getPassword())) {
             throw new AjustesException("passwordActual", "La contraseña actual no es correcta.");
         }
         if (nueva == null || nueva.length() < PASSWORD_MIN || nueva.length() > PASSWORD_MAX) {
@@ -76,16 +70,18 @@ public class AjustesLectorService {
         if (nueva.contains(" ")) {
             throw new AjustesException("passwordNueva", "La contraseña no puede tener espacios.");
         }
-        if (nueva.equals(actual.getPassword())) {
+        if (PasswordUtil.coincide(nueva, actual.getPassword())) {
             throw new AjustesException("passwordNueva", "La nueva contraseña debe ser distinta a la actual.");
         }
         if (!nueva.equals(confirmar)) {
             throw new AjustesException("passwordConfirmar", "Las contraseñas no coinciden.");
         }
 
+        String hash = PasswordUtil.hash(nueva);
         List<Lector> registros = lectorRepository.findAllByCodigoLector(actual.getCodigoLector());
         for (Lector registro : registros) {
-            registro.setPassword(nueva);
+            registro.setPassword(hash);
+            registro.setDebeCambiarPassword(false); // ya no usa la contraseña temporal
         }
         lectorRepository.saveAll(registros);
     }

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- Módulo AJUSTES del administrador: datos de la librería, contraseña y método de pago -->
+<!-- Módulo AJUSTES del administrador: datos de la librería, política de préstamos, contraseña y avance de configuración -->
 <html
   lang="es"
   xmlns:th="http://www.thymeleaf.org"
   th:replace="~{admin/layout :: molde(
           'Ajustes del Sistema',
-          'Datos de tu librería, política de préstamos, seguridad y método de pago',
+          'Datos de tu librería, política de préstamos y seguridad',
           'ajustes.css',
           'ajustes.js',
           'ajustes',
@@ -19,10 +19,9 @@
     <div class="dashboard-container">
       <div class="aj-layout">
 
-        <!-- ===================== COLUMNA PRINCIPAL ===================== -->
         <div class="aj-main">
 
-          <!-- DATOS DE LA LIBRERÍA -->
+          <!-- Datos de la librería -->
           <form class="aj-card" id="formDatos" novalidate>
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-solid fa-store"></i></div>
@@ -62,10 +61,18 @@
                 <input type="email" id="ajCorreo" name="correoContacto" data-campo="correoContacto"
                        th:value="${libreria.correoContacto}" maxlength="120" placeholder="contacto@tulibreria.pe" autocomplete="off" />
               </div>
-              <div class="aj-campo">
-                <label for="ajHorario">Horario de atención <small>(opcional · visible en Red Global)</small></label>
-                <input type="text" id="ajHorario" name="horarioAtencion" data-campo="horarioAtencion"
-                       th:value="${libreria.horarioAtencion}" maxlength="120" placeholder="Ej. Lun a Sáb, 9:00 a 20:00" autocomplete="off" />
+              <div class="aj-campo completo" id="ajCampoHorario">
+                <label>Horario de atención <small>(opcional · visible en Red Global)</small></label>
+                <div class="aj-hor-presets" id="ajHorPresets">
+                  <button type="button" data-p="semana">Lun a Vie</button>
+                  <button type="button" data-p="sabado">Lun a Sáb</button>
+                  <button type="button" data-p="todos">Todos los días</button>
+                  <button type="button" data-p="limpiar" class="aj-hor-limpiar">Limpiar</button>
+                </div>
+                <div class="aj-hor-dias" id="ajHorDias"></div>
+                <div class="aj-hor-resumen" id="ajHorResumen"></div>
+                <input type="hidden" id="ajHorario" name="horarioAtencion" data-campo="horarioAtencion"
+                       th:value="${libreria.horarioAtencion}" />
               </div>
               <div class="aj-campo completo">
                 <label for="ajDescripcion">Descripción <small>(opcional · visible en Red Global, máx. 300 caracteres)</small></label>
@@ -78,11 +85,11 @@
             <p class="aj-ok" id="okDatos" hidden></p>
 
             <div class="aj-acciones">
-              <button type="submit" class="aj-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+              <button type="submit" class="aj-btn" data-requiere-membresia><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
             </div>
           </form>
 
-          <!-- POLÍTICA DE PRÉSTAMOS -->
+          <!-- Política de préstamos -->
           <form class="aj-card" id="formPolitica" novalidate>
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-solid fa-hand-holding-dollar"></i></div>
@@ -145,17 +152,16 @@
             <p class="aj-ok" id="okPolitica" hidden></p>
 
             <div class="aj-acciones">
-              <button type="submit" class="aj-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar política</button>
+              <button type="submit" class="aj-btn" data-requiere-membresia><i class="fa-solid fa-floppy-disk"></i> Guardar política</button>
             </div>
           </form>
 
-          <!-- CONTRASEÑA -->
           <form class="aj-card" id="formPassword" novalidate>
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-solid fa-lock"></i></div>
               <div>
                 <h3>Cambiar contraseña</h3>
-                <p>Es la contraseña con la que ingresas al panel administrativo (entre 4 y 6 caracteres, sin espacios).</p>
+                <p>Es la contraseña con la que ingresas al panel administrativo (entre 8 y 20 caracteres, sin espacios).</p>
               </div>
             </div>
 
@@ -170,14 +176,14 @@
               <div class="aj-campo">
                 <label for="ajPassNueva">Nueva contraseña</label>
                 <div class="aj-password">
-                  <input type="password" id="ajPassNueva" name="passwordNueva" data-campo="passwordNueva" maxlength="6" autocomplete="new-password" />
+                  <input type="password" id="ajPassNueva" name="passwordNueva" data-campo="passwordNueva" maxlength="20" autocomplete="new-password" />
                   <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
                 </div>
               </div>
               <div class="aj-campo">
                 <label for="ajPassConfirmar">Confirmar nueva contraseña</label>
                 <div class="aj-password">
-                  <input type="password" id="ajPassConfirmar" name="passwordConfirmar" data-campo="passwordConfirmar" maxlength="6" autocomplete="new-password" />
+                  <input type="password" id="ajPassConfirmar" name="passwordConfirmar" data-campo="passwordConfirmar" maxlength="20" autocomplete="new-password" />
                   <button type="button" class="aj-ojo" tabindex="-1" title="Mostrar u ocultar"><i class="fa-regular fa-eye"></i></button>
                 </div>
               </div>
@@ -192,10 +198,8 @@
           </form>
         </div>
 
-        <!-- ===================== COLUMNA LATERAL ===================== -->
         <aside class="aj-side">
 
-          <!-- PLAN -->
           <div class="aj-card">
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-solid fa-crown"></i></div>
@@ -210,7 +214,7 @@
                 <strong th:text="${libreria.tipoPlan == 'ANUAL'} ? 'Plan Anual' : 'Plan Mensual'">Plan Mensual</strong>
               </li>
               <li>
-                <span>Renovación</span>
+                <span th:text="${libreria.renovacionAutomatica ? 'Se renueva el' : 'Vence el'}">Vence el</span>
                 <strong th:text="${libreria.fechaVencimiento != null ? #temporals.format(libreria.fechaVencimiento, 'dd/MM/yyyy') : '—'}">01/01/2027</strong>
               </li>
             </ul>
@@ -219,96 +223,44 @@
             </button>
           </div>
 
-          <!-- MÉTODO DE PAGO -->
-          <div class="aj-card" id="cardPago">
+          <!-- CONFIGURACIÓN DE LA LIBRERÍA (avance del perfil) -->
+          <div class="aj-card" id="cardCompleto" th:classappend="${completitud.completo} ? 'completo'">
             <div class="aj-card-head">
-              <div class="aj-icono"><i class="fa-regular fa-credit-card"></i></div>
+              <div class="aj-icono"><i class="fa-solid fa-chart-pie"></i></div>
               <div>
-                <h3>Método de pago</h3>
-                <p>Tarjeta para el cobro de tu membresía.</p>
+                <h3>Configuración de tu librería</h3>
+                <p>Qué tan completo está tu perfil en Ajustes.</p>
               </div>
             </div>
 
-            <!-- Sin tarjeta -->
-            <div class="aj-tarjeta-vacia" id="tarjetaVacia" th:hidden="${tarjeta != null}">
-              <i class="fa-regular fa-credit-card"></i>
-              <p>Todavía no tienes una tarjeta registrada.</p>
-            </div>
-
-            <!-- Tarjeta guardada -->
-            <div class="aj-tarjeta" id="tarjetaVista" th:hidden="${tarjeta == null}">
-              <div class="aj-tarjeta-fila">
-                <i class="fa-solid fa-microchip aj-chip"></i>
-                <span class="aj-marca" id="tMarca" th:text="${tarjeta != null ? tarjeta.marca : ''}">VISA</span>
-              </div>
-              <div class="aj-tarjeta-numero" id="tNumero"
-                   th:text="${tarjeta != null ? '•••• •••• •••• ' + tarjeta.ultimosDigitos : ''}">•••• •••• •••• 1234</div>
-              <div class="aj-tarjeta-fila abajo">
-                <div>
-                  <small>TITULAR</small>
-                  <span id="tTitular" th:text="${tarjeta != null ? tarjeta.titular : ''}">NOMBRE APELLIDO</span>
-                </div>
-                <div>
-                  <small>VENCE</small>
-                  <span id="tVence" th:text="${tarjeta != null ? tarjeta.vencimientoTexto : ''}">12/28</span>
-                </div>
+            <div class="aj-anillo" th:attr="data-pct=${completitud.porcentaje}">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="aj-anillo-pista" cx="60" cy="60" r="52"></circle>
+                <circle class="aj-anillo-valor" id="ajAnilloValor" cx="60" cy="60" r="52"
+                        th:style="'stroke-dashoffset:' + ${326.73 * (100 - completitud.porcentaje) / 100}"></circle>
+              </svg>
+              <div class="aj-anillo-centro">
+                <strong id="ajAnilloPct" th:text="${completitud.porcentaje + '%'}">0%</strong>
+                <span id="ajAnilloEtq" th:text="${completitud.completo ? 'completo' : 'configurado'}">configurado</span>
               </div>
             </div>
 
-            <!-- Formulario para agregar / cambiar la tarjeta -->
-            <form id="formTarjeta" novalidate>
-              <p class="aj-subtitulo" id="tituloFormTarjeta" th:text="${tarjeta != null} ? 'Cambiar tarjeta' : 'Agregar tarjeta'">Agregar tarjeta</p>
-
-              <div class="aj-grid una-columna compacto">
-                <div class="aj-campo">
-                  <label for="ajNumero">Número de tarjeta</label>
-                  <input type="text" id="ajNumero" data-campo="numero" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="off" />
-                </div>
-                <div class="aj-campo">
-                  <label for="ajTitular">Titular</label>
-                  <input type="text" id="ajTitular" data-campo="titular" placeholder="Como aparece en la tarjeta" maxlength="100" autocomplete="off" />
-                </div>
-                <div class="aj-doble">
-                  <div class="aj-campo">
-                    <label for="ajVence">Vence (MM/AA)</label>
-                    <input type="text" id="ajVence" data-campo="vence" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="off" />
-                  </div>
-                  <div class="aj-campo">
-                    <label for="ajCvv">CVV</label>
-                    <input type="password" id="ajCvv" data-campo="cvv" inputmode="numeric" placeholder="•••" maxlength="3" autocomplete="off" />
-                  </div>
-                </div>
+            <div class="aj-faltan" id="ajFaltan">
+              <p class="aj-faltan-ok" id="ajFaltanOk" th:hidden="${!completitud.completo}">
+                <i class="fa-solid fa-circle-check"></i> Tu librería está completamente configurada.
+              </p>
+              <div id="ajFaltanLista" th:hidden="${completitud.completo}">
+                <p class="aj-faltan-tit">Te falta completar:</p>
+                <ul id="ajFaltanItems">
+                  <li th:each="f : ${completitud.faltan}"
+                      th:attr="data-ir=${f == 'Teléfono de contacto' ? 'ajTelefono' : (f == 'Correo de contacto' ? 'ajCorreo' : (f == 'Horario de atención' ? 'ajHorPresets' : 'ajDescripcion'))}">
+                    <i class="fa-regular fa-circle"></i> <span th:text="${f}">Campo</span>
+                  </li>
+                </ul>
               </div>
-
-              <p class="aj-nota-seg"><i class="fa-solid fa-shield-halved"></i> Por seguridad no guardamos el número completo ni el CVV: solo la marca, los últimos 4 dígitos, el titular y el vencimiento.</p>
-
-              <p class="aj-error-campo" id="errorTarjeta" hidden></p>
-              <p class="aj-ok" id="okTarjeta" hidden></p>
-
-              <div class="aj-acciones dos">
-                <button type="button" class="aj-btn-peligro" id="btnQuitarTarjeta" th:hidden="${tarjeta == null}">
-                  <i class="fa-regular fa-trash-can"></i> Quitar
-                </button>
-                <button type="submit" class="aj-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar tarjeta</button>
-              </div>
-            </form>
+            </div>
           </div>
         </aside>
-      </div>
-
-      <!-- MODAL: CONFIRMAR QUITAR TARJETA -->
-      <div id="modalQuitarTarjeta" class="modal-overlay">
-        <div class="modal-content modal-sm">
-          <div class="aj-modal-box">
-            <div class="aj-modal-icono"><i class="fa-regular fa-trash-can"></i></div>
-            <h3>¿Quitar la tarjeta?</h3>
-            <p>Se eliminará tu método de pago guardado. Podrás agregar otro cuando quieras.</p>
-            <div class="aj-modal-acciones">
-              <button type="button" class="aj-btn-claro" id="btnCancelarQuitar">Cancelar</button>
-              <button type="button" class="aj-btn-rojo" id="btnConfirmarQuitar">Sí, quitar</button>
-            </div>
-          </div>
-        </div>
       </div>
 
     </div>

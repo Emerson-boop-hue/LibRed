@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Botón "Ingresar" de Red Global: cambia al lector a otra librería sin cerrar sesión.
- * Cambia en la sesión el registro del lector por el que tiene en la librería elegida (se crea si es su primera vez).
- */
+/** Botón "Ingresar" de Red Global: cambia al lector a otra librería sin cerrar sesión. */
 @Controller
 public class CambioSedeController {
 

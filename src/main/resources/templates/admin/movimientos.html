@@ -1,14 +1,177 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{admin/layout :: molde('Movimientos', 'Historial de préstamos, devoluciones y multas de tu librería', '', '', 'movimientos', ~{:: .dashboard-container})}">
+      th:replace="~{admin/layout :: molde('Movimientos', 'Historial de préstamos, devoluciones y multas de tu librería', 'movimientos.css', 'movimientos.js', 'movimientos', ~{:: .dashboard-container})}">
 <head><title>Movimientos | LibRed</title></head>
 <body>
     <div class="dashboard-container">
-        <div class="content-card" style="padding: 40px; text-align: center;">
-            <i class="fa-solid fa-timeline" style="font-size: 3rem; color: #2563eb; margin-bottom: 20px;"></i>
-            <h2 style="font-size: 1.5rem; color: var(--text-dark); margin-bottom: 10px;">Módulo de Movimientos en Construcción</h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Aquí podrás consultar y filtrar todos los préstamos, devoluciones y multas de tu librería.</p>
+
+        <div class="mv-tabs" role="tablist">
+          <button type="button" class="mv-tab activa" data-tab="prestamos" role="tab">
+            <i class="fa-solid fa-book-open-reader"></i> Préstamos
+            <span class="mv-tab-num" id="numPrestamos" th:text="${#lists.size(m.prestamos())}">0</span>
+          </button>
+          <button type="button" class="mv-tab" data-tab="devoluciones" role="tab">
+            <i class="fa-solid fa-rotate-left"></i> Devoluciones
+            <span class="mv-tab-num" id="numDevoluciones" th:text="${#lists.size(m.devoluciones())}">0</span>
+          </button>
+          <button type="button" class="mv-tab" data-tab="multas" role="tab">
+            <i class="fa-solid fa-file-invoice-dollar"></i> Multas
+            <span class="mv-tab-num" id="numMultas" th:text="${#lists.size(m.multas())}">0</span>
+          </button>
         </div>
+
+        <!-- FILTROS (se aplican a la pestaña activa) -->
+        <div class="mv-filtros">
+          <div class="mv-buscador">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="mvBuscar" placeholder="Buscar por lector, artículo o código..." autocomplete="off" />
+          </div>
+
+          <div class="mv-fechas">
+            <label class="mv-fecha" for="mvDesde">
+              <span>Desde</span>
+              <input type="date" id="mvDesde" th:max="${hoy}" />
+            </label>
+            <label class="mv-fecha" for="mvHasta">
+              <span>Hasta</span>
+              <input type="date" id="mvHasta" th:max="${hoy}" />
+            </label>
+          </div>
+
+          <select id="mvEstado" class="mv-select"></select>
+
+          <button type="button" class="mv-btn-limpiar inactivo" id="mvLimpiar">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+
+          <span class="mv-resumen" id="mvResumen"></span>
+        </div>
+
+        <div class="mv-tabla-caja" id="panelPrestamos" data-panel="prestamos">
+          <table class="mv-tabla">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Lector</th>
+                <th>Artículo</th>
+                <th>Devolver hasta</th>
+                <th>Devuelto el</th>
+                <th class="mv-der">Servicio</th>
+                <th>Origen</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(m.prestamos())}">
+                <td colspan="8" class="mv-vacio">Todavía no hay préstamos registrados.</td>
+              </tr>
+              <tr th:each="f : ${m.prestamos()}" class="mv-fila"
+                  th:data-dia="${f.dia()}" th:data-estado="${f.estado()}" th:data-monto="${f.servicio()}"
+                  th:data-lector="${f.lector()}" th:data-cod="${f.codLector()}"
+                  th:data-titulo="${f.titulo()}" th:data-codigo="${f.codigo()}">
+                <td class="mv-nowrap" th:text="${f.fecha()}">11/11/2026 10:00</td>
+                <td>
+                  <div class="mv-principal" th:text="${f.lector()}">Lector</div>
+                  <div class="mv-sub" th:text="${f.codLector()}">LEC-1001</div>
+                </td>
+                <td>
+                  <div class="mv-principal" th:text="${f.titulo()}">Título</div>
+                  <div class="mv-sub" th:text="${f.codigo()}">LIB-001</div>
+                </td>
+                <td class="mv-nowrap" th:text="${f.limite()}">18/11/2026</td>
+                <td class="mv-nowrap" th:text="${f.devuelto()}">—</td>
+                <td class="mv-der mv-nowrap" th:text="${'S/. ' + f.servicio()}">S/. 0.00</td>
+                <td><span class="mv-etiqueta" th:text="${f.origen()}">Mostrador</span></td>
+                <td><span class="mv-estado" th:classappend="${'e-' + #strings.toLowerCase(f.estado())}" th:text="${f.estadoTexto()}">Activo</span></td>
+              </tr>
+              <tr class="mv-sin-resultados" hidden><td colspan="8" class="mv-vacio">Sin resultados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mv-tabla-caja" id="panelDevoluciones" data-panel="devoluciones" hidden>
+          <table class="mv-tabla">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Lector</th>
+                <th>Artículo</th>
+                <th>Retraso</th>
+                <th class="mv-der">Mora</th>
+                <th class="mv-der">Multa</th>
+                <th class="mv-der">Total cobrado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(m.devoluciones())}">
+                <td colspan="7" class="mv-vacio">Todavía no hay devoluciones registradas.</td>
+              </tr>
+              <tr th:each="f : ${m.devoluciones()}" class="mv-fila"
+                  th:data-dia="${f.dia()}" data-estado="" th:data-monto="${f.total()}"
+                  th:data-lector="${f.lector()}" th:data-cod="${f.codLector()}"
+                  th:data-titulo="${f.titulo()}" th:data-codigo="${f.codigo()}">
+                <td class="mv-nowrap" th:text="${f.fecha()}">11/11/2026 10:00</td>
+                <td>
+                  <div class="mv-principal" th:text="${f.lector()}">Lector</div>
+                  <div class="mv-sub" th:text="${f.codLector()}">LEC-1001</div>
+                </td>
+                <td>
+                  <div class="mv-principal" th:text="${f.titulo()}">Título</div>
+                  <div class="mv-sub" th:text="${f.codigo()}">LIB-001</div>
+                </td>
+                <td class="mv-nowrap">
+                  <span th:if="${f.diasRetraso() > 0}" class="mv-retraso" th:text="${f.diasRetraso() + (f.diasRetraso() == 1 ? ' día' : ' días')}">5 días</span>
+                  <span th:unless="${f.diasRetraso() > 0}" class="mv-aldia">Al día</span>
+                </td>
+                <td class="mv-der mv-nowrap" th:text="${'S/. ' + f.mora()}">S/. 0.00</td>
+                <td class="mv-der mv-nowrap" th:text="${'S/. ' + f.multa()}">S/. 0.00</td>
+                <td class="mv-der mv-nowrap"><strong th:text="${'S/. ' + f.total()}">S/. 0.00</strong></td>
+              </tr>
+              <tr class="mv-sin-resultados" hidden><td colspan="7" class="mv-vacio">Sin resultados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mv-tabla-caja" id="panelMultas" data-panel="multas" hidden>
+          <table class="mv-tabla">
+            <thead>
+              <tr>
+                <th>Emisión</th>
+                <th>Lector</th>
+                <th>Artículo</th>
+                <th>Motivo</th>
+                <th class="mv-der">Monto</th>
+                <th>Estado</th>
+                <th>Pagada el</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(m.multas())}">
+                <td colspan="7" class="mv-vacio">Todavía no hay multas registradas.</td>
+              </tr>
+              <tr th:each="f : ${m.multas()}" class="mv-fila"
+                  th:data-dia="${f.dia()}" th:data-estado="${f.estado()}" th:data-monto="${f.monto()}"
+                  th:data-lector="${f.lector()}" th:data-cod="${f.codLector()}"
+                  th:data-titulo="${f.titulo()}" th:data-codigo="${f.codigo()}">
+                <td class="mv-nowrap" th:text="${f.fecha()}">11/11/2026 10:00</td>
+                <td>
+                  <div class="mv-principal" th:text="${f.lector()}">Lector</div>
+                  <div class="mv-sub" th:text="${f.codLector()}">LEC-1001</div>
+                </td>
+                <td>
+                  <div class="mv-principal" th:text="${f.titulo()}">Título</div>
+                  <div class="mv-sub" th:text="${f.codigo()}">LIB-001</div>
+                </td>
+                <td><span class="mv-etiqueta" th:classappend="${#strings.contains(#strings.toLowerCase(f.motivo()), 'perd')} ? 'm-perdida' : (${#strings.contains(#strings.toLowerCase(f.motivo()), 'da')} ? 'm-dano' : '')" th:text="${f.motivo()}">Daño Físico</span></td>
+                <td class="mv-der mv-nowrap"><strong th:text="${'S/. ' + f.monto()}">S/. 0.00</strong></td>
+                <td><span class="mv-estado" th:classappend="${'e-' + #strings.toLowerCase(f.estado())}" th:text="${f.estadoTexto()}">Pendiente</span></td>
+                <td class="mv-nowrap" th:text="${f.fechaPago()}">—</td>
+              </tr>
+              <tr class="mv-sin-resultados" hidden><td colspan="7" class="mv-vacio">Sin resultados</td></tr>
+            </tbody>
+          </table>
+        </div>
+
     </div>
 </body>
 </html>

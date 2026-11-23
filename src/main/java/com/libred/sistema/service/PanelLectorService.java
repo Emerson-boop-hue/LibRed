@@ -69,7 +69,6 @@ public class PanelLectorService {
         Libreria sede = libreriaId == null ? null : libreriaRepository.findById(libreriaId).orElse(null);
         LocalDate hoy = LocalDate.now();
 
-        // ---------- Préstamos en curso ----------
         List<Prestamo> propios = prestamoRepository.findByLectorIdOrderByFechaPrestamoDesc(lectorId);
         List<Prestamo> enCursoBd = propios.stream()
                 .filter(p -> EN_CURSO.contains(p.getEstadoPrestamo()))
@@ -100,7 +99,6 @@ public class PanelLectorService {
                     limite == null ? "—" : limite.format(FECHA), textoRestante(faltan), nivel, porcentaje(p, hoy)));
         }
 
-        // Próxima devolución
         String proximaNivel = "ninguna", proximaValor = "—", proximaDetalle = "No tienes préstamos en curso";
         if (proximo != null && proximo.getFechaDevolucionLimite() != null) {
             long faltan = ChronoUnit.DAYS.between(hoy, proximo.getFechaDevolucionLimite());
@@ -111,7 +109,6 @@ public class PanelLectorService {
                     + proximo.getFechaDevolucionLimite().format(FECHA);
         }
 
-        // ---------- Multas ----------
         long multasPend = 0;
         BigDecimal montoPend = BigDecimal.ZERO;
         for (Multa m : multaRepository.buscarPorLector(lectorId)) {
@@ -120,17 +117,19 @@ public class PanelLectorService {
                 montoPend = montoPend.add(m.getMonto() == null ? BigDecimal.ZERO : m.getMonto());
             }
         }
-        boolean sancionado = "SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta()) || multasPend > 0;
+        boolean bloqueado = "BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta()) || multasPend > 0;
 
-        // ---------- Calificaciones ----------
         var calif = calificacionService.resumen(lectorId);
 
-        // ---------- Gráficos: préstamos por mes (últimos 6) y puntualidad ----------
+        // Gráficos: préstamos por mes (últimos 6) y puntualidad
         YearMonth mesActual = YearMonth.from(hoy);
         long[] porMes = new long[6];
         long aTiempo = 0, devueltosConFecha = 0;
         java.util.Map<String, Long> porCategoria = new java.util.LinkedHashMap<>();
         for (Prestamo p : propios) {
+            if ("CANCELADO".equals(p.getEstadoPrestamo())) {
+                continue;
+            }
             if (p.getFechaPrestamo() != null) {
                 long atras = ChronoUnit.MONTHS.between(YearMonth.from(p.getFechaPrestamo()), mesActual);
                 if (atras >= 0 && atras < 6) {
@@ -167,7 +166,7 @@ public class PanelLectorService {
                 .toList();
         int puntualidad = devueltosConFecha == 0 ? -1 : (int) Math.round(aTiempo * 100.0 / devueltosConFecha);
 
-        // ---------- Otras librerías donde ya tiene cuenta ----------
+        // Otras librerías donde ya tiene cuenta
         List<SedeRed> otras = new ArrayList<>();
         for (Lector l : lectorRepository.findAllByCodigoLector(lector.getCodigoLector())) {
             if (l.getLibreriaId() == null || l.getLibreriaId().equals(libreriaId)) {
@@ -186,7 +185,7 @@ public class PanelLectorService {
         fecha = fecha.substring(0, 1).toUpperCase() + fecha.substring(1);
 
         return Optional.of(new PanelLectorVista(
-                saludo(), primerNombre, fecha, sancionado ? "SANCIONADO" : "HABILITADO",
+                saludo(), primerNombre, fecha, bloqueado ? "BLOQUEADO" : "HABILITADO",
                 enCursoBd.size(), sede == null ? null : politicaService.obtenerMaxActivos(libreriaId),
                 proximaNivel, proximaValor, proximaDetalle, multasPend, montoPend,
                 calif.devueltos(), calif.calificadas(), calif.promedio(),

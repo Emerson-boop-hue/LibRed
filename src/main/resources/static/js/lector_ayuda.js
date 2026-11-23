@@ -1,4 +1,4 @@
-/* Módulo AYUDA Y SOPORTE del lector. IIFE: el layout vuelve a cargar este script al navegar entre módulos. */
+// Módulo AYUDA Y SOPORTE del lector. IIFE: el layout vuelve a cargar este script al navegar entre módulos.
 (function () {
   const lista = document.getElementById("ayLista");
   if (!lista) return;

@@ -22,7 +22,6 @@
         <!-- COLUMNA PRINCIPAL: formularios -->
         <div class="aj-main">
 
-          <!-- DATOS PERSONALES -->
           <form class="aj-card" id="formPerfil" novalidate>
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-regular fa-id-card"></i></div>
@@ -62,14 +61,18 @@
             </div>
           </form>
 
-          <!-- CONTRASEÑA -->
-          <form class="aj-card" id="formPassword" novalidate>
+          <form class="aj-card" id="formPassword" novalidate th:classappend="${session.lectorCambiarPassword != null} ? 'aj-card-aviso'">
             <div class="aj-card-head">
               <div class="aj-icono"><i class="fa-solid fa-lock"></i></div>
               <div>
                 <h3>Cambiar contraseña</h3>
                 <p>Usa entre 6 y 20 caracteres, sin espacios. Será la misma en todas las librerías.</p>
               </div>
+            </div>
+
+            <div class="aj-aviso-temporal" th:if="${session.lectorCambiarPassword != null}">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              <span>Estás usando una contraseña temporal. Escríbela en «Contraseña actual» y elige una nueva.</span>
             </div>
 
             <div class="aj-grid una-columna">

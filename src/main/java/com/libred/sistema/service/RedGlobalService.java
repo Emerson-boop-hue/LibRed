@@ -29,9 +29,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Red Global: directorio de todas las librerías de LibRed para el lector.
- * Todo sale de la base de datos (artículos, categorías activas, política de préstamos, contacto).
- * No se muestran datos privados: ni RUC, ni código de administrador, ni contraseñas, ni datos de otros lectores.
+ * Red Global: directorio de todas las librerías de LibRed para el lector. Todo sale de la base de datos (artículos,
+ * categorías activas, política de préstamos, contacto).
  */
 @Service
 public class RedGlobalService {
@@ -43,15 +42,17 @@ public class RedGlobalService {
     private final RecursoRepository recursoRepository;
     private final PoliticaPrestamoService politicaService;
     private final CalificacionRepository calificacionRepository;
+    private final MembresiaService membresiaService;
 
     public RedGlobalService(LibreriaRepository libreriaRepository, LectorRepository lectorRepository,
                             RecursoRepository recursoRepository, PoliticaPrestamoService politicaService,
-                            CalificacionRepository calificacionRepository) {
+                            CalificacionRepository calificacionRepository, MembresiaService membresiaService) {
         this.libreriaRepository = libreriaRepository;
         this.lectorRepository = lectorRepository;
         this.recursoRepository = recursoRepository;
         this.politicaService = politicaService;
         this.calificacionRepository = calificacionRepository;
+        this.membresiaService = membresiaService;
     }
 
     @Transactional(readOnly = true)
@@ -130,6 +131,7 @@ public class RedGlobalService {
                     chips,
                     id.equals(sede),
                     miembroEn.contains(id),
+                    membresiaService.estadoDe(lib).escrituraBloqueada(),
                     votos.getOrDefault(id, new long[5])));
         }
 

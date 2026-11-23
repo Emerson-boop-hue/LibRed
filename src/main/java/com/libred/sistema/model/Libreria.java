@@ -3,6 +3,7 @@ package com.libred.sistema.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/** Librería de la red y su suscripción. */
 @Entity
 @Table(name = "libreria")
 public class Libreria {
@@ -54,13 +55,47 @@ public class Libreria {
     @Column(name = "horario_atencion", length = 120)
     private String horarioAtencion;
 
-    // Política de préstamos: máximo de días que un lector puede llevarse un artículo (se edita en Ajustes del administrador)
+    // Política de préstamos: máximo de días que un lector puede llevarse un artículo (se edita en Ajustes del
+    // administrador)
     @Column(name = "max_dias_prestamo", nullable = false, columnDefinition = "INT NOT NULL DEFAULT 7")
     private Integer maxDiasPrestamo = 7;
 
     // Máximo de préstamos activos por lector. NULL = sin límite (el admin decide en Ajustes si lo limita o no)
     @Column(name = "max_prestamos_activos", columnDefinition = "INT NULL DEFAULT 3")
     private Integer maxPrestamosActivos = 3;
+
+    // Correo de la cuenta (el que se verificó con el código al registrarse). Sirve para recuperar el acceso y para
+    // enviar comprobantes.
+    @Column(name = "correo_cuenta", unique = true, length = 120)
+    private String correoCuenta;
+
+    @Column(name = "correo_verificado", nullable = false, columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0")
+    private boolean correoVerificado = false;
+
+    // Momento en que el administrador aceptó los términos y condiciones al registrarse
+    @Column(name = "terminos_aceptados_en")
+    private LocalDateTime terminosAceptadosEn;
+
+    // Renovación de la membresía true = al vencer, LibRed cobra sola el siguiente periodo con el medio guardado (solo
+    // tarjeta y PayPal).
+    @Column(name = "renovacion_automatica", nullable = false, columnDefinition = "TINYINT(1) NOT NULL DEFAULT 0")
+    private boolean renovacionAutomatica = false;
+
+    // Medio del banco de pruebas con el que se renueva sola (en un sistema real sería el "token" de la tarjeta)
+    @Column(name = "medio_renovacion_id")
+    private Integer medioRenovacionId;
+
+    // Cobros automáticos rechazados seguidos; al llegar a 3 se desactiva la renovación automática
+    @Column(name = "intentos_renovacion", nullable = false, columnDefinition = "INT NOT NULL DEFAULT 0")
+    private Integer intentosRenovacion = 0;
+
+    // No se vuelve a intentar el cobro antes de esta fecha (se reintenta una vez al día)
+    @Column(name = "proximo_intento_renovacion")
+    private LocalDateTime proximoIntentoRenovacion;
+
+    // Fecha de vencimiento para la que ya se envió el aviso "tu membresía está por vencer"
+    @Column(name = "aviso_vencimiento_para")
+    private LocalDateTime avisoVencimientoPara;
 
     // Método que JPA ejecuta automáticamente antes de guardar el registro por primera vez
     @PrePersist
@@ -72,8 +107,6 @@ public class Libreria {
     public Libreria() {
     }
 
-    // --- GETTERS Y SETTERS ---
-    
     public Integer getId() {
         return id;
     }
@@ -192,4 +225,28 @@ public class Libreria {
     public void setMaxPrestamosActivos(Integer maxPrestamosActivos) {
         this.maxPrestamosActivos = maxPrestamosActivos;
     }
+
+    public String getCorreoCuenta() { return correoCuenta; }
+    public void setCorreoCuenta(String correoCuenta) { this.correoCuenta = correoCuenta; }
+
+    public boolean isCorreoVerificado() { return correoVerificado; }
+    public void setCorreoVerificado(boolean correoVerificado) { this.correoVerificado = correoVerificado; }
+
+    public LocalDateTime getTerminosAceptadosEn() { return terminosAceptadosEn; }
+    public void setTerminosAceptadosEn(LocalDateTime terminosAceptadosEn) { this.terminosAceptadosEn = terminosAceptadosEn; }
+
+    public boolean isRenovacionAutomatica() { return renovacionAutomatica; }
+    public void setRenovacionAutomatica(boolean renovacionAutomatica) { this.renovacionAutomatica = renovacionAutomatica; }
+
+    public Integer getMedioRenovacionId() { return medioRenovacionId; }
+    public void setMedioRenovacionId(Integer medioRenovacionId) { this.medioRenovacionId = medioRenovacionId; }
+
+    public int getIntentosRenovacion() { return intentosRenovacion == null ? 0 : intentosRenovacion; }
+    public void setIntentosRenovacion(Integer intentosRenovacion) { this.intentosRenovacion = intentosRenovacion; }
+
+    public LocalDateTime getProximoIntentoRenovacion() { return proximoIntentoRenovacion; }
+    public void setProximoIntentoRenovacion(LocalDateTime proximoIntentoRenovacion) { this.proximoIntentoRenovacion = proximoIntentoRenovacion; }
+
+    public LocalDateTime getAvisoVencimientoPara() { return avisoVencimientoPara; }
+    public void setAvisoVencimientoPara(LocalDateTime avisoVencimientoPara) { this.avisoVencimientoPara = avisoVencimientoPara; }
 }

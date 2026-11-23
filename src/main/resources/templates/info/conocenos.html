@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conócenos | LibRed</title>
+    <script th:src="@{/js/tema.js}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/info.css}" href="/css/info.css">
+    <link rel="stylesheet" th:href="@{/css/tema_publico.css}" href="/css/tema_publico.css">
+</head>
+<body class="inf-body">
+
+<div th:replace="~{info/partes :: cabecera('conocenos')}"></div>
+
+<main>
+    <section class="inf-hero" style="background-image: url('/img/bg3.jpg');" th:style="'background-image: url(' + @{/img/bg3.jpg} + ');'">
+        <div class="inf-hero-vel"></div>
+        <div class="inf-hero-in">
+            <span class="inf-etiqueta">Red de librerías</span>
+            <h1>Las librerías de tu distrito, conectadas en una sola plataforma</h1>
+            <p>Consulta qué hay disponible, pide prestados libros, mangas, cómics y más, y lleva el control de tus préstamos desde la web. Y si tienes una librería, gestiónala completa desde un mismo lugar.</p>
+            <div class="inf-hero-btns">
+                <a class="inf-btn inf-btn-claro" th:href="@{/login}" href="/login">Ingresar como lector</a>
+                <a class="inf-btn inf-btn-borde" th:href="@{/registro}" href="/registro">Registrar mi librería</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion">
+        <div class="inf-cont">
+            <div class="inf-pilares">
+                <article class="inf-pilar">
+                    <span class="inf-ico"><i class="fa-solid fa-book-open-reader"></i></span>
+                    <h3>Para lectores</h3>
+                    <p>Una sola cuenta para pedir prestado en las librerías de la red, ver cuánto tiempo te queda y calificar lo que devuelves.</p>
+                </article>
+                <article class="inf-pilar">
+                    <span class="inf-ico"><i class="fa-solid fa-store"></i></span>
+                    <h3>Para librerías</h3>
+                    <p>Inventario, préstamos, devoluciones, multas y reportes en un panel pensado para el trabajo diario del mostrador.</p>
+                </article>
+                <article class="inf-pilar">
+                    <span class="inf-ico"><i class="fa-solid fa-globe"></i></span>
+                    <h3>Una red</h3>
+                    <p>Las librerías comparten una misma plataforma, pero cada una ve solo sus propios datos: nada se mezcla.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion inf-fondo">
+        <div class="inf-cont">
+            <div class="inf-cab">
+                <h2>Cómo funciona</h2>
+                <p>Empezar es simple, seas lector o tengas una librería.</p>
+            </div>
+            <div class="inf-conmuta" role="tablist">
+                <button type="button" class="inf-conmuta-btn activo" data-pasos="lector" role="tab">Soy lector</button>
+                <button type="button" class="inf-conmuta-btn" data-pasos="libreria" role="tab">Tengo una librería</button>
+            </div>
+
+            <div class="inf-pasos" data-pasos-panel="lector">
+                <div class="inf-paso"><span class="inf-num">1</span><h3>Crea tu cuenta</h3><p>Regístrate en tu librería con tu celular y una contraseña. Confirmas con un código que te llega por SMS.</p></div>
+                <div class="inf-paso"><span class="inf-num">2</span><h3>Explora y solicita</h3><p>Elige la categoría y el artículo, indica por cuántos días lo necesitas y revisa tu comprobante antes de confirmar.</p></div>
+                <div class="inf-paso"><span class="inf-num">3</span><h3>Recoge, disfruta y devuelve</h3><p>Recoges el artículo en la librería, lo devuelves a tiempo y calificas tu experiencia.</p></div>
+            </div>
+            <div class="inf-pasos" data-pasos-panel="libreria" hidden>
+                <div class="inf-paso"><span class="inf-num">1</span><h3>Elige tu plan</h3><p>Registra tu librería, elige el plan mensual o anual y completa el pago. Recibes tu código de administrador.</p></div>
+                <div class="inf-paso"><span class="inf-num">2</span><h3>Carga tu inventario</h3><p>Registra tus artículos por categoría y define las tarifas del servicio de préstamo.</p></div>
+                <div class="inf-paso"><span class="inf-num">3</span><h3>Gestiona todo desde el panel</h3><p>Controla préstamos, devoluciones, multas y lectores, y revisa tus estadísticas y reportes.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion">
+        <div class="inf-cont">
+            <div class="inf-cab">
+                <h2>Todo lo que necesitas, en un solo lugar</h2>
+                <p>Herramientas para quienes leen y para quienes atienden.</p>
+            </div>
+            <div class="inf-funciones">
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-book"></i></span><h3>Catálogo en red</h3><p>Explora los artículos de tu librería y descubre los de otras librerías de la red.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-file-circle-plus"></i></span><h3>Préstamos en línea</h3><p>Solicita desde la web y obtén un comprobante con la fecha de devolución y el servicio ya calculado.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-star"></i></span><h3>Calificaciones</h3><p>Los lectores califican lo que devuelven y las librerías conocen mejor qué funciona.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-file-invoice-dollar"></i></span><h3>Multas y mora claras</h3><p>Seguimiento de multas pendientes, con avisos visibles para el lector.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-boxes-stacked"></i></span><h3>Inventario y movimientos</h3><p>Control del stock de cada artículo con el historial de entradas y salidas.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-chart-column"></i></span><h3>Estadísticas y reportes</h3><p>Indicadores de tu librería y reportes que puedes descargar en Excel o PDF.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-users"></i></span><h3>Gestión de lectores</h3><p>Registra y administra a tus lectores, cada uno con su propio código.</p></div>
+                <div class="inf-func"><span class="inf-ico"><i class="fa-solid fa-shield-halved"></i></span><h3>Acceso seguro</h3><p>Verificación por código al celular y recuperación de contraseña sin pasos complicados.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion inf-fondo">
+        <div class="inf-cont">
+            <div class="inf-cab">
+                <h2>Planes para tu librería</h2>
+                <p>Los dos incluyen todos los módulos, sin límites.</p>
+            </div>
+            <div class="inf-planes">
+                <article class="inf-plan">
+                    <h3 th:text="${planMensual.nombre}">Plan Mensual</h3>
+                    <div class="inf-precio">S/ <span th:text="${planMensual.precio}">29.00</span> <small th:text="${planMensual.periodo}">por mes</small></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Acceso completo por <span th:text="${planMensual.dias}">30</span> días</li>
+                        <li><i class="fa-solid fa-check"></i> Todos los módulos, sin límites</li>
+                        <li><i class="fa-solid fa-check"></i> Ideal para empezar y conocer LibRed</li>
+                    </ul>
+                    <a class="inf-btn inf-btn-sec" th:href="@{/registro}" href="/registro">Elegir este plan</a>
+                </article>
+                <article class="inf-plan inf-plan-dest">
+                    <span class="inf-plan-tag">Ahorras S/ <span th:text="${ahorroAnual}">58.00</span></span>
+                    <h3 th:text="${planAnual.nombre}">Plan Anual</h3>
+                    <div class="inf-precio">S/ <span th:text="${planAnual.precio}">290.00</span> <small th:text="${planAnual.periodo}">por año</small></div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Acceso completo por <span th:text="${planAnual.dias}">365</span> días</li>
+                        <li><i class="fa-solid fa-check"></i> Todos los módulos, sin límites</li>
+                        <li><i class="fa-solid fa-check"></i> Equivale a solo S/ <span th:text="${equivalenteMensual}">24.17</span> al mes</li>
+                    </ul>
+                    <a class="inf-btn inf-btn-pri" th:href="@{/registro}" href="/registro">Elegir este plan</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-seccion">
+        <div class="inf-cont">
+            <div class="inf-cab">
+                <h2>El equipo detrás de LibRed</h2>
+                <p>Somos las personas que diseñaron y desarrollaron la plataforma.</p>
+            </div>
+            <div class="inf-equipo">
+                <img th:src="@{/img/Integrante1.jpg}" src="/img/Integrante1.jpg" alt="Integrante del equipo LibRed" loading="lazy">
+                <img th:src="@{/img/Integrante2.jpg}" src="/img/Integrante2.jpg" alt="Integrante del equipo LibRed" loading="lazy">
+                <img th:src="@{/img/Integrante3.jpg}" src="/img/Integrante3.jpg" alt="Integrante del equipo LibRed" loading="lazy">
+                <img th:src="@{/img/Integrante4.jpg}" src="/img/Integrante4.jpg" alt="Integrante del equipo LibRed" loading="lazy">
+                <img th:src="@{/img/Integrante5.jpg}" src="/img/Integrante5.jpg" alt="Integrante del equipo LibRed" loading="lazy">
+            </div>
+        </div>
+    </section>
+
+    <section class="inf-llamada">
+        <div class="inf-cont">
+            <h2>¿Listo para empezar?</h2>
+            <p>Entra con tu cuenta o suma tu librería a la red.</p>
+            <div class="inf-hero-btns">
+                <a class="inf-btn inf-btn-claro" th:href="@{/login}" href="/login">Ingresar</a>
+                <a class="inf-btn inf-btn-borde" th:href="@{/contacto}" href="/contacto">Hablar con nosotros</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{info/partes :: pie}"></div>
+<script th:src="@{/js/info.js}" src="/js/info.js"></script>
+</body>
+</html>

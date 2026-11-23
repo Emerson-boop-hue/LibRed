@@ -1,13 +1,9 @@
-// =====================================================================
-// MÓDULO HISTORIAL DEL LECTOR
-// Pestañas (Préstamos / Multas) y filtros en vivo en cada tabla.
-// Es una función autocontenida: el layout la ejecuta cada vez que se entra al módulo (navegación AJAX).
-// =====================================================================
+// Módulo historial del lector: pestañas (Préstamos / Multas) y filtros en vivo en cada tabla. Es una función
+// autocontenida: el layout la ejecuta cada vez que se entra al módulo (navegación AJAX).
 (function () {
   const tabs = document.querySelectorAll(".hs-tab");
   if (!tabs.length) return;
 
-  // ---------- pestañas ----------
   const paneles = {
     prestamos: document.getElementById("panelPrestamos"),
     multas: document.getElementById("panelMultas"),
@@ -23,8 +19,6 @@
     });
   });
 
-  // ---------- filtro genérico de tabla ----------
-  // cfg: { cuerpo, texto, selects: [{ el, atributo }], limpiar, contador, contadorTexto, sinResultados, singular, plural }
   function conectarFiltros(cfg) {
     const cuerpo = document.getElementById(cfg.cuerpo);
     const inputTexto = document.getElementById(cfg.texto);
@@ -94,7 +88,7 @@
     plural: "multas",
   });
 
-  // ---------- pestaña Calificaciones: filtros (las filas pueden aumentar al calificar, por eso se leen en cada filtrado) ----------
+  // pestaña Calificaciones: filtros (las filas pueden aumentar al calificar, por eso se leen en cada filtrado)
   const hcCuerpo = document.getElementById("hcCuerpo");
   const hcTexto = document.getElementById("hcTexto");
   const hcPuntaje = document.getElementById("hcPuntaje");
@@ -137,7 +131,7 @@
     });
   }
 
-  // ---------- calificar un préstamo devuelto / cambiar una calificación ----------
+  // calificar un préstamo devuelto / cambiar una calificación
   const modal = document.getElementById("hsModalCalif");
   if (modal) {
     const botonesEstrella = Array.from(modal.querySelectorAll(".hs-estrella"));
@@ -158,7 +152,7 @@
       5: { txt: "Excelente", icono: "fa-regular fa-face-grin-stars" },
     };
 
-    let actual = null;      // { prestamo, titulo, codigo, categoria, estrellas, modo: "nueva" | "cambio" }
+    let actual = null;
     let elegido = 0;
     let confirmando = false; // en modo "cambio" hay una confirmación antes de enviar
 
@@ -217,7 +211,6 @@
     window.__hsEsc = (e) => { if (e.key === "Escape" && !modal.hidden) cerrar(); };
     document.addEventListener("keydown", window.__hsEsc);
 
-    // "Calificar" (pestaña Préstamos)
     const cuerpo = document.getElementById("hsCuerpo");
     if (cuerpo) {
       cuerpo.addEventListener("click", (e) => {
@@ -228,7 +221,6 @@
                 categoria: c.dataset.categoria, estrellas: 0 });
       });
     }
-    // "Cambiar" (pestaña Calificaciones)
     if (hcCuerpo) {
       hcCuerpo.addEventListener("click", (e) => {
         const boton = e.target.closest(".hs-btn-cambiar");

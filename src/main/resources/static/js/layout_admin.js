@@ -1,12 +1,5 @@
-// =====================================================================
-// NAVEGACIÓN AJAX ENTRE MÓDULOS (sin parpadeo)
-// =====================================================================
-// Idea: NO se toca nada de lo visible hasta que el CSS nuevo ya está descargado.
-//  1) se pide la página,  2) se precarga su CSS sin aplicarlo (media="print"),
-//  3) en un solo paso síncrono: se inserta el HTML, se activa el CSS nuevo y se quita el viejo,
-//  4) recién ahí se carga el JS del módulo.
-// El CSS/JS de cada módulo se lee de la propia página recibida (#dynamic-specific-css / #dynamic-specific-js),
-// así no hay que mantener un mapa a mano y funcionan todos los módulos (devoluciones, panel, etc.).
+// NAVEGACIÓN AJAX ENTRE MÓDULOS (sin parpadeo) Idea: NO se toca nada de lo visible hasta que el CSS nuevo ya está
+// descargado.
 
 let navegacionEnCurso = 0; // token para ignorar respuestas viejas si el usuario hace clic rápido
 
@@ -87,14 +80,12 @@ async function navegarA(url, empujarHistorial) {
     const cssNuevoHref = doc.getElementById("dynamic-specific-css")?.getAttribute("href") || "";
     const jsNuevoSrc = doc.getElementById("dynamic-specific-js")?.getAttribute("src") || "";
 
-    // 1) Descargar el CSS nuevo ANTES de tocar la pantalla
     const linkNuevo = await precargarCss(cssNuevoHref);
     if (miToken !== navegacionEnCurso) {
       if (linkNuevo && linkNuevo.media === "print") linkNuevo.remove();
       return;
     }
 
-    // 2) Cambio atómico (todo en el mismo ciclo: el navegador no pinta nada a medias)
     const linkViejo = document.getElementById("dynamic-specific-css");
     const scriptViejo = document.getElementById("dynamic-specific-js");
 
@@ -115,7 +106,6 @@ async function navegarA(url, empujarHistorial) {
       linkViejo.remove(); // la página nueva no tiene CSS propio
     }
 
-    // 3) JS del módulo (los <script> insertados con innerHTML no se ejecutan, por eso se recrea)
     if (scriptViejo) scriptViejo.remove();
     if (jsNuevoSrc) {
       const s = document.createElement("script");
@@ -128,7 +118,6 @@ async function navegarA(url, empujarHistorial) {
       document.body.appendChild(s);
     }
 
-    // 4) URL y menú activo
     if (empujarHistorial) window.history.pushState({}, "", url);
     marcarMenuActivo(url);
     const area = document.getElementById("mainContent");
@@ -146,10 +135,6 @@ function marcarMenuActivo(url) {
   });
 }
 
-// =====================================================================
-// FUNCIONES NATIVAS GLOBALES
-// =====================================================================
-
 function toggleSidebar() {
   document.getElementById("sidebar").classList.toggle("collapsed");
   document.getElementById("mainContent").classList.toggle("expanded");
@@ -159,6 +144,18 @@ function setActive(element) {
   document.querySelectorAll(".sidebar-nav .nav-item").forEach((i) => i.classList.remove("active"));
   element.classList.add("active");
 }
+
+// Con la membresía suspendida, las acciones que modifican datos abren el plan en lugar de ejecutarse
+document.addEventListener("click", function (e) {
+  if (!e.target.closest(".mb-suspendida")) return;
+  const bloqueado = e.target.closest(
+    ".btn-nuevo-articulo, .btn-portadas, .btn-nuevo-lector, [onclick^='abrirModalEditar'], [onclick^='abrirModalEliminar']," +
+    " #btnSubmitPrestamo, #btnEntregar, [data-requiere-membresia]");
+  if (!bloqueado) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  if (typeof abrirModalPlan === "function") abrirModalPlan();
+}, true);
 
 function abrirModalSuscripcion() {
   document.getElementById("modalSuscripcion").classList.add("active");

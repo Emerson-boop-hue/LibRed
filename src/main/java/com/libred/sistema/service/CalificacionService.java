@@ -9,10 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Calificaciones de los lectores. Solo se puede calificar un préstamo propio que ya fue devuelto,
- * y cada préstamo tiene una única calificación (si el lector la cambia, se reemplaza).
- */
+/** Calificaciones de los lectores. */
 @Service
 public class CalificacionService {
 

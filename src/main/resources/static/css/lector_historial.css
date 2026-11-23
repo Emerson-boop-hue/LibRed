@@ -1,8 +1,6 @@
-/* =====================================================================
-   MÓDULO HISTORIAL DEL LECTOR  (tema azul)
-   ===================================================================== */
+/* MÓDULO HISTORIAL DEL LECTOR (tema azul) */
 
-/* --- RESUMEN --- */
+/* Resumen */
 .hs-kpis {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -18,7 +16,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    box-shadow: var(--shadow-card);
 }
 .hs-kpi span { display: block; font-size: 0.76rem; font-weight: 600; color: var(--text-muted); }
 .hs-kpi strong { font-size: 1.35rem; color: var(--text-dark); }
@@ -41,7 +39,7 @@
 .hs-kpi-icono.verde { background: var(--ok-bg); color: var(--ok-icon); }
 .hs-kpi-icono.rojo { background: var(--danger-bg); color: var(--danger-icon); }
 
-/* --- TARJETA CON PESTAÑAS --- */
+/* Tarjeta con pestañas */
 /* La página no se desplaza: la tarjeta ocupa el alto disponible y solo la tabla tiene scroll */
 .lector-container:has(> .hs-card) { overflow: hidden; }
 
@@ -54,7 +52,7 @@
     border: 1px solid var(--sidebar-border);
     border-radius: 14px;
     padding: 4px 22px 18px 22px;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    box-shadow: var(--shadow-card);
 }
 
 .hs-tabs {
@@ -103,7 +101,7 @@
 .hs-panel[hidden] { display: none; }
 .hs-panel:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
-/* --- FILTROS --- */
+/* Filtros */
 .hs-filtros {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr auto;
@@ -149,7 +147,7 @@
 .hs-resumen { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
 .hs-resumen strong { color: var(--primary); font-size: 1rem; }
 
-/* --- TABLAS --- */
+/* Tablas */
 .hs-tabla-wrap {
     /* La tabla tiene su propio scroll: la pantalla no crece, solo se desplazan las filas */
     flex: 1;
@@ -204,13 +202,15 @@
 .hs-estado.e-activo { background: var(--info-bg); color: var(--info-text); }
 .hs-estado.e-vencido { background: var(--danger-bg); color: var(--danger-text); }
 .hs-estado.e-devuelto { background: var(--ok-bg); color: var(--ok-text); }
+.hs-estado.e-por_entregar { background: var(--warn-bg); color: var(--warn-text); }
+.hs-estado.e-cancelado { background: var(--surface-2); color: var(--text-muted); }
 
-/* --- ESTADOS VACÍOS --- */
+/* Estados vacíos */
 .hs-vacio { text-align: center; color: var(--text-muted); padding: 34px 10px; }
 .hs-vacio i { font-size: 2rem; color: var(--faint); margin-bottom: 8px; display: block; }
 .hs-vacio[hidden] { display: none; }
 
-/* --- ADAPTACIÓN A PANTALLAS PEQUEÑAS --- */
+/* Adaptación a pantallas pequeñas */
 @media (max-width: 1000px) {
     .hs-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .hs-filtros, .hs-filtros.hs-filtros-multas { grid-template-columns: 1fr 1fr; }
@@ -226,9 +226,7 @@
     .hs-card { flex: none; min-height: 460px; }
 }
 
-/* =====================================================================
-   CALIFICACIÓN DE PRÉSTAMOS DEVUELTOS
-   ===================================================================== */
+/* Calificación de préstamos devueltos */
 .hs-calif { margin-top: 7px; }
 
 /* Estrellas "de solo lectura": se pintan hasta el porcentaje --p (sin necesitar iconos) */
@@ -237,7 +235,7 @@
     font-size: 1.05rem;
     letter-spacing: 1px;
     line-height: 1;
-    background: linear-gradient(90deg, #f59e0b var(--p), var(--star-off) var(--p));
+    background: linear-gradient(90deg, var(--star-on) var(--p), var(--star-off) var(--p));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -249,8 +247,8 @@
     font-family: inherit;
     font-size: 0.74rem;
     font-weight: 700;
-    color: #92400e;
-    background: linear-gradient(135deg, #fde68a, #fbbf24);
+    color: var(--warn-text);
+    background: var(--warn-bg);
     border: none;
     border-radius: 999px;
     padding: 6px 13px;
@@ -261,7 +259,7 @@
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
     animation: hsLate 1.6s ease-in-out infinite;
 }
-.hs-btn-calificar i { color: #b45309; }
+.hs-btn-calificar i { color: var(--warn-accent); }
 .hs-btn-calificar:hover { animation-play-state: paused; transform: scale(1.08); }
 @keyframes hsLate {
     0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35); }
@@ -279,7 +277,7 @@
     gap: 8px;
 }
 
-/* --- Ventana de calificación --- */
+/* Ventana de calificación */
 .hs-modal {
     position: fixed; inset: 0; z-index: 1000; background: rgba(15, 27, 61, 0.55);
     display: flex; align-items: center; justify-content: center; padding: 16px;
@@ -298,12 +296,12 @@
 .hs-modal-sub { font-size: 0.85rem; color: var(--text-muted); margin: 6px 0 14px; }
 .hs-modal-sub strong { color: var(--text-dark); }
 
-.hs-cara { font-size: 3.4rem; line-height: 1; color: #94a3b8; margin: 6px 0 10px; transition: color .15s, transform .15s; }
-.hs-cara[data-nivel="1"] { color: #dc2626; transform: scale(1.05); }
-.hs-cara[data-nivel="2"] { color: #ea580c; transform: scale(1.05); }
-.hs-cara[data-nivel="3"] { color: #ca8a04; transform: scale(1.05); }
-.hs-cara[data-nivel="4"] { color: #65a30d; transform: scale(1.08); }
-.hs-cara[data-nivel="5"] { color: #16a34a; transform: scale(1.12); }
+.hs-cara { font-size: 3.4rem; line-height: 1; color: var(--faint); margin: 6px 0 10px; transition: color .15s, transform .15s; }
+.hs-cara[data-nivel="1"] { color: var(--st-bad); transform: scale(1.05); }
+.hs-cara[data-nivel="2"] { color: var(--st-warn); transform: scale(1.05); }
+.hs-cara[data-nivel="3"] { color: #b8962e; transform: scale(1.05); }
+.hs-cara[data-nivel="4"] { color: #7a9a3c; transform: scale(1.08); }
+.hs-cara[data-nivel="5"] { color: var(--st-ok); transform: scale(1.12); }
 
 .hs-estrellas-input { display: flex; justify-content: center; gap: 6px; }
 .hs-estrella {
@@ -311,7 +309,7 @@
     transition: transform .12s, color .12s;
 }
 .hs-estrella:hover { transform: scale(1.18); }
-.hs-estrella.on { color: #f59e0b; }
+.hs-estrella.on { color: var(--star-on); }
 .hs-etiqueta { margin: 10px 0 4px; min-height: 1.4em; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); }
 .hs-etiqueta.elegida { color: var(--text-dark); }
 .hs-calif-error { margin-top: 8px; font-size: 0.82rem; color: var(--danger-text); }
@@ -336,7 +334,7 @@
     .hs-btn-calificar { animation: none; }
 }
 
-/* --- Pestaña Calificaciones --- */
+/* Pestaña Calificaciones */
 .hs-filtros.hs-filtros-calif { grid-template-columns: 2fr 1.2fr 1.2fr auto; }
 .oculto { display: none !important; }
 .hc-nota { white-space: nowrap; }

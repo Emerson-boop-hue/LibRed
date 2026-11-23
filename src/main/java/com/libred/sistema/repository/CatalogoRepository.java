@@ -7,13 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-/**
- * Consultas del CATÁLOGO DEL LECTOR (solo lectura).
- * Trabaja sobre la misma tabla "recurso" que usa el inventario del admin, pero con su propio repositorio
- * para no mezclar los dos módulos.
- *
- * Los filtros llegan SIEMPRE como texto (vacío = "no filtrar"), así no hay parámetros nulos en la consulta.
- */
+/** Consultas del CATÁLOGO DEL LECTOR (solo lectura). */
 public interface CatalogoRepository extends JpaRepository<Recurso, Integer> {
 
     @Query("""

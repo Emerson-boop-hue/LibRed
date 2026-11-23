@@ -17,6 +17,18 @@
   <body>
     <div class="dashboard-container" data-css="prestamos.css">
 
+      <div class="pr-tabs" role="tablist">
+        <button type="button" class="pr-tab activa" data-tab="nuevo" role="tab">
+          <i class="fa-solid fa-book-open-reader"></i> Nuevo préstamo
+        </button>
+        <button type="button" class="pr-tab" data-tab="entrega" role="tab">
+          <i class="fa-solid fa-hand-holding-hand"></i> Por entregar
+          <span class="pr-tab-num" id="prNumPedidos" th:text="${#lists.size(pedidos)}">0</span>
+        </button>
+      </div>
+
+      <!-- Pestaña: nuevo préstamo -->
+      <div class="pr-tabpanel" id="prTabNuevo">
       <form th:action="@{/admin/prestamos/guardar}" method="post" id="formPrestamo" class="pr-panel"
             th:attr="data-max-dias=${maxDias}, data-max-activos=${maxActivos != null ? maxActivos : ''}">
 
@@ -39,11 +51,14 @@
 
         <div class="pr-grid">
 
-          <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+          <!-- Columna izquierda: formulario -->
           <div class="pr-col-form">
 
             <div class="pr-campo">
-              <label for="selectLector"><span class="pr-num">1</span> Lector</label>
+              <div class="pr-lector-cab">
+                <label for="selectLector"><span class="pr-num">1</span> Lector</label>
+                <span id="lectorChip" class="pr-chip" hidden></span>
+              </div>
               <select id="selectLector" name="lectorId" class="pr-control" required>
                 <option value="" disabled selected>Seleccione un lector</option>
                 <option th:each="l : ${lectores}"
@@ -52,11 +67,10 @@
                         th:data-codigo="${l.codigoLector}"
                         th:data-estado="${l.estadoCuenta}"
                         th:data-activos="${enCursoPorLector[l.id] != null ? enCursoPorLector[l.id] : 0}"
-                        th:classappend="${l.estadoCuenta == 'SANCIONADO'} ? 'op-sancionado'"
-                        th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + (l.estadoCuenta == 'SANCIONADO' ? ' (SANCIONADO)' : '')}">
+                        th:classappend="${l.estadoCuenta == 'BLOQUEADO'} ? 'op-bloqueado'"
+                        th:text="${l.codigoLector + ' - ' + l.nombres + ' ' + l.apellidos + (l.estadoCuenta == 'BLOQUEADO' ? ' (BLOQUEADO)' : '')}">
                 </option>
               </select>
-              <div id="lectorChip" class="pr-chip" hidden></div>
             </div>
 
             <div class="pr-fila-2">
@@ -105,7 +119,6 @@
               <div class="pr-calc-card pr-calc-total"><span>Servicio total</span><strong id="calcTotal">--</strong></div>
             </div>
 
-            <!-- Alertas -->
             <div class="pr-alertas">
               <div id="alertaValidacion" class="pr-alerta" hidden></div>
               <div th:if="${error}" class="pr-alerta pr-alerta-error" th:text="${error}"></div>
@@ -121,30 +134,26 @@
             </div>
           </div>
 
-          <!-- COLUMNA DERECHA: COMPROBANTE -->
+          <!-- Columna derecha: comprobante -->
           <div class="pr-col-ticket">
             <div class="ticket-container">
               <div class="ticket-header">
-                <i class="fa-solid fa-receipt"></i>
                 <h4>Comprobante de préstamo</h4>
                 <span>Se actualiza mientras completas los datos</span>
               </div>
               <div class="ticket-body">
-                <div class="ticket-seccion">Lector</div>
-                <div class="ticket-row"><span>Nombre</span><span id="resumenLectorNombre">--</span></div>
-                <div class="ticket-row"><span>Código</span><span id="resumenLectorCodigo">--</span></div>
-
-                <div class="ticket-seccion">Artículo</div>
-                <div class="ticket-row"><span>Título</span><span id="resumenArticuloTitulo">--</span></div>
-                <div class="ticket-row"><span>Código</span><span id="resumenArticuloCodigo">--</span></div>
-                <div class="ticket-row"><span>Categoría</span><span id="resumenCategoria">--</span></div>
-
-                <div class="ticket-seccion">Plazo y servicio</div>
-                <div class="ticket-row"><span>F. préstamo</span><span id="resumenFechaPrestamo">--</span></div>
-                <div class="ticket-row"><span>F. límite</span><span id="resumenFechaLimite" class="ticket-resalte">--</span></div>
-                <div class="ticket-row"><span>Días</span><span id="resumenDias">--</span></div>
-                <div class="ticket-row"><span>Tarifa por día</span><span id="resumenTarifa">--</span></div>
-                <div class="ticket-row ticket-total"><span>Servicio a cobrar</span><span id="resumenTotal">--</span></div>
+                <div class="ticket-row"><span>Lector</span><strong id="resumenLectorNombre">--</strong></div>
+                <div class="ticket-row"><span>Código lector</span><strong id="resumenLectorCodigo">--</strong></div>
+                <div class="ticket-sep"></div>
+                <div class="ticket-row"><span>Artículo</span><strong id="resumenArticuloTitulo">--</strong></div>
+                <div class="ticket-row"><span>Código artículo</span><strong id="resumenArticuloCodigo">--</strong></div>
+                <div class="ticket-row"><span>Categoría</span><strong id="resumenCategoria">--</strong></div>
+                <div class="ticket-sep"></div>
+                <div class="ticket-row"><span>F. préstamo</span><strong id="resumenFechaPrestamo">--</strong></div>
+                <div class="ticket-row"><span>Último día de devolución</span><strong id="resumenFechaLimite" class="ticket-resalte">--</strong></div>
+                <div class="ticket-row"><span>Días de préstamo</span><strong id="resumenDias">--</strong></div>
+                <div class="ticket-row"><span>Tarifa por día</span><strong id="resumenTarifa">--</strong></div>
+                <div class="ticket-row ticket-total"><span>Servicio a cobrar</span><strong id="resumenTotal">--</strong></div>
                 <p class="ticket-nota"><i class="fa-solid fa-circle-info"></i> El servicio se cancela en la librería al entregar el artículo.</p>
               </div>
             </div>
@@ -163,6 +172,153 @@
               th:data-stock="${a.stock}"></li>
         </ul>
       </form>
+      </div>
+
+      <!-- Pestaña: por entregar -->
+      <div class="pr-tabpanel" id="prTabEntrega" hidden>
+        <div class="pe-layout">
+
+          <section class="pe-izquierda">
+            <!-- Solo se muestra si falla la entrega o la cancelación -->
+            <div class="pe-aviso pe-aviso-error" th:if="${errorEntrega}"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorEntrega}">Error.</span></div>
+
+            <div class="pe-filtros">
+              <div class="pe-buscador">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="buscarPedido" placeholder="Buscar por lector, artículo o código..." autocomplete="off" />
+              </div>
+              <button type="button" class="pe-btn-limpiar inactivo" id="btnLimpiarBusquedaPedido">
+                <i class="fa-solid fa-eraser"></i> Limpiar
+              </button>
+              <span class="pe-resumen" id="peResumen"></span>
+            </div>
+
+            <div class="pe-tabla-caja">
+              <table class="pe-tabla">
+                <thead>
+                  <tr>
+                    <th>Lector</th>
+                    <th>Artículo</th>
+                    <th>Pedido</th>
+                    <th class="pe-col-dias">Días</th>
+                    <th class="pe-col-monto">Servicio</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyPedidos">
+                  <tr th:if="${pedidos.isEmpty()}">
+                    <td colspan="5" class="pe-vacio">No hay pedidos pendientes de entrega.</td>
+                  </tr>
+                  <tr th:each="p : ${pedidos}"
+                      class="pe-fila"
+                      th:data-id="${p.id}"
+                      th:data-lector="${p.lector != null ? p.lector.nombres + ' ' + p.lector.apellidos : 'Sin Lector'}"
+                      th:data-codlector="${p.lector != null ? p.lector.codigoLector : ''}"
+                      th:data-articulo="${p.recurso != null ? p.recurso.titulo : 'Sin Artículo'}"
+                      th:data-codarticulo="${p.recurso != null ? p.recurso.codigo : ''}"
+                      th:data-pedido="${p.fechaPrestamo != null ? #temporals.format(p.fechaPrestamo, 'dd/MM/yyyy HH:mm') : ''}"
+                      th:data-dias="${p.diasPrestamo}"
+                      th:data-tarifa="${p.tarifaDia}"
+                      th:data-monto="${p.montoServicio}">
+                    <td>
+                      <div class="pe-celda">
+                        <span class="pe-principal" th:text="${p.lector != null ? p.lector.nombres + ' ' + p.lector.apellidos : 'Sin Lector'}">Nombre Lector</span>
+                        <span class="pe-sub" th:text="${p.lector != null ? p.lector.codigoLector : ''}">LEC-1001</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="pe-celda" th:if="${p.recurso != null}">
+                        <span class="pe-principal" th:text="${p.recurso.titulo}">Título</span>
+                        <span class="pe-sub" th:text="${p.recurso.codigo}">LIB-001</span>
+                      </div>
+                    </td>
+                    <td class="pe-chip-fecha" th:text="${p.fechaPrestamo != null ? #temporals.format(p.fechaPrestamo, 'dd/MM/yyyy HH:mm') : '—'}">11/11/2026 10:00</td>
+                    <td class="pe-col-dias" th:text="${p.diasPrestamo}">3</td>
+                    <td class="pe-col-monto"><strong th:text="${'S/. ' + #numbers.formatDecimal(p.montoServicio != null ? p.montoServicio : 0, 1, 'NONE', 2, 'POINT')}">S/. 0.00</strong></td>
+                  </tr>
+                  <tr id="filaSinResultadosPedido" hidden>
+                    <td colspan="5" class="pe-vacio">Sin resultados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="pe-derecha">
+            <div class="pe-card pe-comprobante">
+              <div class="pe-card-cabecera">
+                <h3>Comprobante de entrega</h3>
+                <span>Se actualiza al elegir un pedido de la tabla</span>
+              </div>
+
+              <div class="pe-vacio-comp" id="peSinSeleccion">
+                <i class="fa-solid fa-hand-holding-hand"></i>
+                <p>Selecciona un pedido de la tabla</p>
+              </div>
+
+              <div class="pe-ticket" id="peTicket" hidden>
+                <div class="pe-dato"><span>Lector</span><strong id="sumLector">--</strong></div>
+                <div class="pe-dato"><span>Código lector</span><strong id="sumCodLector">--</strong></div>
+                <div class="pe-sep"></div>
+                <div class="pe-dato"><span>Artículo</span><strong id="sumArticulo">--</strong></div>
+                <div class="pe-dato"><span>Código artículo</span><strong id="sumCodArticulo">--</strong></div>
+                <div class="pe-sep"></div>
+                <div class="pe-dato"><span>Pedido el</span><strong id="sumPedido">--</strong></div>
+                <div class="pe-dato"><span>Días de préstamo</span><strong id="sumDias">--</strong></div>
+                <div class="pe-dato"><span>Tarifa por día</span><strong id="sumTarifa">--</strong></div>
+                <div class="pe-dato"><span>Último día de devolución</span><strong id="sumLimite">--</strong></div>
+                <div class="pe-dato pe-total"><span>Total a cobrar</span><strong id="sumMonto">--</strong></div>
+              </div>
+
+              <div class="pe-descarga" id="peDescarga" hidden>
+                <a class="pe-btn-sec" id="peBtnComprobante" href="#" th:unless="${membresia != null and membresia.suspendida}"><i class="fa-solid fa-file-pdf"></i> Descargar comprobante</a>
+                <button type="button" class="pe-btn-sec" disabled th:if="${membresia != null and membresia.suspendida}"><i class="fa-solid fa-lock"></i> Descargar comprobante</button>
+              </div>
+
+              <div class="pe-pie">
+                <button type="button" class="pe-btn-peligro" id="btnCancelarPedido" disabled>Cancelar pedido</button>
+                <button type="button" class="pe-btn-pri" id="btnEntregar" disabled>Entregar y cobrar</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Confirmación de entrega y cobro -->
+        <div id="peModalEntrega" class="pe-overlay" hidden>
+          <div class="pe-modal" role="dialog" aria-modal="true" aria-labelledby="peTituloEntrega">
+            <h3 id="peTituloEntrega">Confirmar entrega</h3>
+            <p class="pe-modal-sub">Se entrega el artículo y se cobra el servicio.</p>
+            <div class="pe-modal-detalle">
+              <div><span>Lector</span><strong id="enLector">--</strong></div>
+              <div><span>Artículo</span><strong id="enArticulo">--</strong></div>
+              <div><span>Último día de devolución</span><strong id="enLimite">--</strong></div>
+              <div class="pe-modal-total"><span>Total a cobrar</span><strong id="enMonto">--</strong></div>
+            </div>
+            <div class="pe-modal-botones">
+              <button type="button" class="pe-btn-sec" id="btnVolverEntrega">Volver</button>
+              <button type="button" class="pe-btn-pri" id="btnConfirmarEntrega">Confirmar entrega</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirmación de cancelación -->
+        <div id="peModalCancelar" class="pe-overlay" hidden>
+          <div class="pe-modal" role="dialog" aria-modal="true" aria-labelledby="peTituloCancelar">
+            <h3 id="peTituloCancelar">Cancelar pedido</h3>
+            <p class="pe-modal-sub">El artículo volverá al stock disponible y no se cobrará nada.</p>
+            <div class="pe-modal-detalle">
+              <div><span>Lector</span><strong id="caLector">--</strong></div>
+              <div><span>Artículo</span><strong id="caArticulo">--</strong></div>
+            </div>
+            <div class="pe-modal-botones">
+              <button type="button" class="pe-btn-sec" id="btnVolverCancelar">Volver</button>
+              <button type="button" class="pe-btn-peligro" id="btnConfirmarCancelar">Cancelar pedido</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario oculto: se envía por POST con la acción del pedido elegido -->
+        <form id="peFormAccion" method="post" hidden></form>
+      </div>
 
       <!-- VENTANA DE CONFIRMACIÓN (tras registrar) -->
       <div th:if="${prestamoOk != null}" class="pr-modal" id="prModalOk">
@@ -177,6 +333,9 @@
             <div><span>Devolver hasta</span><strong th:text="${prestamoOk['fechaLimite']}">--</strong></div>
             <div class="pr-modal-total"><span>Servicio a cobrar</span><strong th:text="${prestamoOk['monto']}">S/ 0.00</strong></div>
           </div>
+          <a class="pr-btn-descarga" th:unless="${membresia != null and membresia.suspendida}"
+             th:href="@{/admin/prestamos/{id}/comprobante.pdf(id=${prestamoOk['id']})}"><i class="fa-solid fa-file-pdf"></i> Descargar comprobante</a>
+          <button type="button" class="pr-btn-descarga" disabled th:if="${membresia != null and membresia.suspendida}"><i class="fa-solid fa-lock"></i> Descargar comprobante</button>
           <button type="button" class="pr-btn-confirmar" id="prModalCerrar"><i class="fa-solid fa-check"></i> Entendido</button>
         </div>
       </div>

@@ -2,6 +2,7 @@ package com.libred.sistema.model;
 
 import jakarta.persistence.*;
 
+/** Artículo del inventario de una librería. */
 @Entity
 @Table(name = "recurso")
 public class Recurso {
@@ -36,9 +37,9 @@ public class Recurso {
     @Column(length = 50)
     private String estado = "DISPONIBLE";
 
-    // ==========================================
-    // GETTERS Y SETTERS
-    // ==========================================
+    // Nombre del archivo de la imagen del artículo (carpeta libred-uploads). Null = sin imagen
+    @Column(name = "imagen", length = 255)
+    private String imagen;
 
     public Integer getId() {
         return id;
@@ -110,5 +111,18 @@ public class Recurso {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
+    }
+
+    // Dato calculado (no se guarda): dirección web de la imagen, o null si el artículo no tiene
+    public String getImagenUrl() {
+        return (imagen == null || imagen.isBlank()) ? null : "/media/articulos/" + imagen;
     }
 }

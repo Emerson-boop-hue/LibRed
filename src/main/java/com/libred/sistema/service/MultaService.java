@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/** Reglas de negocio de las multas. */
 @Service
 public class MultaService {
 
@@ -56,7 +57,6 @@ public class MultaService {
 
         Multa multaGuardada;
 
-        // 1. EDICIÓN DIRECTA POR ID (solo si la multa es de esta librería)
         if (multa.getId() != null) {
             Optional<Multa> existenteOpt = multaRepository.findById(multa.getId());
             if (existenteOpt.isPresent()) {
@@ -72,7 +72,6 @@ public class MultaService {
             }
         }
 
-        // 2. VALIDAR QUE LECTOR Y PRÉSTAMO SEAN DE ESTA LIBRERÍA
         if (multa.getLector() == null || multa.getLector().getId() == null) {
             throw new IllegalArgumentException("Selecciona un lector.");
         }
@@ -92,7 +91,6 @@ public class MultaService {
             throw new IllegalArgumentException("El préstamo seleccionado no pertenece a tu librería.");
         }
 
-        // 3. SOBREESCRIBIR SI YA EXISTE MULTA PENDIENTE EN ESTE PRÉSTAMO (solo de esta librería)
         List<Multa> pendientes = multaRepository.findByLibreriaIdAndEstadoPago(libId, "PENDIENTE");
         for (Multa mExistente : pendientes) {
             if (mExistente.getPrestamo() != null && mExistente.getPrestamo().getId().equals(prestamoBD.getId())) {
@@ -104,7 +102,6 @@ public class MultaService {
             }
         }
 
-        // 4. REGISTRO NUEVO (siempre queda ligado a la librería de la sesión)
         multa.setLibreriaId(libId);
         multa.setLector(lectorBD);
         multa.setPrestamo(prestamoBD);
@@ -140,7 +137,7 @@ public class MultaService {
             Lector lectorCompleto = lectorRepository.findById(lectorFront.getId()).orElse(null);
             if (lectorCompleto != null) {
                 boolean tienePendientes = multaRepository.existsByLectorIdAndEstadoPago(lectorCompleto.getId(), "PENDIENTE");
-                String estadoReal = tienePendientes ? "SANCIONADO" : "HABILITADO";
+                String estadoReal = tienePendientes ? "BLOQUEADO" : "HABILITADO";
                 if (!estadoReal.equals(lectorCompleto.getEstadoCuenta())) {
                     lectorCompleto.setEstadoCuenta(estadoReal);
                     lectorRepository.save(lectorCompleto);

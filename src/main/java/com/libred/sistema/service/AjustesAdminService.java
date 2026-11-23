@@ -1,37 +1,31 @@
 package com.libred.sistema.service;
 
 import com.libred.sistema.model.Libreria;
-import com.libred.sistema.model.TarjetaPago;
 import com.libred.sistema.repository.LibreriaRepository;
-import com.libred.sistema.repository.TarjetaPagoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.YearMonth;
-import java.util.Optional;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+import com.libred.sistema.util.PasswordUtil;
 
-/**
- * Ajustes del administrador: datos de la librería, contraseña y método de pago (tarjeta).
- */
+/** Ajustes del administrador: datos de la librería, política de préstamos y contraseña. */
 @Service
 public class AjustesAdminService {
 
     // Mismas reglas de contraseña que el registro de la librería (SuscripcionService)
-    private static final int PASSWORD_MIN = 4;
-    private static final int PASSWORD_MAX = 6;
+    private static final int PASSWORD_MIN = 8;
+    private static final int PASSWORD_MAX = 20;
 
     private static final Pattern CORREO = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
-    private static final Pattern TITULAR = Pattern.compile("^[\\p{L}][\\p{L} .'’-]{2,99}$");
-    private static final Set<String> MARCAS = Set.of("VISA", "MASTERCARD", "TARJETA");
 
     private final LibreriaRepository libreriaRepository;
-    private final TarjetaPagoRepository tarjetaPagoRepository;
 
-    public AjustesAdminService(LibreriaRepository libreriaRepository, TarjetaPagoRepository tarjetaPagoRepository) {
+    public AjustesAdminService(LibreriaRepository libreriaRepository) {
         this.libreriaRepository = libreriaRepository;
-        this.tarjetaPagoRepository = tarjetaPagoRepository;
     }
 
     public Libreria obtenerLibreria(Integer libreriaId) {
@@ -39,13 +33,28 @@ public class AjustesAdminService {
                 .orElseThrow(() -> new AjustesException(null, "No se encontró la librería."));
     }
 
-    public Optional<TarjetaPago> obtenerTarjeta(Integer libreriaId) {
-        return tarjetaPagoRepository.findByLibreriaId(libreriaId);
+    /**
+     * Qué tan completo está el perfil de la librería en Ajustes: teléfono, correo de contacto, horario y descripción
+     * (25 % cada uno). No mira libros ni préstamos.
+     */
+    public Map<String, Object> completitud(Libreria l) {
+        List<String> faltan = new ArrayList<>();
+        if (vacio(l.getTelefonoContacto())) faltan.add("Teléfono de contacto");
+        if (vacio(l.getCorreoContacto())) faltan.add("Correo de contacto");
+        if (vacio(l.getHorarioAtencion())) faltan.add("Horario de atención");
+        if (vacio(l.getDescripcion())) faltan.add("Descripción");
+        int total = 4;
+        Map<String, Object> r = new LinkedHashMap<>();
+        r.put("porcentaje", (total - faltan.size()) * 100 / total);
+        r.put("faltan", faltan);
+        r.put("completo", faltan.isEmpty());
+        return r;
     }
 
-    // ------------------------------------------------------------------
-    // DATOS DE LA LIBRERÍA
-    // ------------------------------------------------------------------
+    private boolean vacio(String texto) {
+        return texto == null || texto.isBlank();
+    }
+
     @Transactional
     public Libreria actualizarDatos(Integer libreriaId, String nombreComercial, String ruc, String direccion,
                                     String telefono, String correo,
@@ -100,14 +109,11 @@ public class AjustesAdminService {
         return libreriaRepository.save(l);
     }
 
-    // ------------------------------------------------------------------
-    // CONTRASEÑA DEL ADMINISTRADOR
-    // ------------------------------------------------------------------
     @Transactional
     public void cambiarPassword(Integer libreriaId, String actualPassword, String nueva, String confirmar) {
         Libreria l = obtenerLibreria(libreriaId);
 
-        if (actualPassword == null || !actualPassword.equals(l.getPassword())) {
+        if (!PasswordUtil.coincide(actualPassword, l.getPassword())) {
             throw new AjustesException("passwordActual", "La contraseña actual no es correcta.");
         }
         if (nueva == null || nueva.length() < PASSWORD_MIN || nueva.length() > PASSWORD_MAX) {
@@ -117,69 +123,15 @@ public class AjustesAdminService {
         if (nueva.contains(" ")) {
             throw new AjustesException("passwordNueva", "La contraseña no puede tener espacios.");
         }
-        if (nueva.equals(l.getPassword())) {
+        if (PasswordUtil.coincide(nueva, l.getPassword())) {
             throw new AjustesException("passwordNueva", "La nueva contraseña debe ser distinta a la actual.");
         }
         if (!nueva.equals(confirmar)) {
             throw new AjustesException("passwordConfirmar", "Las contraseñas no coinciden.");
         }
 
-        l.setPassword(nueva);
+        l.setPassword(PasswordUtil.hash(nueva));
         libreriaRepository.save(l);
-    }
-
-    // ------------------------------------------------------------------
-    // MÉTODO DE PAGO (TARJETA): se crea o se reemplaza la tarjeta de la librería
-    // El navegador solo envía marca, últimos 4 dígitos, titular y vencimiento.
-    // ------------------------------------------------------------------
-    @Transactional
-    public TarjetaPago guardarTarjeta(Integer libreriaId, String titular, String marca, String ultimosDigitos,
-                                      String venceMes, String venceAnio) {
-        obtenerLibreria(libreriaId);
-
-        String tit = limpiar(titular).replaceAll("\\s+", " ");
-        if (!TITULAR.matcher(tit).matches()) {
-            throw new AjustesException("titular", "Ingresa el nombre del titular tal como aparece en la tarjeta.");
-        }
-
-        String marcaLimpia = limpiar(marca).toUpperCase();
-        if (!MARCAS.contains(marcaLimpia)) {
-            marcaLimpia = "TARJETA";
-        }
-
-        String ultimos = limpiar(ultimosDigitos);
-        if (!ultimos.matches("\\d{4}")) {
-            throw new AjustesException("numero", "Número de tarjeta inválido.");
-        }
-
-        int mes;
-        int anio;
-        try {
-            mes = Integer.parseInt(limpiar(venceMes));
-            anio = Integer.parseInt(limpiar(venceAnio));
-        } catch (NumberFormatException e) {
-            throw new AjustesException("vence", "Fecha de vencimiento inválida (MM/AA).");
-        }
-        if (mes < 1 || mes > 12 || anio < 2000 || anio > 2100) {
-            throw new AjustesException("vence", "Fecha de vencimiento inválida (MM/AA).");
-        }
-        if (YearMonth.of(anio, mes).isBefore(YearMonth.now())) {
-            throw new AjustesException("vence", "La tarjeta está vencida.");
-        }
-
-        TarjetaPago tarjeta = tarjetaPagoRepository.findByLibreriaId(libreriaId).orElseGet(TarjetaPago::new);
-        tarjeta.setLibreriaId(libreriaId);
-        tarjeta.setTitular(tit.toUpperCase());
-        tarjeta.setMarca(marcaLimpia);
-        tarjeta.setUltimosDigitos(ultimos);
-        tarjeta.setVenceMes(mes);
-        tarjeta.setVenceAnio(anio);
-        return tarjetaPagoRepository.save(tarjeta);
-    }
-
-    @Transactional
-    public void quitarTarjeta(Integer libreriaId) {
-        tarjetaPagoRepository.findByLibreriaId(libreriaId).ifPresent(tarjetaPagoRepository::delete);
     }
 
     private String limpiar(String texto) {

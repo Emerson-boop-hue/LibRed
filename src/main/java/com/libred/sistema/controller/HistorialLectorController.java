@@ -7,8 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * Módulo HISTORIAL del lector (solo consulta): /lector/historial
- * El interceptor de WebConfig garantiza que hay un lector en la sesión.
+ * Módulo HISTORIAL del lector (solo consulta): /lector/historial El interceptor de WebConfig garantiza que hay un
+ * lector en la sesión.
  */
 @Controller
 public class HistorialLectorController {

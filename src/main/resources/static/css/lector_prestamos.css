@@ -1,32 +1,22 @@
-/* =====================================================================
-   MÓDULO PRÉSTAMOS DEL LECTOR  (tema azul)
-   ===================================================================== */
+/* MÓDULO PRÉSTAMOS DEL LECTOR (tema azul) */
 
-/* --- AVISO DE BLOQUEO --- */
+/* MOTIVO DEL BLOQUEO: texto simple bajo el botón deshabilitado, con el triángulo de alerta (sin caja ni fondo) */
 .pl-aviso {
+    margin: 10px 2px 0;
     display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--warn-bg);
-    border: 1px solid var(--warn-border);
-    color: var(--warn-text);
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 0.86rem;
-    font-weight: 600;
-    margin-bottom: 16px;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    text-align: left;
+    color: var(--text-muted);
 }
-.pl-aviso i { font-size: 1.05rem; }
+.pl-aviso i { font-size: 0.95rem; margin-top: 1px; flex-shrink: 0; color: var(--warn-accent); }
+.pl-aviso.bloqueado { color: var(--danger-text); }
+.pl-aviso.bloqueado i { color: var(--danger-icon); }
 
-/* Cuenta SANCIONADA: aviso en rojo para dar más énfasis */
-.pl-aviso.sancionado {
-    background: #dc2626;
-    border-color: #b91c1c;
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
-}
-
-/* --- DISTRIBUCIÓN: formulario + comprobante --- */
+/* DISTRIBUCIÓN: formulario + comprobante */
 .pl-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
@@ -39,7 +29,7 @@
     border: 1px solid var(--sidebar-border);
     border-radius: 14px;
     padding: 22px 24px;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    box-shadow: var(--shadow-card);
 }
 
 .pl-card-head {
@@ -66,7 +56,7 @@
     font-size: 1.05rem;
 }
 
-/* --- CAMPOS --- */
+/* Campos */
 .pl-campo {
     display: flex;
     flex-direction: column;
@@ -97,7 +87,7 @@
     box-shadow: 0 0 0 3px var(--focus-ring);
 }
 .pl-campo select:disabled { background: var(--surface-2); color: var(--text-muted); cursor: not-allowed; }
-.pl-campo .con-error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+.pl-campo .con-error { border-color: var(--st-bad); box-shadow: 0 0 0 3px rgba(185, 82, 76, 0.12); }
 .pl-solo-lectura { background: var(--surface-2) !important; color: var(--text-dark); font-weight: 600; cursor: default; }
 .pl-ayuda { font-size: 0.76rem; color: var(--text-muted); }
 .pl-ayuda strong { color: var(--primary); }
@@ -108,7 +98,7 @@
     gap: 14px;
 }
 
-/* --- VALORES CALCULADOS --- */
+/* Valores calculados */
 .pl-calculo {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -129,7 +119,7 @@
 .pl-dato.destacado { background: var(--primary-soft); border-color: var(--primary-soft-border); }
 .pl-dato.destacado strong { color: var(--primary-strong); font-size: 1.1rem; }
 
-/* --- ERROR Y BOTONES --- */
+/* Error y botones */
 .pl-error {
     background: var(--danger-bg);
     color: var(--danger-text);
@@ -146,7 +136,7 @@
 .pl-acciones .btn-primario { flex: 1; justify-content: center; }
 .pl-acciones .btn-primario:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* --- COMPROBANTE --- */
+/* Comprobante */
 .pl-ticket {
     background: var(--surface-soft);
     border: 1px dashed var(--faint);
@@ -198,7 +188,7 @@
 }
 .pl-ticket-nota i { color: var(--primary); margin-right: 4px; }
 
-/* --- CONTADOR DE PRÉSTAMOS ACTIVOS --- */
+/* Contador de préstamos activos */
 .pl-contador {
     margin-left: auto;
     background: var(--primary-soft);
@@ -212,7 +202,7 @@
 .pl-contador i { margin-right: 4px; }
 .pl-contador.lleno { background: var(--danger-bg); color: var(--danger-text); }
 
-/* --- MODAL DE ÉXITO --- */
+/* Modal de éxito */
 .pl-modal-box { text-align: center; padding: 6px; }
 .pl-modal-icono {
     width: 58px;
@@ -254,10 +244,12 @@
 .pl-modal-nota { font-size: 0.78rem; color: var(--text-muted); margin: 12px 0 16px 0; }
 .pl-modal-box .btn-primario { width: 100%; justify-content: center; }
 
-/* --- ADAPTACIÓN A PANTALLAS PEQUEÑAS --- */
+/* Adaptación a pantallas pequeñas */
 @media (max-width: 1000px) {
     .pl-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
     .pl-fila-doble, .pl-calculo { grid-template-columns: 1fr; }
 }
+.pl-btn-descarga { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; margin-bottom: 8px; text-decoration: none; }
+.pl-btn-descarga:disabled { opacity: .5; cursor: not-allowed; }

@@ -1,7 +1,6 @@
 package com.libred.sistema.controller;
 
 import com.libred.sistema.model.Libreria;
-import com.libred.sistema.model.TarjetaPago;
 import com.libred.sistema.service.AjustesAdminService;
 import com.libred.sistema.service.AjustesException;
 import com.libred.sistema.service.PoliticaPrestamoService;
@@ -21,8 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Módulo AJUSTES del administrador: datos de la librería, contraseña y tarjeta de pago.
- * La pantalla guarda con fetch (JSON). El interceptor de WebConfig garantiza que hay una librería en la sesión.
+ * Módulo AJUSTES del administrador: datos de la librería, política de préstamos y contraseña. La pantalla guarda con
+ * fetch (JSON).
  */
 @Controller
 @RequestMapping("/admin/ajustes")
@@ -44,8 +43,9 @@ public class AjustesAdminController {
     @GetMapping
     public String mostrarAjustes(Model model, HttpSession session) {
         Integer libreriaId = libreriaActual(session);
-        model.addAttribute("libreria", ajustesService.obtenerLibreria(libreriaId));
-        model.addAttribute("tarjeta", ajustesService.obtenerTarjeta(libreriaId).orElse(null));
+        Libreria libreria = ajustesService.obtenerLibreria(libreriaId);
+        model.addAttribute("libreria", libreria);
+        model.addAttribute("completitud", ajustesService.completitud(libreria));
         // Política de préstamos (máximo de días y tarifa por categoría)
         model.addAttribute("maxDias", politicaService.obtenerMaxDias(libreriaId));
         model.addAttribute("maxActivos", politicaService.obtenerMaxActivos(libreriaId)); // null = sin límite
@@ -68,6 +68,7 @@ public class AjustesAdminController {
         respuesta.put("ok", true);
         respuesta.put("mensaje", "Los datos de tu librería se actualizaron correctamente.");
         respuesta.put("nombreComercial", l.getNombreComercial());
+        respuesta.put("completitud", ajustesService.completitud(l));
         return respuesta;
     }
 
@@ -91,34 +92,6 @@ public class AjustesAdminController {
         Map<String, Object> respuesta = new LinkedHashMap<>();
         respuesta.put("ok", true);
         respuesta.put("mensaje", "Tu contraseña se cambió correctamente.");
-        return respuesta;
-    }
-
-    @PostMapping("/tarjeta")
-    @ResponseBody
-    public Map<String, Object> guardarTarjeta(@RequestBody Map<String, String> datos, HttpSession session) {
-        TarjetaPago t = ajustesService.guardarTarjeta(libreriaActual(session),
-                datos.get("titular"), datos.get("marca"), datos.get("ultimosDigitos"),
-                datos.get("venceMes"), datos.get("venceAnio"));
-
-        Map<String, Object> respuesta = new LinkedHashMap<>();
-        respuesta.put("ok", true);
-        respuesta.put("mensaje", "Tu método de pago se guardó correctamente.");
-        respuesta.put("marca", t.getMarca());
-        respuesta.put("ultimosDigitos", t.getUltimosDigitos());
-        respuesta.put("titular", t.getTitular());
-        respuesta.put("vencimiento", t.getVencimientoTexto());
-        return respuesta;
-    }
-
-    @PostMapping("/tarjeta/eliminar")
-    @ResponseBody
-    public Map<String, Object> quitarTarjeta(HttpSession session) {
-        ajustesService.quitarTarjeta(libreriaActual(session));
-
-        Map<String, Object> respuesta = new LinkedHashMap<>();
-        respuesta.put("ok", true);
-        respuesta.put("mensaje", "Se quitó tu método de pago.");
         return respuesta;
     }
 

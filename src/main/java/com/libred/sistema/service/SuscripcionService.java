@@ -1,9 +1,15 @@
 package com.libred.sistema.service;
 
-import com.libred.sistema.model.RegistroSuscripcionRequest;
 import com.libred.sistema.model.Libreria;
+import com.libred.sistema.model.MedioPagoPrueba;
+import com.libred.sistema.model.Pago;
 import com.libred.sistema.model.PlanSuscripcion;
+import com.libred.sistema.model.RegistroDtos.SolicitudPago;
+import com.libred.sistema.model.RegistroDtos.SolicitudRenovar;
 import com.libred.sistema.repository.LibreriaRepository;
+import com.libred.sistema.repository.MedioPagoPruebaRepository;
+import com.libred.sistema.repository.PagoRepository;
+import com.libred.sistema.util.PlantillasCorreo;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,24 +24,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/** Suscripción de las librerías: plan, estado y renovación. */
 @Service
 public class SuscripcionService {
 
-    // Reglas de la contraseña del administrador (máximo 6 según el diseño; el mínimo se puede cambiar aquí)
-    private static final int PASSWORD_MIN = 4;
-    private static final int PASSWORD_MAX = 6;
-
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATO_FECHA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final LibreriaRepository libreriaRepository;
+    private final PagoRepository pagoRepository;
+    private final MedioPagoPruebaRepository medioRepository;
+    private final PagoSimuladoService pagoService;
+    private final CorreoSistemaService correoService;
 
-    public SuscripcionService(LibreriaRepository libreriaRepository) {
+    public SuscripcionService(LibreriaRepository libreriaRepository, PagoRepository pagoRepository,
+                              MedioPagoPruebaRepository medioRepository, PagoSimuladoService pagoService,
+                              CorreoSistemaService correoService) {
         this.libreriaRepository = libreriaRepository;
+        this.pagoRepository = pagoRepository;
+        this.medioRepository = medioRepository;
+        this.pagoService = pagoService;
+        this.correoService = correoService;
     }
 
-    // =====================================================================
     // ERROR DE NEGOCIO (lo convierte en JSON el controlador)
-    // =====================================================================
     public static class SuscripcionException extends RuntimeException {
         private final String campo;       // campo del formulario al que se refiere el error (puede ser null)
         private final HttpStatus estado;  // 400 = dato inválido, 404 = no existe, 409 = duplicado/ya aplicado
@@ -55,9 +67,7 @@ public class SuscripcionService {
         }
     }
 
-    // =====================================================================
     // PLANES DISPONIBLES (paso 1 del asistente)
-    // =====================================================================
     public List<Map<String, Object>> listarPlanes() {
         List<Map<String, Object>> lista = new ArrayList<>();
         for (PlanSuscripcion plan : PlanSuscripcion.values()) {
@@ -77,9 +87,6 @@ public class SuscripcionService {
         return lista;
     }
 
-    // =====================================================================
-    // CÓDIGO DE ADMINISTRADOR AUTOGENERADO (ADM-003, ADM-004, ...)
-    // =====================================================================
     public String generarSiguienteCodigoAdmin() {
         long numero = libreriaRepository.count() + 1;
         String codigo = formatoCodigo(numero);
@@ -94,58 +101,7 @@ public class SuscripcionService {
         return String.format("ADM-%03d", numero);
     }
 
-    // =====================================================================
-    // REGISTRO DE UNA LIBRERÍA NUEVA (paso 3 -> "Finalizar Registro")
-    // =====================================================================
-    @Transactional
-    public Libreria registrarLibreria(RegistroSuscripcionRequest r) {
-        PlanSuscripcion plan = PlanSuscripcion.desdeCodigo(r.getTipoPlan());
-        if (plan == null) {
-            throw new SuscripcionException("tipoPlan", "Selecciona un plan válido.", HttpStatus.BAD_REQUEST);
-        }
-
-        String nombre = limpiar(r.getNombreComercial());
-        if (nombre.length() < 2 || nombre.length() > 150) {
-            throw new SuscripcionException("nombreComercial",
-                    "El nombre comercial es obligatorio (máximo 150 caracteres).", HttpStatus.BAD_REQUEST);
-        }
-
-        String ruc = limpiar(r.getRuc());
-        if (!ruc.matches("\\d{11}")) {
-            throw new SuscripcionException("ruc", "El RUC debe tener exactamente 11 dígitos.", HttpStatus.BAD_REQUEST);
-        }
-        if (libreriaRepository.existsByRuc(ruc)) {
-            throw new SuscripcionException("ruc", "Este RUC ya está registrado en LibRed.", HttpStatus.CONFLICT);
-        }
-
-        String direccion = limpiar(r.getDireccion());
-        if (direccion.length() < 5 || direccion.length() > 255) {
-            throw new SuscripcionException("direccion",
-                    "La dirección es obligatoria (máximo 255 caracteres).", HttpStatus.BAD_REQUEST);
-        }
-
-        String password = r.getPassword() == null ? "" : r.getPassword();
-        if (password.length() < PASSWORD_MIN || password.length() > PASSWORD_MAX) {
-            throw new SuscripcionException("password",
-                    "La contraseña debe tener entre " + PASSWORD_MIN + " y " + PASSWORD_MAX + " caracteres.",
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        Libreria nueva = new Libreria();
-        nueva.setNombreComercial(nombre);
-        nueva.setRuc(ruc);
-        nueva.setDireccion(direccion);
-        nueva.setPassword(password);
-        nueva.setCodigoAdmin(generarSiguienteCodigoAdmin()); // se vuelve a generar aquí: es el valor definitivo
-        nueva.setEstadoSuscripcion("NORMAL");
-        nueva.setTipoPlan(plan.name());
-        nueva.setFechaVencimiento(LocalDateTime.now().plusDays(plan.getDias()));
-        return libreriaRepository.save(nueva);
-    }
-
-    // =====================================================================
     // ESTADO DE LA MEMBRESÍA (modal "Ver plan actual")
-    // =====================================================================
     public Map<String, Object> obtenerEstado(Integer libreriaId) {
         Libreria l = buscarLibreria(libreriaId);
 
@@ -178,37 +134,141 @@ public class SuscripcionService {
         m.put("puedeMigrar", plan == PlanSuscripcion.MENSUAL);
         m.put("precioAnual", monto(PlanSuscripcion.ANUAL.getPrecio()));
         m.put("ahorroAnual", monto(ahorroAnual()));
+        // Datos extra para el modal (solo lectura)
+        m.put("diasPlan", plan.getDias());
+        m.put("inicioPeriodo", vencimiento == null ? "—" : vencimiento.minusDays(plan.getDias()).format(FORMATO_FECHA));
+        m.put("miembroDesde", l.getFechaRegistro() == null ? "—" : l.getFechaRegistro().format(FORMATO_FECHA));
+        m.put("totalAnualMensual", monto(PlanSuscripcion.MENSUAL.getPrecio().multiply(BigDecimal.valueOf(12))));
+        // Cómo paga y cómo se renueva
+        Pago ultimo = pagoRepository.findFirstByLibreriaIdAndEstadoOrderByIdDesc(libreriaId, "APROBADO").orElse(null);
+        m.put("metodoPago", ultimo == null || ultimo.getReferencia() == null ? "Sin pagos registrados" : ultimo.getReferencia());
+        m.put("ultimoPago", ultimo == null ? null : ultimo.getFecha().format(FORMATO_FECHA));
+
+        MedioPagoPrueba medio = l.getMedioRenovacionId() == null ? null
+                : medioRepository.findById(l.getMedioRenovacionId()).orElse(null);
+        String renovacion = l.isRenovacionAutomatica() ? "AUTOMATICA" : (medio != null ? "CANCELADA" : "MANUAL");
+        m.put("renovacion", renovacion);
+        m.put("medioRenovacion", medio == null ? null : PagoSimuladoService.describir(medio));
+        m.put("puedeReactivar", "CANCELADA".equals(renovacion) && vigente && medioUsable(medio));
+        m.put("cobroFallido", l.isRenovacionAutomatica() && l.getIntentosRenovacion() > 0);
+        m.put("proximoCobro", monto(plan.getPrecio()));
+        m.put("usdMensual", monto(pagoService.aDolares(PlanSuscripcion.MENSUAL.getPrecio())));
+        m.put("usdAnual", monto(pagoService.aDolares(PlanSuscripcion.ANUAL.getPrecio())));
         return m;
     }
 
-    // =====================================================================
-    // MIGRACIÓN MENSUAL -> ANUAL (es el UPDATE sobre la tabla libreria)
-    // =====================================================================
-    @Transactional
-    public Map<String, Object> migrarAPlanAnual(Integer libreriaId) {
-        Libreria l = buscarLibreria(libreriaId);
+    private boolean medioUsable(MedioPagoPrueba medio) {
+        if (medio == null || MedioPagoPrueba.YAPE.equals(medio.getTipo()) || !"ACTIVO".equals(medio.getEstado())) {
+            return false;
+        }
+        return !medio.esTarjeta() || (medio.getVenceMes() != null && medio.getVenceAnio() != null
+                && !java.time.YearMonth.of(medio.getVenceAnio(), medio.getVenceMes()).isBefore(java.time.YearMonth.now()));
+    }
 
-        if (PlanSuscripcion.ANUAL.name().equalsIgnoreCase(l.getTipoPlan())) {
-            throw new SuscripcionException(null, "Tu librería ya cuenta con el Plan Anual.", HttpStatus.CONFLICT);
+    // RENOVAR O PASAR AL PLAN ANUAL (el administrador paga desde "Ver plan actual")
+    @Transactional(noRollbackFor = SuscripcionException.class)
+    public Map<String, Object> pagar(Integer libreriaId, SolicitudRenovar s) {
+        Libreria l = libreriaRepository.findById(libreriaId).orElseThrow(
+                () -> new SuscripcionException(null, "No se encontró la librería.", HttpStatus.NOT_FOUND));
+
+        PlanSuscripcion actual = PlanSuscripcion.desdeCodigo(l.getTipoPlan());
+        if (actual == null) {
+            actual = PlanSuscripcion.MENSUAL;
+        }
+        PlanSuscripcion plan = PlanSuscripcion.desdeCodigo(s.plan());
+        if (plan == null) {
+            throw new SuscripcionException("plan", "Selecciona un plan válido.", HttpStatus.BAD_REQUEST);
+        }
+        if (actual == PlanSuscripcion.ANUAL && plan == PlanSuscripcion.MENSUAL) {
+            throw new SuscripcionException("plan", "Tu librería ya cuenta con el Plan Anual.", HttpStatus.CONFLICT);
         }
 
-        // Si todavía le quedan días al plan mensual, el año nuevo se suma a partir de esa fecha (no se pierden días)
+        SolicitudPago pagoSolicitud = new SolicitudPago(null, plan.name(), s.metodo(), s.numero(), s.titular(), s.vence(),
+                s.cvv(), s.celular(), s.codigo(), s.correoPaypal(), s.clavePaypal());
+        boolean mejora = actual == PlanSuscripcion.MENSUAL && plan == PlanSuscripcion.ANUAL;
+        Pago pago = pagoService.cobrar(PagoSimuladoService.Pagador.deLibreria(l, "MANUAL"), plan, pagoSolicitud);
+
+        // Si todavía le quedan días, el nuevo periodo se suma al final del actual (no se pierden días)
         LocalDateTime ahora = LocalDateTime.now();
         LocalDateTime base = (l.getFechaVencimiento() != null && l.getFechaVencimiento().isAfter(ahora))
-                ? l.getFechaVencimiento()
-                : ahora;
-
-        l.setTipoPlan(PlanSuscripcion.ANUAL.name());
-        l.setFechaVencimiento(base.plusDays(PlanSuscripcion.ANUAL.getDias()));
+                ? l.getFechaVencimiento() : ahora;
+        l.setTipoPlan(plan.name());
+        l.setFechaVencimiento(base.plusDays(plan.getDias()));
         l.setEstadoSuscripcion("NORMAL");
+        l.setIntentosRenovacion(0);
+        l.setProximoIntentoRenovacion(null);
+
+        // Tarjeta y PayPal pueden renovarse solos (si el administrador lo deja marcado); Yape nunca
+        MedioPagoPrueba medio = pago.getMedioId() == null ? null : medioRepository.findById(pago.getMedioId()).orElse(null);
+        if (medio != null && !MedioPagoPrueba.YAPE.equals(medio.getTipo())) {
+            boolean auto = s.automatica() == null || s.automatica();
+            l.setMedioRenovacionId(medio.getId());
+            l.setRenovacionAutomatica(auto);
+        }
         libreriaRepository.save(l);
 
+        enviarComprobante(l, plan, pago, false);
+
+        Map<String, Object> r = obtenerEstado(libreriaId);
+        r.put("ok", true);
+        r.put("mejora", mejora);
+        r.put("operacion", pago.getNumeroOperacion());
+        return r;
+    }
+
+    @Transactional
+    public Map<String, Object> cancelarRenovacion(Integer libreriaId) {
+        Libreria l = buscarLibreria(libreriaId);
+        if (!l.isRenovacionAutomatica()) {
+            throw new SuscripcionException(null, "Tu membresía no tiene renovación automática.", HttpStatus.CONFLICT);
+        }
+        l.setRenovacionAutomatica(false);
+        l.setIntentosRenovacion(0);
+        l.setProximoIntentoRenovacion(null);
+        libreriaRepository.save(l);
         return obtenerEstado(libreriaId);
     }
 
-    // =====================================================================
-    // UTILIDADES
-    // =====================================================================
+    @Transactional
+    public Map<String, Object> reactivarRenovacion(Integer libreriaId) {
+        Libreria l = buscarLibreria(libreriaId);
+        MedioPagoPrueba medio = l.getMedioRenovacionId() == null ? null
+                : medioRepository.findById(l.getMedioRenovacionId()).orElse(null);
+        if (l.getFechaVencimiento() != null && l.getFechaVencimiento().isBefore(LocalDateTime.now())) {
+            throw new SuscripcionException(null, "Tu membresía ya venció. Renuévala con un método de pago.", HttpStatus.CONFLICT);
+        }
+        if (!medioUsable(medio)) {
+            throw new SuscripcionException(null,
+                    "No podemos reactivarla con tu método anterior. Paga con una tarjeta o PayPal para volver a activarla.",
+                    HttpStatus.CONFLICT);
+        }
+        l.setRenovacionAutomatica(true);
+        l.setIntentosRenovacion(0);
+        l.setProximoIntentoRenovacion(null);
+        libreriaRepository.save(l);
+        return obtenerEstado(libreriaId);
+    }
+
+    /** Yape: genera el código de aprobación para pagar desde "Ver plan actual". */
+    public Map<String, Object> solicitarCodigoYape(String celular) {
+        return pagoService.emitirCodigoYape(celular);
+    }
+
+    /** Comprobante por correo (solo si la librería tiene correo de cuenta verificado). */
+    void enviarComprobante(Libreria l, PlanSuscripcion plan, Pago pago, boolean automatica) {
+        if (l.getCorreoCuenta() == null) {
+            return;
+        }
+        String montoTexto = "PEN".equals(pago.getMoneda())
+                ? "S/ " + monto(pago.getMonto())
+                : "S/ " + monto(pago.getMonto()) + " (US$ " + monto(pago.getMontoCobrado()) + ")";
+        correoService.enviarEnSegundoPlano(l.getCorreoCuenta(),
+                (automatica ? "Renovamos tu membresía · " : "Comprobante de pago · ") + l.getCodigoAdmin(),
+                PlantillasCorreo.comprobanteRenovacion(l.getNombreComercial(), plan.getNombre(), montoTexto,
+                        pago.getReferencia(), pago.getNumeroOperacion(), pago.getFecha().format(FORMATO_FECHA_HORA),
+                        l.getFechaVencimiento().format(FORMATO_FECHA), automatica));
+    }
+
     private Libreria buscarLibreria(Integer id) {
         return libreriaRepository.findById(id).orElseThrow(
                 () -> new SuscripcionException(null, "No se encontró la librería.", HttpStatus.NOT_FOUND));
@@ -219,11 +279,7 @@ public class SuscripcionService {
                 .subtract(PlanSuscripcion.ANUAL.getPrecio());
     }
 
-    private String monto(BigDecimal valor) {
+    String monto(BigDecimal valor) {
         return valor.setScale(2, RoundingMode.HALF_UP).toPlainString();
-    }
-
-    private String limpiar(String texto) {
-        return texto == null ? "" : texto.trim();
     }
 }

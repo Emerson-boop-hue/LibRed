@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Calificación (1 a 5 estrellas) que un lector da a un PRÉSTAMO ya devuelto.
- * Hay a lo sumo una por préstamo (si el lector la cambia, se reemplaza). El promedio y los votos de una
- * librería salen de todas las calificaciones de sus préstamos.
+ * Calificación (1 a 5 estrellas) que un lector da a un PRÉSTAMO ya devuelto. Hay a lo sumo una por préstamo (si el
+ * lector la cambia, se reemplaza).
  */
 @Entity
 @Table(name = "calificacion",
         uniqueConstraints = @UniqueConstraint(name = "uk_calificacion_prestamo", columnNames = {"prestamo_id"}))
+/** Calificación que un lector da a un préstamo devuelto. */
 public class Calificacion {
 
     @Id

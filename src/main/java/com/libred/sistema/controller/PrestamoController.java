@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,14 +32,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Módulo PRÉSTAMOS del administrador: registra un préstamo en mostrador.
- * Usa las mismas reglas que el lector (PrestamoService): plazo máximo, tarifa por categoría, stock y límites.
+ * Módulo PRÉSTAMOS del administrador: registra un préstamo en mostrador (pestaña "Nuevo préstamo") y entrega los
+ * pedidos que hicieron los lectores (pestaña "Por entregar").
  */
 @Controller
 @RequestMapping("/admin/prestamos")
 public class PrestamoController {
 
-    private static final List<String> ESTADOS_EN_CURSO = List.of("ACTIVO", "VENCIDO");
+    private static final List<String> ESTADOS_EN_CURSO = List.of("ACTIVO", "VENCIDO", "POR_ENTREGAR");
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final PrestamoRepository prestamoRepository;
@@ -111,6 +112,9 @@ public class PrestamoController {
         model.addAttribute("maxDias", politicaService.obtenerMaxDias(libreriaId));
         model.addAttribute("maxActivos", politicaService.obtenerMaxActivos(libreriaId)); // null = sin límite
 
+        // Pestaña "Por entregar": pedidos de lectores que aún no recogieron su artículo
+        model.addAttribute("pedidos", prestamoService.listarPorEntregar(libreriaId));
+
         return "admin/prestamos";
     }
 
@@ -135,11 +139,12 @@ public class PrestamoController {
             prestamo.setFechaDevolucionLimite(LocalDate.parse(fechaDevolucionLimite));
             prestamo.setOrigen("ADMIN");
 
-            // Ejecuta la lógica de negocio (pertenencia, sanciones, límites, plazo, tarifa, stock)
+            // Ejecuta la lógica de negocio (pertenencia, bloqueos, límites, plazo, tarifa, stock)
             Prestamo guardado = prestamoService.registrarPrestamo(libreriaActual(session), prestamo);
 
             // Datos para la ventana de confirmación
             Map<String, String> ok = new LinkedHashMap<>();
+            ok.put("id", String.valueOf(guardado.getId()));
             ok.put("numero", "#" + guardado.getId());
             ok.put("lector", guardado.getLector().getNombres() + " " + guardado.getLector().getApellidos());
             ok.put("articulo", guardado.getRecurso().getTitulo());
@@ -152,5 +157,27 @@ public class PrestamoController {
         }
 
         return "redirect:/admin/prestamos";
+    }
+
+    // Entrega el artículo y cobra el servicio: el préstamo pasa a ACTIVO y el plazo empieza hoy
+    @PostMapping("/entregar/{id}")
+    public String entregar(@PathVariable Integer id, HttpSession session, RedirectAttributes redirect) {
+        try {
+            prestamoService.confirmarEntrega(libreriaActual(session), id);
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorEntrega", e.getMessage());
+        }
+        return "redirect:/admin/prestamos?tab=por-entregar";
+    }
+
+    // Cancela un pedido que nadie recogió: el artículo vuelve al stock
+    @PostMapping("/cancelar/{id}")
+    public String cancelar(@PathVariable Integer id, HttpSession session, RedirectAttributes redirect) {
+        try {
+            prestamoService.cancelarPedido(libreriaActual(session), id);
+        } catch (Exception e) {
+            redirect.addFlashAttribute("errorEntrega", e.getMessage());
+        }
+        return "redirect:/admin/prestamos?tab=por-entregar";
     }
 }

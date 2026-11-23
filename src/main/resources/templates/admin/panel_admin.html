@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{admin/layout :: molde(
-          'Panel de Control', 
-          'Resumen operativo general de la librería', 
-          'panel_admin.css', 
-          '', 
+          'Panel de Control',
+          'Resumen operativo general de la librería',
+          'panel_admin.css',
+          'panel_admin.js',
           'panel',
           ~{:: .dashboard-container}
       )}">
@@ -13,156 +13,85 @@
 </head>
 <body>
 
-    <!-- Dashboard Visual Ajustado -->
     <div class="dashboard-container" data-css="panel_admin.css">
-        
-        <!-- 4 Tarjetas Superiores con Iconos Estilizados -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-title-area">
-                    <div class="metric-icon-box icon-recursos">
-                        <i class="fa-solid fa-book"></i>
-                    </div>
-                    <span class="metric-title">RECURSOS</span>
-                </div>
-                <h2>3,842</h2>
-                <span class="metric-sub text-dark">+124 este mes</span>
-            </div>
 
-            <div class="metric-card">
-                <div class="metric-title-area">
-                    <div class="metric-icon-box icon-usuarios">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <span class="metric-title">USUARIOS</span>
+        <div class="pn-kpis">
+            <div class="pn-kpi" th:each="k : ${p.kpis()}">
+                <div class="pn-kpi-cab">
+                    <span class="pn-icono" th:classappend="'t-' + ${k.tono()}"><i class="fa-solid" th:classappend="${k.icono()}"></i></span>
+                    <span class="pn-kpi-titulo" th:text="${k.titulo()}">ARTÍCULOS</span>
                 </div>
-                <h2>5,126</h2>
-                <span class="metric-sub text-dark">+45 nuevos este mes</span>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title-area">
-                    <div class="metric-icon-box icon-prestamos">
-                        <i class="fa-solid fa-right-left"></i>
-                    </div>
-                    <span class="metric-title">PRÉSTAMOS</span>
-                </div>
-                <h2>284</h2>
-                <span class="metric-sub text-dark">+12% esta semana</span>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-title-area">
-                    <div class="metric-icon-box icon-vencidos">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <span class="metric-title">VENCIDOS</span>
-                </div>
-                <h2>17</h2>
-                <span class="metric-sub text-dark">Requieren acción</span>
+                <strong class="pn-kpi-valor" th:text="${k.valor()}">0</strong>
+                <span class="pn-kpi-detalle" th:text="${k.detalle()}">detalle</span>
             </div>
         </div>
 
-        <!-- Rejilla Inferior de 2 Columnas -->
-        <div class="dashboard-grid">
-            
-            <!-- COLUMNA IZQUIERDA -->
-            <div class="dashboard-col-left">
-                <div class="content-card resources-card">
-                    <div class="card-header-title">
-                        <h3>Recursos Más Solicitados</h3>
+        <!-- Últimos 7 días -->
+        <section class="pn-card pn-c-grafico">
+            <header class="pn-cab">
+                <h3>Últimos 7 días</h3>
+                <div class="pn-leyenda">
+                    <span><i class="pn-punto pn-prestamos"></i>Préstamos <b th:text="${p.totalPrestamos7()}">0</b></span>
+                    <span><i class="pn-punto pn-devoluciones"></i>Devoluciones <b th:text="${p.totalDevoluciones7()}">0</b></span>
+                </div>
+            </header>
+            <div class="pn-grafico">
+                <div class="pn-dia" th:each="d : ${p.dias()}">
+                    <div class="pn-barras">
+                        <div class="pn-relleno pn-prestamos" th:style="'height:' + ${d.altoPrestamos()} + '%'">
+                            <span class="pn-valor" th:text="${d.prestamos()}">0</span>
+                        </div>
+                        <div class="pn-relleno pn-devoluciones" th:style="'height:' + ${d.altoDevoluciones()} + '%'">
+                            <span class="pn-valor" th:text="${d.devoluciones()}">0</span>
+                        </div>
                     </div>
-                    <div class="table-scroll-container">
-                        <table class="styled-table">
-                           <thead>
-                               <tr>
-                                   <th>RECURSO</th>
-                                   <th>TIPO</th>
-                                   <th>PRÉSTAMOS</th>
-                               </tr>
-                           </thead>
-                           <tbody>
-                               <tr>
-                                   <td class="font-semibold">Patrones de Diseño (GoF)</td>
-                                   <td><span class="badge-tipo">Libro</span></td>
-                                   <td>
-                                       <div class="progress-info">
-                                           <span>142</span>
-                                           <div class="progress-bar"><div class="progress-fill fill-dark" style="width: 85%;"></div></div>
-                                       </div>
-                                   </td>
-                               </tr>
-                               <tr>
-                                   <td class="font-semibold">IA en la Educación</td>
-                                   <td><span class="badge-tipo">Tesis</span></td>
-                                   <td>
-                                       <div class="progress-info">
-                                           <span>89</span>
-                                           <div class="progress-bar"><div class="progress-fill fill-green" style="width: 55%;"></div></div>
-                                       </div>
-                                   </td>
-                               </tr>
-                               <tr>
-                                   <td class="font-semibold">Clean Architecture</td>
-                                   <td><span class="badge-tipo">Libro</span></td>
-                                   <td>
-                                       <div class="progress-info">
-                                           <span>64</span>
-                                           <div class="progress-bar"><div class="progress-fill fill-blue" style="width: 40%;"></div></div>
-                                       </div>
-                                   </td>
-                               </tr>
-                           </tbody>
-                        </table>
-                    </div>
+                    <span class="pn-etiqueta" th:text="${d.etiqueta()}">Hoy</span>
                 </div>
             </div>
+        </section>
 
-            <!-- COLUMNA DERECHA -->
-            <div class="dashboard-col-right">
-                <!-- Actividad Reciente -->
-                <div class="content-card activity-card">
-                    <h3>Actividad Reciente</h3>
-                    <div class="activity-scroll-container">
-                        <ul class="activity-list">
-                            <li>
-                                <span class="dot green"></span>
-                                <div class="activity-content">
-                                    <strong>3 consultas en red</strong>
-                                    <p>Lectores de otras librerías revisando nuestro catálogo local</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="dot blue"></span>
-                                <div class="activity-content">
-                                    <strong>Nuevos Lectores</strong>
-                                    <p>5 Usuarios nuevos se registraron hoy</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span class="dot purple"></span>
-                                <div class="activity-content">
-                                    <strong>Devoluciones</strong>
-                                    <p>15 lectores tienen devoluciones programadas para hoy</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Multas Pendientes -->
-                <div class="content-card fine-card">
-                    <div class="card-header-warning">
-                        <h3>Multas Pendientes</h3>
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <h2>S/ 842.50</h2>
-                    <p>Saldo total sin pagar de 45 usuarios.</p>
-                </div>
+        <!-- Requiere tu atención -->
+        <section class="pn-card pn-c-atencion">
+            <header class="pn-cab"><h3>Requiere tu atención</h3></header>
+            <div class="pn-avisos">
+                <a class="pn-aviso" th:each="a : ${p.atencion()}" th:href="@{${a.url()}}" th:classappend="${a.pendiente()} ? 'pendiente'">
+                    <span class="pn-icono" th:classappend="${a.pendiente()} ? 't-' + ${a.tono()}"><i class="fa-solid" th:classappend="${a.icono()}"></i></span>
+                    <strong class="pn-cantidad" th:text="${a.cantidad()}">0</strong>
+                    <span class="pn-aviso-texto" th:text="${a.texto()}">Pedidos por entregar</span>
+                    <small th:text="${a.pendiente() ? a.detalle() : 'Al día'}">detalle</small>
+                </a>
             </div>
+        </section>
 
-        </div>
+        <!-- Historial de actividad -->
+        <section class="pn-card pn-c-actividad">
+            <header class="pn-cab">
+                <h3>Actividad reciente</h3>
+                <small class="pn-total"><span id="pnConteo" th:text="${p.totalActividad()}">0</span> movimientos</small>
+            </header>
+            <div class="pn-filtros">
+                <button type="button" class="pn-filtro activo" data-filtro="todo">Todo</button>
+                <button type="button" class="pn-filtro" data-filtro="prestamo">Préstamos</button>
+                <button type="button" class="pn-filtro" data-filtro="pedido">Pedidos</button>
+                <button type="button" class="pn-filtro" data-filtro="devolucion">Devoluciones</button>
+                <button type="button" class="pn-filtro" data-filtro="multa">Multas</button>
+            </div>
+            <p class="pn-vacio" th:if="${p.totalActividad() == 0}">Todavía no hay movimientos.</p>
+            <div class="pn-historial" id="pnHistorial" th:if="${p.totalActividad() > 0}">
+                <div class="pn-grupo" th:each="g : ${p.actividad()}">
+                    <div class="pn-dia-titulo" th:text="${g.etiqueta()}">Hoy</div>
+                    <div class="pn-mov" th:each="a : ${g.movimientos()}" th:attr="data-filtro=${a.filtro()}">
+                        <span class="pn-icono" th:classappend="'t-' + ${a.tono()}"><i class="fa-solid" th:classappend="${a.icono()}"></i></span>
+                        <span class="pn-mov-texto">
+                            <span class="pn-mov-linea"><b th:text="${a.quien()}">Lector</b><small th:text="${a.hora()}">09:41</small></span>
+                            <span class="pn-mov-detalle"><em th:text="${a.tipo()}">Préstamo</em><span th:text="${a.detalle()}">detalle</span></span>
+                        </span>
+                    </div>
+                </div>
+                <p class="pn-vacio" id="pnSinResultados" hidden>No hay movimientos de este tipo.</p>
+            </div>
+        </section>
+
     </div>
-
 </body>
 </html>

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/** Registro de devoluciones y cálculo de mora. */
 @Service
 public class DevolucionService {
 
@@ -46,15 +47,19 @@ public class DevolucionService {
             throw new Exception("Este préstamo ya fue devuelto anteriormente.");
         }
 
-        // 1. Marcar préstamo como DEVUELTO y guardar fecha real
+        // Un pedido del lector que aún no se entregó (o fue cancelado) no se puede devolver
+        if ("POR_ENTREGAR".equalsIgnoreCase(prestamo.getEstadoPrestamo())
+                || "CANCELADO".equalsIgnoreCase(prestamo.getEstadoPrestamo())) {
+            throw new Exception("Este préstamo aún no fue entregado al lector.");
+        }
+
         prestamo.setEstadoPrestamo("DEVUELTO");
         prestamo.setFechaDevolucionReal(LocalDateTime.now());
         prestamoRepository.save(prestamo);
 
-        // 2. Incrementar stock disponible del recurso y actualizar estado (NORMAL / CRITICO)
         Recurso recurso = prestamo.getRecurso();
         if (recurso != null) {
-            recurso.setStockDisponible(recurso.getStockDisponible() + 1);
+            recurso.setStockDisponible(Math.min(recurso.getStockTotal(), recurso.getStockDisponible() + 1)); // nunca por encima del total
             if (recurso.getStockDisponible() > 2) {
                 recurso.setEstado("NORMAL");
             } else if (recurso.getStockDisponible() > 0) {
@@ -63,7 +68,6 @@ public class DevolucionService {
             recursoRepository.save(recurso);
         }
 
-        // 3. Calcular días de retraso y monto acumulado por mora
         int diasRetraso = 0;
         BigDecimal montoMora = BigDecimal.ZERO;
         if (prestamo.getFechaDevolucionLimite() != null) {
@@ -77,7 +81,6 @@ public class DevolucionService {
             }
         }
 
-        // 4. Buscar y saldar multas pendientes de ESTA librería asociadas a este préstamo (Daño / Pérdida)
         BigDecimal montoMulta = BigDecimal.ZERO;
         List<Multa> multasPendientes = multaRepository.findByLibreriaIdAndEstadoPago(libreriaId.longValue(), "PENDIENTE");
         for (Multa m : multasPendientes) {
@@ -89,7 +92,6 @@ public class DevolucionService {
             }
         }
 
-        // 5. Guardar la transacción formal de devolución con su mora y multas separadas
         Devolucion devolucion = new Devolucion();
         devolucion.setLibreriaId(prestamo.getLibreriaId());
         devolucion.setPrestamo(prestamo);
@@ -99,11 +101,10 @@ public class DevolucionService {
         devolucion.setMontoTotal(montoMora.add(montoMulta));
         Devolucion devGuardada = devolucionRepository.save(devolucion);
 
-        // 6. Sincronizar estado del lector (HABILITADO / SANCIONADO)
         if (prestamo.getLector() != null) {
             Lector lector = prestamo.getLector();
             boolean tieneOtrasMultas = multaRepository.existsByLectorIdAndEstadoPago(lector.getId(), "PENDIENTE");
-            String estadoFinal = tieneOtrasMultas ? "SANCIONADO" : "HABILITADO";
+            String estadoFinal = tieneOtrasMultas ? "BLOQUEADO" : "HABILITADO";
             if (!estadoFinal.equalsIgnoreCase(lector.getEstadoCuenta())) {
                 lector.setEstadoCuenta(estadoFinal);
                 lectorRepository.save(lector);

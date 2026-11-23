@@ -18,7 +18,6 @@
   <body>
     <div class="lector-container">
 
-      <!-- RESUMEN -->
       <div class="hs-kpis">
         <div class="hs-kpi">
           <div class="hs-kpi-icono"><i class="fa-solid fa-book-open-reader"></i></div>
@@ -42,7 +41,6 @@
       </div>
 
       <section class="hs-card">
-        <!-- PESTAÑAS -->
         <div class="hs-tabs" role="tablist">
           <button type="button" class="hs-tab activa" data-tab="prestamos" role="tab">
             <i class="fa-solid fa-book-open-reader"></i> Préstamos
@@ -59,7 +57,6 @@
           <span class="hs-sede"><i class="fa-solid fa-store"></i> <span th:text="${h.sedeNombre}">Librería</span></span>
         </div>
 
-        <!-- ============ PESTAÑA PRÉSTAMOS ============ -->
         <div class="hs-panel" id="panelPrestamos">
           <div class="hs-filtros">
             <div class="hs-campo hs-campo-grande">
@@ -160,7 +157,6 @@
           </div>
         </div>
 
-        <!-- ============ PESTAÑA MULTAS ============ -->
         <div class="hs-panel" id="panelMultas" hidden>
           <div class="hs-vacio" th:if="${#lists.isEmpty(h.multas)}">
             <i class="fa-solid fa-face-smile"></i>
@@ -234,7 +230,7 @@
           </th:block>
         </div>
 
-        <!-- ============ PESTAÑA CALIFICACIONES (lo que ya calificaste) ============ -->
+        <!-- PESTAÑA CALIFICACIONES (lo que ya calificaste) -->
         <div class="hs-panel" id="panelCalificaciones" hidden>
           <div class="hs-filtros hs-filtros-calif" id="hcFiltros" th:classappend="${h.totalCalificadas == 0} ? 'oculto'">
             <div class="hs-campo hs-campo-grande">
@@ -324,8 +320,7 @@
         </div>
       </section>
 
-
-      <!-- VENTANA PARA CALIFICAR UN PRÉSTAMO -->
+      <!-- Ventana para calificar un préstamo -->
       <div class="hs-modal" id="hsModalCalif" hidden>
         <div class="hs-modal-caja" role="dialog" aria-modal="true" aria-labelledby="hsCalifTitulo">
           <button type="button" class="hs-modal-cerrar" id="hsCalifCerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>

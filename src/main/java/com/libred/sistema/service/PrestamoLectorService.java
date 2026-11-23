@@ -26,15 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Módulo PRÉSTAMOS del lector: arma la pantalla y registra los préstamos que el lector solicita él mismo.
- * El registro real (stock, plazo, tarifa) lo hace PrestamoService, el mismo que usa el administrador,
- * así las reglas son idénticas para ambos.
- */
+/** Módulo PRÉSTAMOS del lector: arma la pantalla y registra los préstamos que el lector solicita él mismo. */
 @Service
 public class PrestamoLectorService {
 
-    private static final List<String> ESTADOS_EN_CURSO = List.of("ACTIVO", "VENCIDO");
+    private static final List<String> ESTADOS_EN_CURSO = List.of("ACTIVO", "VENCIDO", "POR_ENTREGAR");
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final LectorRepository lectorRepository;
@@ -43,19 +39,22 @@ public class PrestamoLectorService {
     private final PrestamoRepository prestamoRepository;
     private final PrestamoService prestamoService;
     private final PoliticaPrestamoService politicaService;
+    private final MembresiaService membresiaService;
 
     public PrestamoLectorService(LectorRepository lectorRepository,
                                  LibreriaRepository libreriaRepository,
                                  RecursoRepository recursoRepository,
                                  PrestamoRepository prestamoRepository,
                                  PrestamoService prestamoService,
-                                 PoliticaPrestamoService politicaService) {
+                                 PoliticaPrestamoService politicaService,
+                                 MembresiaService membresiaService) {
         this.lectorRepository = lectorRepository;
         this.libreriaRepository = libreriaRepository;
         this.recursoRepository = recursoRepository;
         this.prestamoRepository = prestamoRepository;
         this.prestamoService = prestamoService;
         this.politicaService = politicaService;
+        this.membresiaService = membresiaService;
     }
 
     /** Datos de la pantalla Préstamos (vacío si el registro del lector ya no existe). */
@@ -100,7 +99,6 @@ public class PrestamoLectorService {
             }
         }
 
-        // Mis préstamos
         List<Prestamo> propios = prestamoRepository.findByLectorIdOrderByFechaPrestamoDesc(lectorId);
         List<FilaPrestamo> filas = new ArrayList<>();
         long activos = 0;
@@ -108,7 +106,8 @@ public class PrestamoLectorService {
         for (Prestamo p : propios) {
             boolean enCurso = ESTADOS_EN_CURSO.contains(p.getEstadoPrestamo());
             LocalDate limite = p.getFechaDevolucionLimite();
-            boolean vencido = enCurso && limite != null && limite.isBefore(hoy);
+            boolean porEntregar = "POR_ENTREGAR".equals(p.getEstadoPrestamo());
+            boolean vencido = enCurso && !porEntregar && limite != null && limite.isBefore(hoy);
             if (enCurso) {
                 activos++;
             }
@@ -121,9 +120,9 @@ public class PrestamoLectorService {
         }
 
         String bloqueo = null;
-        boolean sancionado = "SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta());
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            bloqueo = "Tu cuenta está SANCIONADA en esta librería. Regulariza tus multas para volver a solicitar préstamos.";
+        boolean bloqueado = "BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta());
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            bloqueo = "Tu cuenta está BLOQUEADA en esta librería. Regulariza tus multas para volver a solicitar préstamos.";
         } else if (vencidos > 0) {
             bloqueo = "Tienes " + vencidos + (vencidos == 1 ? " préstamo vencido" : " préstamos vencidos")
                     + ". Devuélvelo en la librería para poder solicitar otro.";
@@ -137,7 +136,7 @@ public class PrestamoLectorService {
 
         return Optional.of(new Pantalla(
                 lector.getNombres() + " " + lector.getApellidos(), lector.getCodigoLector(), sede,
-                maxDias, maxActivos, activos, bloqueo, sancionado, categorias, articulos, filas));
+                maxDias, maxActivos, activos, bloqueo, bloqueado, categorias, articulos, filas));
     }
 
     private FilaPrestamo aFila(Prestamo p, boolean enCurso, boolean vencido, LocalDate hoy) {
@@ -146,7 +145,15 @@ public class PrestamoLectorService {
         String detalle;
         LocalDate limite = p.getFechaDevolucionLimite();
 
-        if (!enCurso) {
+        if ("CANCELADO".equals(p.getEstadoPrestamo())) {
+            estado = "CANCELADO";
+            texto = "Cancelado";
+            detalle = "Pedido cancelado por la librería";
+        } else if ("POR_ENTREGAR".equals(p.getEstadoPrestamo())) {
+            estado = "POR_ENTREGAR";
+            texto = "Por recoger";
+            detalle = "Acércate a la librería para recogerlo";
+        } else if (!enCurso) {
             estado = "DEVUELTO";
             texto = "Devuelto";
             detalle = p.getFechaDevolucionReal() != null ? "Devuelto el " + p.getFechaDevolucionReal().format(FORMATO_FECHA) : "";
@@ -175,8 +182,8 @@ public class PrestamoLectorService {
     }
 
     /**
-     * Registra el préstamo que el lector solicita. Lanza AjustesException (con el campo y el mensaje)
-     * si algo no se cumple; la pantalla muestra ese mensaje.
+     * Registra el préstamo que el lector solicita. Lanza AjustesException (con el campo y el mensaje) si algo no se
+     * cumple; la pantalla muestra ese mensaje.
      */
     @Transactional
     public Prestamo solicitar(Integer lectorId, Integer recursoId, Integer dias) {
@@ -184,6 +191,9 @@ public class PrestamoLectorService {
                 .orElseThrow(() -> new AjustesException(null, "Tu registro de lector ya no existe. Vuelve a iniciar sesión."));
         Integer libreriaId = lector.getLibreriaId();
 
+        if (membresiaService.estadoDe(libreriaId).escrituraBloqueada()) {
+            throw new AjustesException(null, "Esta librería no está recibiendo pedidos por ahora. Prueba en otra de la red.");
+        }
         if (recursoId == null) {
             throw new AjustesException("articulo", "Selecciona el artículo que deseas.");
         }
@@ -197,8 +207,8 @@ public class PrestamoLectorService {
                     + (maxDias == 1 ? " día." : " días."));
         }
 
-        if ("SANCIONADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
-            throw new AjustesException(null, "Tu cuenta está SANCIONADA en esta librería. No puedes solicitar préstamos.");
+        if ("BLOQUEADO".equalsIgnoreCase(lector.getEstadoCuenta())) {
+            throw new AjustesException(null, "Tu cuenta está BLOQUEADA en esta librería. No puedes solicitar préstamos.");
         }
         if (prestamoRepository.countByLectorIdAndEstadoPrestamoAndFechaDevolucionLimiteBefore(
                 lectorId, "ACTIVO", LocalDate.now()) > 0

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 /**
- * Módulo CATÁLOGO del lector: ver y filtrar los artículos de la librería a la que entró.
- * El interceptor de WebConfig garantiza que hay un lector en la sesión.
+ * Módulo CATÁLOGO del lector: ver y filtrar los artículos de la librería a la que entró. El interceptor de WebConfig
+ * garantiza que hay un lector en la sesión.
  */
 @Controller
 @RequestMapping("/lector/catalogo")

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibRed - Crea tu cuenta</title>
+    <script th:src="@{/js/tema.js}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/registro.css}" href="/css/registro.css">
+    <link rel="stylesheet" th:href="@{/css/tema_publico.css}" href="/css/tema_publico.css">
+</head>
+<body>
+
+    <button type="button" class="tema-flotante tema-registro" data-tema-toggle title="Modo oscuro" aria-label="Cambiar entre modo claro y oscuro">
+        <i class="fa-solid fa-moon ic-luna"></i><i class="fa-solid fa-sun ic-sol"></i>
+    </button>
+
+<div class="rg">
+
+    <aside class="rg-side">
+        <a class="rg-marca" th:href="@{/login-admin}" href="/login-admin" aria-label="LibRed">
+            <img th:src="@{/img/LogoModoOscuro.png}" src="/img/LogoModoOscuro.png" alt="LibRed">
+        </a>
+
+        <div class="rg-side-centro">
+            <h1>Lleva tu librería al siguiente nivel</h1>
+            <p>Inventario, préstamos y lectores en un solo lugar.</p>
+
+            <ol class="rg-pasos" id="rgPasos">
+                <li data-paso="1" class="activo"><span class="rg-num">1</span><span class="rg-txt"><b>Cuenta</b><small>Verifica tu correo</small></span></li>
+                <li data-paso="2"><span class="rg-num">2</span><span class="rg-txt"><b>Plan</b><small>Elige tu membresía</small></span></li>
+                <li data-paso="3"><span class="rg-num">3</span><span class="rg-txt"><b>Pago</b><small>Método de pago</small></span></li>
+                <li data-paso="4"><span class="rg-num">4</span><span class="rg-txt"><b>Librería</b><small>Datos del establecimiento</small></span></li>
+                <li data-paso="5"><span class="rg-num">5</span><span class="rg-txt"><b>Perfil</b><small>Opcional</small></span></li>
+            </ol>
+        </div>
+
+        <div class="rg-pedido" id="rgPedido" hidden>
+            <span class="rg-pedido-t">Tu pedido</span>
+            <div class="rg-pedido-fila"><span id="rgPedidoPlan">Plan</span><strong id="rgPedidoMonto">S/ 0.00</strong></div>
+            <small id="rgPedidoNota"></small>
+        </div>
+
+        <a class="rg-volver" th:href="@{/login-admin}" href="/login-admin"><i class="fa-solid fa-arrow-left"></i> Volver al inicio de sesión</a>
+    </aside>
+
+    <main class="rg-main">
+
+        <!-- Progreso en pantallas pequeñas -->
+        <div class="rg-movil" id="rgMovil">
+            <span id="rgMovilTxt">Paso 1 de 5 · Cuenta</span>
+            <div class="rg-movil-barra"><i id="rgMovilBarra"></i></div>
+        </div>
+
+        <div class="rg-caja">
+
+            <section class="rg-panel activo" data-panel="1">
+
+                <div id="rgCuentaForm">
+                    <h2>Crea tu cuenta</h2>
+                    <p class="rg-sub">Te enviaremos un código para verificar tu correo y, al final, el comprobante de tu pago.</p>
+
+                    <div class="rg-campo">
+                        <label for="rgCorreo">Correo electrónico</label>
+                        <div class="rg-input">
+                            <input type="email" id="rgCorreo" maxlength="120" placeholder="nombre@empresa.com" autocomplete="email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+                        <small class="rg-err" id="rgCorreoErr"></small>
+                    </div>
+
+                    <label class="rg-check">
+                        <input type="checkbox" id="rgAcepta">
+                        <span class="rg-check-caja"><i class="fa-solid fa-check"></i></span>
+                        <span>Acepto los <a href="#" id="rgVerTerminos">términos y condiciones</a> y la política de privacidad.</span>
+                    </label>
+                    <small class="rg-err" id="rgAceptaErr"></small>
+
+                    <div class="rg-pie">
+                        <button type="button" class="rg-btn rg-btn-pri rg-ancho" id="rgEnviarCodigo" disabled>Enviar código</button>
+                    </div>
+                </div>
+
+                <div id="rgVerifForm" hidden>
+                    <h2>Revisa tu correo</h2>
+                    <p class="rg-sub">Enviamos un código de 6 dígitos a<br><strong id="rgCorreoVerif"></strong></p>
+
+                    <div class="rg-otp" id="rgOtp"></div>
+                    <small class="rg-err rg-centro" id="rgOtpErr"></small>
+
+                    <div class="rg-pie">
+                        <button type="button" class="rg-btn rg-btn-pri rg-ancho" id="rgVerificar" disabled>Verificar y continuar</button>
+                    </div>
+                    <div class="rg-enlaces">
+                        <button type="button" class="rg-link" id="rgReenviar" disabled>Reenviar código</button>
+                        <span>·</span>
+                        <button type="button" class="rg-link" id="rgCambiarCorreo">Cambiar correo</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rg-panel" data-panel="2">
+                <h2>Elige tu membresía</h2>
+                <p class="rg-sub">Todas las herramientas de LibRed, sin límites. Solo decide por cuánto tiempo.</p>
+
+                <div class="rg-planes" id="rgPlanes">Cargando planes...</div>
+
+                <div class="rg-pie">
+                    <button type="button" class="rg-btn rg-btn-pri rg-ancho" id="rgPlanSiguiente" disabled>Continuar</button>
+                </div>
+
+                <div class="rg-incluye">
+                    <h3>Así se ve tu panel</h3>
+                    <div class="rg-vista" aria-hidden="true">
+                        <div class="rg-vista-barra"><span></span><span></span><span></span><em>Panel de control · Tu librería</em></div>
+                        <div class="rg-vista-cuerpo">
+                            <ul class="rg-vista-menu">
+                                <li class="on"><i class="fa-solid fa-table-columns"></i>Panel</li>
+                                <li><i class="fa-solid fa-users"></i>Lectores</li>
+                                <li><i class="fa-solid fa-boxes-stacked"></i>Inventario</li>
+                                <li><i class="fa-solid fa-book-open-reader"></i>Préstamos</li>
+                                <li><i class="fa-solid fa-rotate-left"></i>Devoluciones</li>
+                                <li><i class="fa-solid fa-chart-line"></i>Reportes</li>
+                            </ul>
+                            <div class="rg-vista-main">
+                                <div class="rg-vista-stats">
+                                    <div><small>Préstamos activos</small><b>24</b></div>
+                                    <div><small>Lectores</small><b>128</b></div>
+                                    <div><small>Ingresos del mes</small><b>S/ 1,240</b></div>
+                                </div>
+                                <div class="rg-vista-graf">
+                                    <i style="height:38%"></i><i style="height:55%"></i><i style="height:46%"></i><i style="height:72%"></i><i style="height:60%"></i><i style="height:84%"></i><i style="height:68%"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="rg-vista-nota">Vista de ejemplo con datos ficticios.</small>
+
+                    <h3>Todo esto incluye tu membresía</h3>
+                    <div class="rg-mods">
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#2563eb"><i class="fa-solid fa-boxes-stacked"></i></span><div><b>Inventario</b><p>Libros y artículos con su stock siempre al día.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#7c3aed"><i class="fa-solid fa-book-open-reader"></i></span><div><b>Préstamos y devoluciones</b><p>Presta en mostrador y sigue cada préstamo hasta que vuelve.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#dc2626"><i class="fa-solid fa-file-invoice-dollar"></i></span><div><b>Multas</b><p>Controla las multas por atraso y su cobro.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#0d9488"><i class="fa-solid fa-users"></i></span><div><b>Lectores</b><p>Registra a tus lectores y consulta su historial.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#d97706"><i class="fa-solid fa-cash-register"></i></span><div><b>Movimientos e ingresos</b><p>Mira cada movimiento y lo que ingresa a tu librería.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#16a34a"><i class="fa-solid fa-file-pdf"></i></span><div><b>Reportes</b><p>Descarga reportes en PDF y Excel.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#0891b2"><i class="fa-solid fa-chart-pie"></i></span><div><b>Estadísticas</b><p>Descubre qué se presta más y cómo rinde tu librería.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#4f46e5"><i class="fa-solid fa-earth-americas"></i></span><div><b>Red Global</b><p>Tu librería visible para lectores de toda la red.</p></div></div>
+                        <div class="rg-mod"><span class="rg-mod-i" style="--c:#475569"><i class="fa-solid fa-circle-question"></i></span><div><b>Ayuda y soporte</b><p>Guías paso a paso y soporte cuando lo necesites.</p></div></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rg-panel" data-panel="3">
+                <h2>Elige cómo pagar</h2>
+                <p class="rg-sub">Selecciona un medio de pago para activar tu membresía.</p>
+
+                <div class="rg-resumen-pago">
+                    <div class="rg-rp-fila"><span>Membresía</span><b id="rgRpPlan"></b></div>
+                    <div class="rg-rp-fila"><span>Acceso hasta</span><b id="rgRpAcceso"></b></div>
+                    <div class="rg-rp-total"><span>Total a pagar</span><b id="rgRpTotal"></b></div>
+                </div>
+                <p class="rg-auto-nota" id="rgAutoNota"></p>
+
+                <div class="rg-metodos" id="rgMetodos">
+                    <button type="button" class="rg-metodo activo" data-metodo="TARJETA">
+                        <span class="rg-m-ico rg-m-tarjeta"><i class="fa-solid fa-credit-card"></i></span>
+                        <span>Tarjeta</span>
+                        <span class="rg-m-marcas"><i class="fa-brands fa-cc-visa"></i><i class="fa-brands fa-cc-mastercard"></i></span>
+                    </button>
+                    <button type="button" class="rg-metodo" data-metodo="YAPE">
+                        <span class="rg-m-ico"><img class="rg-yape-img" th:src="@{/img/yape.webp}" src="/img/yape.webp" alt="" onerror="this.outerHTML='&lt;span class=&quot;rg-logo-yape&quot;&gt;yape&lt;/span&gt;'"></span>
+                        <span>Yape</span>
+                    </button>
+                    <button type="button" class="rg-metodo" data-metodo="PAYPAL">
+                        <span class="rg-m-ico"><img class="rg-pp-img" th:src="@{/img/paypal.jpg}" src="/img/paypal.jpg" alt="PayPal" onerror="this.outerHTML='&lt;span class=&quot;rg-logo-paypal&quot;&gt;&lt;b&gt;Pay&lt;/b&gt;&lt;i&gt;Pal&lt;/i&gt;&lt;/span&gt;'"></span>
+                        <span>PayPal</span>
+                    </button>
+                </div>
+
+                <div class="rg-mpanel activo" data-mpanel="TARJETA">
+                    <div class="rg-campo">
+                        <label for="rgFa" class="rg-etq" data-t="Número de tarjeta"></label>
+                        <div class="rg-input">
+                            <input type="text" id="rgFa" inputmode="numeric" maxlength="19" placeholder="•••• •••• •••• ••••" autocomplete="off" name="rg-n1">
+                            <i class="fa-regular fa-credit-card" id="rgMarcaIcono"></i>
+                        </div>
+                        <small class="rg-err" id="rgFaErr"></small>
+                    </div>
+                    <div class="rg-campo">
+                        <label for="rgFb" class="rg-etq" data-t="Nombre del titular"></label>
+                        <div class="rg-input">
+                            <input type="text" id="rgFb" maxlength="60" placeholder="Nombre y apellido" autocomplete="off" name="rg-n2">
+                            <i class="fa-regular fa-user"></i>
+                        </div>
+                        <small class="rg-err" id="rgFbErr"></small>
+                    </div>
+                    <div class="rg-fila">
+                        <div class="rg-campo">
+                            <label for="rgFc" class="rg-etq" data-t="Vencimiento"></label>
+                            <div class="rg-input">
+                                <input type="text" id="rgFc" inputmode="numeric" maxlength="5" placeholder="••/••" autocomplete="off" name="rg-n3">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
+                            <small class="rg-err" id="rgFcErr"></small>
+                        </div>
+                        <div class="rg-campo">
+                            <label for="rgFd" class="rg-etq" data-t="CVV"></label>
+                            <div class="rg-input">
+                                <input type="text" id="rgFd" class="rg-secreto" inputmode="numeric" maxlength="3" placeholder="•••" autocomplete="off" name="rg-n4">
+                                <i class="fa-solid fa-lock"></i>
+                            </div>
+                            <small class="rg-err" id="rgFdErr"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rg-mpanel" data-mpanel="YAPE">
+                    <ol class="rg-yape-pasos">
+                        <li><b>1</b><span>Escribe tu celular</span></li>
+                        <li><b>2</b><span>Recibe tu código</span></li>
+                        <li><b>3</b><span>Confírmalo</span></li>
+                    </ol>
+                    <div class="rg-campo">
+                        <label for="rgCelular">Número de celular</label>
+                        <div class="rg-input">
+                            <input type="text" id="rgCelular" inputmode="numeric" maxlength="11" placeholder="999 999 999" autocomplete="off" name="rg-n5">
+                            <i class="fa-solid fa-mobile-screen"></i>
+                        </div>
+                        <small class="rg-err" id="rgCelularErr"></small>
+                    </div>
+
+                    <button type="button" class="rg-btn rg-btn-sec rg-ancho" id="rgYapeSolicitar" disabled>Obtener código de aprobación</button>
+
+                    <div class="rg-yape-app" id="rgYapeApp" hidden>
+                        <div class="rg-yape-cab"><span class="rg-logo-yape rg-logo-claro">yape</span><small>ahora</small></div>
+                        <p>Tu código de aprobación</p>
+                        <strong id="rgYapeCodigoVista">000 000</strong>
+                        <small>Vale por 5 minutos</small>
+                    </div>
+
+                    <div class="rg-campo" id="rgYapeIngreso" hidden>
+                        <label>Código de aprobación</label>
+                        <div class="rg-otp" id="rgOtpYape"></div>
+                        <small class="rg-err rg-centro" id="rgCodigoErr"></small>
+                    </div>
+                </div>
+
+                <div class="rg-mpanel" data-mpanel="PAYPAL">
+                    <div class="rg-paypal-info">
+                        <img class="rg-pp-img" th:src="@{/img/paypal.jpg}" src="/img/paypal.jpg" alt="PayPal" onerror="this.outerHTML='&lt;span class=&quot;rg-logo-paypal&quot;&gt;&lt;b&gt;Pay&lt;/b&gt;&lt;i&gt;Pal&lt;/i&gt;&lt;/span&gt;'">
+                        <p>Inicia sesión en tu cuenta de PayPal para confirmar el pago. El cobro se hace en dólares (US$).</p>
+                        <ul class="rg-paypal-lista">
+                            <li><i class="fa-solid fa-check"></i>Revisas el monto en dólares antes de pagar</li>
+                            <li><i class="fa-solid fa-check"></i>Puedes cancelar y volver cuando quieras</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="rg-error-bloque" id="rgPagoError" hidden></p>
+
+                <div class="rg-pie rg-pie-doble">
+                    <button type="button" class="rg-btn rg-btn-sec" id="rgPagoAtras">Atrás</button>
+                    <button type="button" class="rg-btn rg-btn-pri" id="rgPagar" disabled>Pagar</button>
+                </div>
+            </section>
+
+            <section class="rg-panel" data-panel="4">
+                <h2>Configura tu establecimiento</h2>
+                <p class="rg-sub">Ingresa los datos de tu librería y crea la contraseña con la que entrarás al panel.</p>
+                <p class="rg-pago-ok" id="rgPagoOk" hidden><i class="fa-solid fa-circle-check"></i><span id="rgPagoOkTxt"></span></p>
+
+                <div class="rg-campo">
+                    <label for="rgNombre">Nombre comercial</label>
+                    <div class="rg-input">
+                        <input type="text" id="rgNombre" maxlength="150" placeholder="Ej: Librería El Ateneo" autocomplete="off">
+                        <i class="fa-regular fa-building"></i>
+                    </div>
+                    <small class="rg-err" id="rgNombreErr"></small>
+                </div>
+                <div class="rg-campo">
+                    <label for="rgRuc">RUC</label>
+                    <div class="rg-input">
+                        <input type="text" id="rgRuc" inputmode="numeric" maxlength="11" placeholder="11 dígitos" autocomplete="off">
+                        <i class="fa-regular fa-id-card"></i>
+                    </div>
+                    <small class="rg-err" id="rgRucErr"></small>
+                </div>
+                <div class="rg-campo">
+                    <label for="rgDireccion">Dirección</label>
+                    <div class="rg-input">
+                        <input type="text" id="rgDireccion" maxlength="255" placeholder="Ej: Av. Próceres 123, San Juan de Lurigancho" autocomplete="off">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <small class="rg-err" id="rgDireccionErr"></small>
+                </div>
+                <div class="rg-campo">
+                    <label for="rgPassword">Contraseña</label>
+                    <div class="rg-input">
+                        <input type="password" id="rgPassword" maxlength="20" placeholder="8 a 20 caracteres" autocomplete="new-password">
+                        <i class="fa-regular fa-eye rg-ojo" id="rgOjo" title="Mostrar u ocultar"></i>
+                    </div>
+                    <div class="rg-fuerza" id="rgFuerza"><i></i><i></i><i></i><i></i></div>
+                    <small class="rg-err" id="rgPasswordErr"></small>
+                </div>
+
+                <div class="rg-pie">
+                    <button type="button" class="rg-btn rg-btn-pri rg-ancho" id="rgContinuarLib" disabled>Continuar</button>
+                </div>
+            </section>
+
+            <section class="rg-panel" data-panel="5">
+                <h2>Perfil de tu librería</h2>
+                <p class="rg-sub">Este paso es opcional: puedes configurarlo cuando quieras en <strong>Ajustes</strong>, dentro de tu panel. Los lectores lo verán en Red Global.</p>
+
+                <div class="rg-campo">
+                    <label for="rgDescripcion">Descripción</label>
+                    <div class="rg-input rg-input-area">
+                        <textarea id="rgDescripcion" maxlength="300" rows="3" placeholder="Cuéntales qué ofrece tu librería" autocomplete="off"></textarea>
+                    </div>
+                    <small class="rg-contador" id="rgDescripcionCont">0 / 300</small>
+                </div>
+
+                <div class="rg-fila">
+                    <div class="rg-campo">
+                        <label for="rgTelefono">Teléfono</label>
+                        <div class="rg-input">
+                            <input type="text" id="rgTelefono" inputmode="numeric" maxlength="11" placeholder="987 654 321" autocomplete="off">
+                            <i class="fa-solid fa-phone"></i>
+                        </div>
+                        <small class="rg-err" id="rgTelefonoErr"></small>
+                    </div>
+                    <div class="rg-campo">
+                        <span class="rg-etiqueta">Correo de contacto</span>
+                        <label class="rg-check rg-check-corto" for="rgUsarCuenta">
+                            <input type="checkbox" id="rgUsarCuenta" checked>
+                            <span class="rg-check-caja"><i class="fa-solid fa-check"></i></span>
+                            <span>El de mi cuenta</span>
+                        </label>
+                        <small class="rg-dato-cuenta" id="rgCorreoCuentaTxt"></small>
+                    </div>
+                </div>
+                <div class="rg-campo" id="rgCorreoContactoCaja" hidden>
+                    <label for="rgCorreoContacto">Otro correo de contacto</label>
+                    <div class="rg-input">
+                        <input type="email" id="rgCorreoContacto" maxlength="120" placeholder="contacto@tulibreria.com" autocomplete="off">
+                        <i class="fa-regular fa-envelope"></i>
+                    </div>
+                    <small class="rg-err" id="rgCorreoContactoErr"></small>
+                </div>
+
+                <div class="rg-campo">
+                    <span class="rg-etiqueta">Horario de atención</span>
+                    <div class="rg-hor-presets" id="rgHorPresets">
+                        <button type="button" data-p="semana">Lun a Vie</button>
+                        <button type="button" data-p="sabado">Lun a Sáb</button>
+                        <button type="button" data-p="todos">Todos los días</button>
+                        <button type="button" data-p="limpiar" class="rg-hor-limpiar">Limpiar</button>
+                    </div>
+                    <div class="rg-hor-dias" id="rgHorDias"></div>
+                    <div class="rg-hor-resumen" id="rgHorResumen"></div>
+                    <input type="hidden" id="rgHorario">
+                    <small class="rg-err" id="rgHorarioErr"></small>
+                </div>
+
+                <p class="rg-error-bloque" id="rgFinError" hidden></p>
+
+                <div class="rg-pie rg-pie-doble">
+                    <button type="button" class="rg-btn rg-btn-sec" id="rgPerfilAtras">Atrás</button>
+                    <button type="button" class="rg-btn rg-btn-pri" id="rgFinalizar">Finalizar registro</button>
+                </div>
+            </section>
+
+            <section class="rg-panel rg-exito" data-panel="6">
+                <div class="rg-exito-icono"><i class="fa-solid fa-check"></i></div>
+                <h2>¡Tu librería está lista!</h2>
+                <p class="rg-sub"><span id="rgExitoTexto">Te enviamos el comprobante de pago a</span><br><strong id="rgExitoCorreo"></strong></p>
+
+                <dl class="rg-resumen">
+                    <div><dt>Librería</dt><dd id="rgExitoNombre"></dd></div>
+                    <div><dt>Código de administrador</dt><dd id="rgExitoCodigo" class="rg-codigo"></dd></div>
+                    <div><dt>Plan</dt><dd id="rgExitoPlan"></dd></div>
+                    <div><dt>Vigente hasta</dt><dd id="rgExitoVence"></dd></div>
+                    <div><dt>Renovación</dt><dd id="rgExitoRenov"></dd></div>
+                </dl>
+
+                <div class="rg-pie">
+                    <a class="rg-btn rg-btn-pri rg-ancho" th:href="@{/login-admin}" href="/login-admin">Ir a iniciar sesión</a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<div class="rg-overlay" id="rgProcesando" hidden>
+    <div class="rg-procesando">
+        <div class="rg-spinner"></div>
+        <strong>Procesando tu pago…</strong>
+        <small>No cierres esta ventana.</small>
+    </div>
+</div>
+
+<!-- PAYPAL (inicio de sesión + confirmación) -->
+<div class="rg-overlay" id="rgPaypal" hidden>
+    <div class="rg-modal rg-paypal-modal" role="dialog" aria-modal="true">
+        <div class="rg-paypal-cab"><img class="rg-pp-img" th:src="@{/img/paypal.jpg}" src="/img/paypal.jpg" alt="PayPal" onerror="this.outerHTML='&lt;span class=&quot;rg-logo-paypal&quot;&gt;&lt;b&gt;Pay&lt;/b&gt;&lt;i&gt;Pal&lt;/i&gt;&lt;/span&gt;'"></div>
+
+        <div id="rgPpLogin">
+            <h3>Inicia sesión en PayPal</h3>
+            <div class="rg-campo">
+                <div class="rg-input"><input type="email" id="rgPpCorreo" placeholder="Correo electrónico" autocomplete="off" maxlength="120"></div>
+            </div>
+            <div class="rg-campo">
+                <div class="rg-input"><input type="password" id="rgPpClave" placeholder="Contraseña" autocomplete="off" maxlength="40"></div>
+            </div>
+            <small class="rg-err" id="rgPpErr"></small>
+            <button type="button" class="rg-btn rg-btn-paypal rg-ancho" id="rgPpEntrar" disabled>Iniciar sesión</button>
+            <button type="button" class="rg-link rg-centro-link" id="rgPpCancelar1">Cancelar y volver</button>
+        </div>
+
+        <div id="rgPpRevisar" hidden>
+            <h3>Revisa tu pago</h3>
+            <p class="rg-pp-hola">Hola, <strong id="rgPpNombre"></strong></p>
+            <dl class="rg-resumen rg-resumen-pp">
+                <div><dt>Pagar a</dt><dd>LibRed</dd></div>
+                <div><dt>Concepto</dt><dd id="rgPpConcepto"></dd></div>
+                <div><dt>Total</dt><dd><strong id="rgPpTotal"></strong></dd></div>
+            </dl>
+            <button type="button" class="rg-btn rg-btn-paypal rg-ancho" id="rgPpPagar">Pagar ahora</button>
+            <button type="button" class="rg-link rg-centro-link" id="rgPpCancelar2">Cancelar y volver</button>
+        </div>
+    </div>
+</div>
+
+<!-- Términos y condiciones -->
+<div class="rg-overlay" id="rgTerminos" hidden>
+    <div class="rg-modal rg-terminos" role="dialog" aria-modal="true" aria-labelledby="rgTerminosTit">
+        <button type="button" class="rg-cerrar" id="rgTerminosCerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        <h3 id="rgTerminosTit">Términos y condiciones</h3>
+        <div class="rg-terminos-cuerpo">
+            <h4>1. El servicio</h4>
+            <p>LibRed es una plataforma web para que librerías y bibliotecas gestionen su inventario, préstamos, lectores, multas y reportes, y para que los lectores consulten el catálogo de la red.</p>
+            <h4>2. Tu cuenta</h4>
+            <p>Debes registrar un correo electrónico válido que sea tuyo y mantener la confidencialidad de tu código de administrador y de tu contraseña. Eres responsable de la actividad que ocurra con tus credenciales.</p>
+            <h4>3. Membresía y pagos</h4>
+            <p>El acceso se contrata por un periodo de 30 días (plan mensual) o 365 días (plan anual), a los precios mostrados al momento de la compra. La membresía se activa cuando el pago es aprobado. Al vencer el periodo, el acceso al panel puede quedar limitado hasta renovar.</p>
+            <h4>4. Uso adecuado</h4>
+            <p>Te comprometes a usar LibRed solo para la gestión legítima de tu establecimiento, a no intentar acceder a datos de otras librerías y a no usar el servicio para fines ilícitos.</p>
+            <h4>5. Datos personales</h4>
+            <p>Tratamos los datos que registras (correo, datos de tu establecimiento y los de tus lectores) únicamente para prestar el servicio, conforme a la Ley N.° 29733, Ley de Protección de Datos Personales. Los datos de cada librería permanecen aislados de los de las demás. No almacenamos números completos de tarjetas.</p>
+            <h4>6. Disponibilidad y responsabilidad</h4>
+            <p>Hacemos nuestro mejor esfuerzo por mantener el servicio disponible, pero no garantizamos que funcione sin interrupciones. Te recomendamos conservar respaldo de la información que consideres crítica.</p>
+            <h4>7. Cambios</h4>
+            <p>Podemos actualizar estos términos; te avisaremos por el correo registrado cuando haya cambios importantes.</p>
+        </div>
+        <button type="button" class="rg-btn rg-btn-pri rg-ancho" id="rgTerminosOk">Entendido</button>
+    </div>
+</div>
+
+<script th:src="@{/js/registro.js}" src="/js/registro.js"></script>
+</body>
+</html>

@@ -6,11 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-/**
- * Pantallas generales del panel del lector:
- *  - Vista General (/lector/panel)
- *  - Cerrar sesión (/lector/logout)
- */
+/** Pantallas generales del panel del lector: */
 @Controller
 public class LectorPanelController {
 

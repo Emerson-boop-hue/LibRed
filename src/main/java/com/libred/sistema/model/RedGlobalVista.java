@@ -45,7 +45,7 @@ public class RedGlobalVista {
         private final Integer id;
         private final String nombre;
         private final String iniciales;
-        private final int tono;              // 0..5: color del avatar
+        private final int tono;
         private final String direccion;
         private final String telefono;
         private final String correo;
@@ -59,6 +59,7 @@ public class RedGlobalVista {
         private final List<CategoriaChip> categorias;
         private final boolean sedeActual;
         private final boolean miembro;
+        private final boolean suspendida;     // membresía vencida: no recibe pedidos
         private final long[] votosPorEstrella; // posición 0 = votos de 1 estrella ... 4 = votos de 5 estrellas
 
         public TarjetaLibreria(Integer id, String nombre, String iniciales, int tono,
@@ -66,7 +67,7 @@ public class RedGlobalVista {
                                String descripcion, String miembroDesde, long articulos,
                                int maxDias, Integer maxActivos, BigDecimal tarifaDesde,
                                List<CategoriaChip> categorias, boolean sedeActual, boolean miembro,
-                               long[] votosPorEstrella) {
+                               boolean suspendida, long[] votosPorEstrella) {
             this.id = id;
             this.nombre = nombre;
             this.iniciales = iniciales;
@@ -84,10 +85,12 @@ public class RedGlobalVista {
             this.categorias = categorias;
             this.sedeActual = sedeActual;
             this.miembro = miembro;
+            this.suspendida = suspendida;
             this.votosPorEstrella = votosPorEstrella;
         }
 
         public Integer getId() { return id; }
+        public boolean isSuspendida() { return suspendida; }
         public String getNombre() { return nombre; }
         public String getIniciales() { return iniciales; }
         public int getTono() { return tono; }
@@ -111,7 +114,7 @@ public class RedGlobalVista {
             }
             return sb.toString();
         }
-        // ----- Calificación (promedio de las calificaciones de sus préstamos) -----
+        // Calificación (promedio de las calificaciones de sus préstamos)
         public long getVotos() {
             long total = 0;
             for (long v : votosPorEstrella) {

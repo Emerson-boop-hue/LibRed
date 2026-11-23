@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-/**
- * Datos básicos del lector que inició sesión (para la Vista General).
- * Cada registro de lector pertenece a una librería: esa es la "sede" a la que entró en este inicio de sesión.
- */
+/** Datos básicos del lector que inició sesión (para la Vista General). */
 @Service
 public class LectorPanelService {
 

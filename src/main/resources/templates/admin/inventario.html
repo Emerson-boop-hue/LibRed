@@ -17,20 +17,23 @@
   <body>
     <!-- Contenedor principal que se inyecta en el layout -->
     <div class="dashboard-container" data-css="inventario.css">
-      
-      <!-- BARRA SUPERIOR DE ACCIONES Y FILTROS -->
-      <div class="inventario-toolbar">
-        <div class="search-box-inv">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input
-            type="text"
-            id="inputBuscar"
-            placeholder="Buscar por título o autor..."
-            th:value="${keyword}"
-          />
-        </div>
 
-        <div class="filter-actions-inv">
+      <!-- Error que el servidor rechazó al guardar (si lo hay) -->
+      <p th:if="${error}" th:text="${error}" style="margin: 0 0 12px; font-size: 0.9rem; font-weight: 600; color: var(--danger-text, #ef4444);"></p>
+
+      <!-- BARRA SUPERIOR: buscador, categoría, limpiar filtros y registrar -->
+      <div class="inventario-toolbar">
+        <div class="inventario-filtros">
+          <div class="search-box-inv">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
+              id="inputBuscar"
+              placeholder="Buscar por título o autor..."
+              th:value="${keyword}"
+            />
+          </div>
+
           <select id="selectCategoria" class="select-categoria">
             <option value="">Todas las categorías</option>
             <option th:each="c : ${categorias}" th:value="${c.valor}"
@@ -39,121 +42,78 @@
                     th:text="${c.etiqueta + ' (desactivada)'}" th:selected="${categoriaSeleccionada == c.valor}">Mangas (desactivada)</option>
           </select>
 
-          <button class="btn-nuevo-articulo" onclick="abrirModalCrear()">
-            <i class="fa-solid fa-plus"></i> Registrar nuevo artículo
+          <!-- Limpia TODOS los filtros: buscador, categoría y estado del stock -->
+          <button type="button" class="btn-limpiar-inv" id="btnLimpiarFiltrosInv" th:classappend="${!hayFiltros} ? 'inactivo'">
+            <i class="fa-solid fa-eraser"></i> Limpiar
           </button>
         </div>
+
+        <!-- Solo aparece si hay artículos sin imagen -->
+        <button type="button" class="btn-portadas" id="btnCompletarPortadas" th:if="${sinPortada > 0}">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Completar portadas (<b id="portadasPendientes" th:text="${sinPortada}">0</b>)</span>
+        </button>
+
+        <button class="btn-nuevo-articulo" onclick="abrirModalCrear()">
+          <i class="fa-solid fa-plus"></i> Registrar nuevo artículo
+        </button>
       </div>
 
-      <!-- KPIS DE INVENTARIO -->
+      <!-- KPIS: los tres funcionan como filtro (clic para activar; otro clic en Crítico/Agotados lo quita; el primero quita todos los filtros) -->
       <div class="inventario-kpis">
-        <div class="kpi-card">
-          <div
-            class="kpi-icon-box"
-            style="background-color: #dbeafe; color: #2563eb"
-          >
-            <i class="fa-solid fa-boxes-stacked"></i>
+        <button type="button" class="kpi-card" id="kpiInvTotal" data-estado="" th:classappend="${estadoSeleccionado == null} ? 'activo'">
+          <div class="kpi-icon-box azul"><i class="fa-solid fa-boxes-stacked"></i></div>
+          <div class="kpi-info">
+            <span class="kpi-label">EJEMPLARES / TÍTULOS</span>
+            <span class="kpi-value"><span th:text="${totalArticulos}">0</span><small class="kpi-sub"> / <span th:text="${totalTitulos}">0</span></small></span>
           </div>
-          <div>
-            <span class="kpi-label">TOTAL ARTÍCULOS</span>
-            <h2 class="kpi-value" th:text="${totalArticulos}">0</h2>
-          </div>
-        </div>
+        </button>
 
-        <div class="kpi-card">
-          <div
-            class="kpi-icon-box"
-            style="background-color: #fef3c7; color: #d97706"
-          >
-            <i class="fa-solid fa-triangle-exclamation"></i>
-          </div>
-          <div>
+        <button type="button" class="kpi-card kpi-critico" id="kpiInvCritico" data-estado="CRITICO" th:classappend="${estadoSeleccionado == 'CRITICO'} ? 'activo'">
+          <div class="kpi-icon-box ambar"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="kpi-info">
             <span class="kpi-label">STOCK CRÍTICO</span>
-            <h2 class="kpi-value text-warning" th:text="${stockCritico}">0</h2>
+            <span class="kpi-value text-warning" th:text="${stockCritico}">0</span>
           </div>
-        </div>
+        </button>
 
-        <div class="kpi-card">
-          <div
-            class="kpi-icon-box"
-            style="background-color: #fee2e2; color: #dc2626"
-          >
-            <i class="fa-solid fa-ban"></i>
-          </div>
-          <div>
+        <button type="button" class="kpi-card kpi-agotado" id="kpiInvAgotado" data-estado="AGOTADO" th:classappend="${estadoSeleccionado == 'AGOTADO'} ? 'activo'">
+          <div class="kpi-icon-box rojo"><i class="fa-solid fa-ban"></i></div>
+          <div class="kpi-info">
             <span class="kpi-label">ARTÍCULOS AGOTADOS</span>
-            <h2 class="kpi-value text-danger" th:text="${articulosAgotados}">0</h2>
+            <span class="kpi-value text-danger" th:text="${articulosAgotados}">0</span>
           </div>
-        </div>
+        </button>
       </div>
 
-      <!-- TABLA DE CATÁLOGO CON SCROLL FIJO -->
+      <!-- Tabla de catálogo con scroll fijo -->
       <div class="tabla-contenedor-fijo" id="tablaContenedor">
         <table class="tabla-inventario">
           <thead>
             <tr>
-              <th style="width: 50px; text-align: center">TIPO</th>
+              <th style="width: 80px; text-align: center">PORTADA</th>
               <th>TÍTULO Y AUTOR</th>
-              <th style="width: 140px">CÓDIGO</th>
+              <th style="width: 130px">CÓDIGO</th>
               <th style="width: 130px">CATEGORÍA</th>
-              <th style="width: 130px">STOCK FÍSICO</th>
-              <th style="width: 140px">ESTADO</th>
-              <th style="width: 100px; text-align: center">ACCIONES</th>
+              <th style="width: 150px">STOCK FÍSICO</th>
+              <th style="width: 120px">ESTADO</th>
+              <th style="width: 110px; text-align: center">ACCIONES</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Mensaje si la base de datos está vacía -->
+            <!-- Mensaje si no hay artículos (o si los filtros no encuentran ninguno) -->
             <tr th:if="${#lists.isEmpty(recursos)}">
-              <td
-                colspan="7"
-                style="
-                  text-align: center;
-                  padding: 30px;
-                  color: var(--text-muted);
-                "
-              >
-                No hay artículos registrados en el inventario.
-              </td>
+              <td colspan="7" class="fila-sin-resultados">Sin resultados</td>
             </tr>
 
             <!-- Iteración sobre los recursos enviados por el controlador -->
             <tr th:each="recurso : ${recursos}">
               <td style="text-align: center">
-                <i
-                  th:if="${recurso.tipoRecurso == 'LIBROS'}"
-                  class="fa-solid fa-book"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'NOVELAS LIGERAS'}"
-                  class="fa-solid fa-feather"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'CUENTOS'}"
-                  class="fa-solid fa-star"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'COMICS'}"
-                  class="fa-solid fa-mask"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'MANGAS'}"
-                  class="fa-solid fa-book-open"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'REVISTAS'}"
-                  class="fa-solid fa-newspaper"
-                  style="color: var(--text-muted)"
-                ></i>
-                <i
-                  th:if="${recurso.tipoRecurso == 'OTROS'}"
-                  class="fa-solid fa-box"
-                  style="color: var(--text-muted)"
-                ></i>
+                <!-- Portada: la imagen del artículo o, si no tiene, un recuadro "Sin imagen" -->
+                <div class="thumb-inv" th:if="${recurso.imagenUrl != null}">
+                  <img th:src="${recurso.imagenUrl}" alt="" loading="lazy" />
+                </div>
+                <div class="thumb-inv sin-imagen" th:if="${recurso.imagenUrl == null}">Sin<br />imagen</div>
               </td>
 
               <td>
@@ -166,10 +126,13 @@
               </td>
               <td th:text="${recurso.codigo}">CÓDIGO</td>
               <td th:text="${recurso.tipoRecurso}">Categoría</td>
-              <td
-                th:text="${recurso.stockDisponible + ' / ' + recurso.stockTotal + ' uds.'}"
-              >
-                0 / 0 uds.
+              <td>
+                <div class="stock-txt" th:text="${recurso.stockDisponible + ' / ' + recurso.stockTotal + ' uds.'}">0 / 0 uds.</div>
+                <!-- Barra: unidades disponibles sobre el total, con el color del estado -->
+                <div class="stock-barra">
+                  <span th:class="'stock-barra-nivel ' + ${recurso.estado.toLowerCase()}"
+                        th:style="'width: ' + ${recurso.stockTotal > 0 ? (recurso.stockDisponible * 100 / recurso.stockTotal) : 0} + '%'"></span>
+                </div>
               </td>
 
               <td>
@@ -180,82 +143,135 @@
                 >
               </td>
 
-              <td style="text-align: center">
-                <!-- Botón Modificar (Lápiz) que abre el modal con datos precargados -->
-                <button class="btn-accion" title="Modificar" 
-                        th:onclick="abrirModalEditar([[${recurso.id}]], [[${recurso.tipoRecurso}]], [[${recurso.codigo}]], [[${recurso.titulo}]], [[${recurso.autorOCreador}]], [[${recurso.stockTotal}]], [[${recurso.stockDisponible}]])">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-                <!-- Botón Eliminar (Papelera) que abre el modal de confirmación -->
-                <button class="btn-accion eliminar" title="Eliminar"
-                        th:onclick="abrirModalEliminar([[${recurso.id}]], [[${recurso.titulo}]], [[${recurso.codigo}]])">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
+              <td>
+                <div class="acciones-inv">
+                  <!-- Botón Modificar (Lápiz) que abre el modal con datos precargados -->
+                  <button class="btn-accion" title="Modificar"
+                          th:onclick="abrirModalEditar([[${recurso.id}]], [[${recurso.tipoRecurso}]], [[${recurso.codigo}]], [[${recurso.titulo}]], [[${recurso.autorOCreador}]], [[${recurso.stockTotal}]], [[${recurso.stockDisponible}]], [[${recurso.imagenUrl}]])">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <!-- Botón Eliminar (Papelera) que abre el modal de confirmación -->
+                  <button class="btn-accion eliminar" title="Eliminar"
+                          th:onclick="abrirModalEliminar([[${recurso.id}]], [[${recurso.titulo}]], [[${recurso.codigo}]])">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- MODAL UNIFICADO (REGISTRO Y EDICIÓN) -->
+      <!-- MODAL UNIFICADO (REGISTRO Y EDICIÓN): campos a la izquierda e imagen a la derecha -->
       <div id="modalArticulo" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="modal-content" style="background: var(--card-bg, #fff); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 id="modalTituloLabel" style="margin: 0; font-size: 1.25rem; color: var(--text-dark);">Registrar Nuevo Artículo</h3>
-            <span onclick="cerrarModalArticulo()" style="cursor: pointer; font-size: 1.2rem; color: var(--text-muted);"><i class="fa-solid fa-xmark"></i></span>
+        <div class="modal-content modal-articulo">
+          <div class="modal-articulo-cabecera">
+            <h3 id="modalTituloLabel">Registrar Nuevo Artículo</h3>
+            <span class="modal-cerrar" onclick="cerrarModalArticulo()"><i class="fa-solid fa-xmark"></i></span>
           </div>
 
-          <form th:action="@{/admin/inventario/guardar}" method="post">
+          <form id="formArticulo" th:action="@{/admin/inventario/guardar}" method="post" enctype="multipart/form-data">
             <!-- ID oculto para saber si es actualización -->
             <input type="hidden" id="modalId" name="id" />
 
-            <div style="margin-bottom: 15px;">
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Categoría / Tipo</label>
-              <select id="modalCategoria" name="tipoRecurso" class="select-categoria" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);">
-                <option th:each="c : ${categorias}" th:value="${c.valor}" th:text="${c.etiqueta}">Libros</option>
-                <!-- Categorías desactivadas: ocultas en la lista; solo permiten editar artículos antiguos que ya estaban en ellas -->
-                <option th:each="c : ${categoriasInactivas}" th:value="${c.valor}" th:text="${c.etiqueta}" hidden>Mangas</option>
-              </select>
-            </div>
+            <div class="modal-articulo-grid">
+              <div class="modal-campos">
+                <div class="mi-campo">
+                  <label>Categoría / Tipo</label>
+                  <select id="modalCategoria" name="tipoRecurso" class="mi-input" required>
+                    <option th:each="c : ${categorias}" th:value="${c.valor}" th:text="${c.etiqueta}">Libros</option>
+                    <!-- Categorías desactivadas: ocultas en la lista; solo permiten editar artículos antiguos que ya estaban en ellas -->
+                    <option th:each="c : ${categoriasInactivas}" th:value="${c.valor}" th:text="${c.etiqueta}" hidden>Mangas</option>
+                  </select>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Código</label>
-              <input type="text" id="modalCodigo" name="codigo" readonly style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: rgba(0,0,0,0.04); color: var(--text-muted); font-weight: 600;" />
-            </div>
+                <div class="mi-campo">
+                  <label>Código</label>
+                  <input type="text" id="modalCodigo" name="codigo" class="mi-input" readonly />
+                </div>
 
-            <div style="margin-bottom: 15px;">
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Título del Artículo</label>
-              <input type="text" id="modalTitulo" name="titulo" placeholder="Ej. Clean Code" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
-            </div>
+                <div class="mi-campo">
+                  <label>Título del Artículo</label>
+                  <input type="text" id="modalTitulo" name="titulo" class="mi-input" placeholder="Ej. Clean Code" required />
+                  <p class="msg-stock" id="msgTitulo" hidden></p>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-              <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Autor o Creador</label>
-              <input type="text" id="modalAutor" name="autorOCreador" placeholder="Ej. Robert C. Martin" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
-            </div>
+                <div class="mi-campo">
+                  <label>Autor o Creador</label>
+                  <input type="text" id="modalAutor" name="autorOCreador" class="mi-input" placeholder="Ej. Robert C. Martin" required />
+                </div>
 
-            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
-              <div style="flex: 1;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Stock Total</label>
-                <input type="number" id="modalStockTotal" name="stockTotal" min="0" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+                <div class="fila-stock">
+                  <div class="mi-campo">
+                    <label>Stock Total</label>
+                    <input type="number" id="modalStockTotal" name="stockTotal" class="mi-input" min="0" required />
+                  </div>
+                  <div class="mi-campo">
+                    <label>Stock Disponible</label>
+                    <input type="number" id="modalStockDisponible" name="stockDisponible" class="mi-input" min="0" required />
+                  </div>
+                </div>
+                <p class="msg-stock" id="msgStock" hidden></p>
               </div>
-              <div style="flex: 1;">
-                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted);">Stock Disponible</label>
-                <input type="number" id="modalStockDisponible" name="stockDisponible" min="0" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark);" />
+
+              <!-- IMAGEN (marco 4:5 fijo: se mueve y se hace zoom; lo que ves es lo que se guarda) -->
+              <div class="modal-imagen">
+                <div class="mi-label-fila">
+                  <label class="mi-label">Imagen del artículo <span class="mi-opcional">(opcional)</span></label>
+                  <span class="info-tip" tabindex="0" aria-label="Información sobre la imagen">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span class="info-tip-texto">
+                      <strong>Formatos:</strong> JPG, PNG, WebP o GIF (máx. 15 MB).<br />
+                      <strong>Marco:</strong> vertical 4:5. Lo que ves dentro es lo que se guarda.<br />
+                      <strong>Ajustes:</strong> arrastra para mover; rueda del mouse o deslizador para el zoom.<br />
+                      También puedes soltar una imagen sobre el marco.
+                    </span>
+                  </span>
+                </div>
+
+                <div class="marco-imagen vacio" id="marcoImagen">
+                  <canvas id="canvasImagen" width="240" height="300"></canvas>
+                  <div class="marco-vacio" id="marcoVacio">
+                    <i class="fa-regular fa-image"></i>
+                    <strong>Sin imagen</strong>
+                    <span>Haz clic o arrastra una imagen aquí</span>
+                  </div>
+                </div>
+
+                <div class="zoom-fila" id="zoomFila" hidden>
+                  <i class="fa-solid fa-magnifying-glass-minus"></i>
+                  <input type="range" id="zoomImagen" min="0" max="100" value="0" />
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </div>
+
+                <div class="botones-imagen">
+                  <button type="button" class="btn-mini" id="btnImagenElegir"><i class="fa-solid fa-image"></i> <span>Elegir imagen</span></button>
+                  <button type="button" class="btn-mini" id="btnImagenAuto" title="Buscar una portada automáticamente"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>Automática</span></button>
+                  <button type="button" class="btn-mini" id="btnImagenAjustar" title="Ajustar al marco" hidden><i class="fa-solid fa-expand"></i></button>
+                  <button type="button" class="btn-mini peligro" id="btnImagenQuitar" title="Quitar imagen" hidden><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+
+                <p class="ayuda-imagen" id="ayudaImagen" hidden></p>
+
+                <!-- Selector de archivo (sin nombre: no se envía) y archivo final recortado (este sí se envía) -->
+                <input type="file" id="inputImagenElegir" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
+                <input type="file" id="inputImagenFinal" name="imagenArchivo" hidden />
+                <input type="hidden" id="quitarImagen" name="quitarImagen" value="false" />
               </div>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-              <button type="button" onclick="cerrarModalArticulo()" style="padding: 10px 18px; border-radius: 8px; border: 1px solid var(--sidebar-border); background: var(--card-bg); color: var(--text-dark); cursor: pointer; font-weight: 500;">Cancelar</button>
-              <button type="submit" style="padding: 10px 18px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-weight: 600;">Guardar</button>
+            <div class="modal-articulo-pie">
+              <button type="button" class="btn-modal-sec" onclick="cerrarModalArticulo()">Cancelar</button>
+              <button type="submit" class="btn-modal-pri" id="btnGuardarArticulo">Guardar</button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+      <!-- Modal de confirmación de eliminación -->
       <div id="modalEliminar" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="modal-content" style="background: var(--card-bg, #fff); padding: 22px 25px; border-radius: 12px; width: 100%; max-width: 360px; height: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; box-sizing: border-box;">
-          <div style="width: 42px; height: 42px; background-color: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 1.1rem;">
+          <div style="width: 42px; height: 42px; background-color: var(--danger-soft); color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 1.1rem;">
             <i class="fa-solid fa-trash-can"></i>
           </div>
           <h3 style="font-size: 1.1rem; color: var(--text-dark); margin-bottom: 6px;">¿Eliminar artículo?</h3>

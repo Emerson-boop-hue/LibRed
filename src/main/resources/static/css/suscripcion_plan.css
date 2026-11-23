@@ -1,102 +1,328 @@
-/* =====================================================================
-   MODAL "ESTADO DE TU MEMBRESÍA" (panel administrativo) - prefijo "sus-"
-   Se apoya en .modal-overlay / .modal-content / .close-modal de layout_admin.css
-   ===================================================================== */
+/* MODALES DEL ENCABEZADO (panel administrativo): */
 
-/* El modal base mide 80% x 75vh; este es compacto y se ajusta a su contenido */
+/* Sin desenfoque de fondo (el blur consume mucha GPU y hace lentos los modales) */
+.modal-overlay { backdrop-filter: none; background: rgba(15, 23, 42, 0.6); }
+
+/* El modal base mide 80% x 75vh; estos son compactos y se ajustan a su contenido */
 .modal-content.sus-plan-modal {
-    width: 100%;
-    max-width: 520px;
-    height: auto;
-    max-height: 92vh;
-    overflow-y: auto;
-    padding: 32px 30px 26px;
+    width: 100%; max-width: 600px; height: auto; max-height: 94vh; overflow-y: auto; overflow-x: hidden;
+    padding: 26px 28px 24px;
 }
+.sus-cerrar {
+    position: absolute; top: 14px; right: 16px; width: 30px; height: 30px; border: 0; border-radius: 8px;
+    background: transparent; color: var(--text-muted); font-size: 1rem; cursor: pointer; transition: background 0.2s, color 0.2s;
+    z-index: 3;
+}
+.sus-cerrar:hover { background: var(--sidebar-hover-bg); color: var(--text-dark); }
 
-.sus-plan-head { text-align: center; margin-bottom: 22px; }
+.sus-plan-head { display: flex; align-items: center; gap: 14px; margin: 0 34px 18px 0; }
 .sus-plan-icon {
-    width: 62px; height: 62px;
-    margin: 0 auto 14px;
-    border-radius: 50%;
-    background: #fef3c7; color: #d97706;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.7rem;
+    width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(135deg, #1e293b, #334155); color: #fde68a;
+    display: flex; align-items: center; justify-content: center; font-size: 1.15rem;
+    box-shadow: 0 6px 14px rgba(30, 41, 59, 0.25);
 }
-.sus-plan-head h2 { font-size: 1.35rem; color: var(--text-dark); margin-bottom: 6px; }
-.sus-plan-head p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+.sus-plan-head h2 { font-size: 1.2rem; color: var(--accent-text-strong); margin: 0 0 2px; }
+.sus-plan-head p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin: 0; }
 
-.sus-plan-cargando { text-align: center; padding: 30px 0; color: var(--text-muted); font-size: 0.9rem; }
-.sus-plan-cargando[hidden], .sus-plan-contenido[hidden], .sus-plan-upgrade[hidden] { display: none; }
+.sus-plan-cargando { text-align: center; padding: 34px 0; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sus-plan-cargando[hidden], .sus-plan-contenido[hidden], .sus-plan-upgrade[hidden], .sus-plan-top[hidden], .sus-aviso-vencido[hidden] { display: none; }
+.sus-spinner { width: 16px; height: 16px; border: 2px solid var(--sidebar-border); border-top-color: var(--active-bg); border-radius: 50%; animation: susGira 0.8s linear infinite; }
+@keyframes susGira { to { transform: rotate(360deg); } }
 
-/* ---------- Resumen ---------- */
-.sus-plan-resumen {
-    border: 1px solid var(--sidebar-border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 18px;
+/* Entrada escalonada */
+.sus-entra .sus-anim { animation: susSube 0.3s ease-out both; animation-delay: calc(var(--d, 0) * 45ms); }
+@keyframes susSube { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.sus-aviso-vencido {
+    display: flex; gap: 10px; align-items: center; background: var(--danger-soft); color: var(--danger-text); border: 1px solid var(--danger-line);
+    border-radius: 12px; padding: 11px 14px; font-size: 0.83rem; margin-bottom: 12px;
 }
-.sus-plan-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 13px 18px;
-    border-bottom: 1px solid var(--sidebar-border);
-    font-size: 0.9rem;
-}
-.sus-plan-item .sus-lbl { color: var(--text-muted); }
-.sus-plan-item .sus-val { color: var(--text-dark); font-weight: 600; text-align: right; }
 
-.sus-estado { padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; }
+/* Tarjeta principal (grafito) */
+.sus-plan-hero {
+    position: relative; overflow: hidden; color: #fff; border-radius: 16px; padding: 20px 22px 18px; margin-bottom: 12px;
+    background: linear-gradient(135deg, #1e293b, #334155);
+}
+.sus-hero-fondo { position: absolute; inset: 0; pointer-events: none; }
+.sus-hero-fondo::before, .sus-hero-fondo::after { content: ""; position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.05); }
+.sus-hero-fondo::before { width: 220px; height: 220px; right: -70px; top: -90px; }
+.sus-hero-fondo::after { width: 140px; height: 140px; left: -50px; bottom: -70px; }
+.sus-hero-fila { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.sus-hero-info { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.sus-hero-etiqueta { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: #94a3b8; }
+.sus-hero-nombre { font-size: 1.45rem; line-height: 1.2; }
+.sus-hero-precio { font-size: 0.86rem; color: #cbd5e1; margin-bottom: 8px; }
+
+.sus-estado { padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
 .sus-estado.ok { background: #dcfce7; color: #166534; }
-.sus-estado.vencido { background: #fee2e2; color: #991b1b; }
+.sus-estado.vencido { background: var(--danger-soft); color: var(--danger-text); }
 
-.sus-plan-dias {
-    display: flex; align-items: baseline; justify-content: center; gap: 8px;
-    padding: 18px;
-    background: var(--sidebar-hover-bg);
-}
-.sus-plan-dias strong { font-size: 2.2rem; color: var(--text-dark); line-height: 1; }
-.sus-plan-dias span { font-size: 0.9rem; color: var(--text-muted); }
+.sus-anillo { position: relative; width: 116px; height: 116px; flex-shrink: 0; }
+.sus-anillo svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.sus-anillo circle { fill: none; stroke-width: 9; }
+.sus-anillo-pista { stroke: rgba(255, 255, 255, 0.14); }
+.sus-anillo-valor { stroke: #e2e8f0; stroke-linecap: round; stroke-dasharray: 326.73; stroke-dashoffset: 326.73; }
+.sus-anillo-centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.sus-anillo-centro strong { font-size: 1.9rem; line-height: 1; }
+.sus-anillo-centro span { font-size: 0.68rem; color: #cbd5e1; margin-top: 3px; }
 
-/* ---------- Tarjeta de mejora ---------- */
-.sus-plan-upgrade {
-    background: linear-gradient(135deg, #eff6ff, #dbeafe);
-    border: 1px solid #bfdbfe;
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 14px;
+.sus-linea { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.sus-linea small { display: block; font-size: 0.68rem; color: #94a3b8; margin-bottom: 1px; }
+.sus-linea b { font-size: 0.84rem; }
+.sus-linea-fin { text-align: right; }
+.sus-linea-barra { height: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); overflow: hidden; }
+.sus-linea-barra i { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--surface-strong); transition: width 0.6s ease-out; }
+
+/* Datos de la cuenta */
+.sus-datos { display: grid; grid-template-columns: 1.3fr 1fr 1.5fr 1fr; gap: 10px; margin-bottom: 12px; }
+.sus-dato {
+    border: 1px solid var(--sidebar-border); border-radius: 12px; padding: 11px 12px; display: flex; flex-direction: column; gap: 1px; min-width: 0;
+    transition: border-color 0.15s;
 }
-.sus-plan-upgrade h4 { font-size: 1rem; color: #1e3a8a; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-.sus-plan-upgrade p { font-size: 0.85rem; color: #1e40af; line-height: 1.5; margin-bottom: 14px; }
-.sus-plan-upgrade .sus-nota-migrar { font-size: 0.8rem; color: #1e40af; margin: -6px 0 12px; font-weight: 600; }
+.sus-dato:hover { border-color: var(--active-bg); }
+.sus-dato-icono {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--sidebar-hover-bg); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; font-size: 0.72rem; margin-bottom: 6px;
+}
+.sus-dato small { font-size: 0.68rem; color: var(--text-muted); }
+.sus-dato b { font-size: 0.82rem; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sus-dato em { font-style: normal; font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Incluido en el plan */
+.sus-incluye { margin-bottom: 12px; }
+.sus-incluye h5 { margin: 0 0 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-muted); }
+.sus-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.sus-chips span { background: var(--sidebar-hover-bg); color: var(--accent-text); border-radius: 999px; padding: 5px 11px; font-size: 0.76rem; font-weight: 500; }
+.sus-chips i { font-size: 0.62rem; margin-right: 4px; color: #16a34a; }
+
+/* Tarjeta de mejora */
+.sus-plan-upgrade, .sus-plan-top {
+    background: var(--bg-main); border: 1px solid var(--sidebar-border); border-radius: 14px; padding: 16px 18px;
+}
+.sus-upg-cab { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+.sus-plan-top { display: flex; gap: 12px; align-items: center; }
+.sus-upg-icono {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; background: var(--sidebar-hover-bg); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+}
+.sus-plan-upgrade h4, .sus-plan-top h4 { font-size: 0.95rem; color: var(--accent-text-strong); margin: 0 0 3px; }
+.sus-plan-upgrade p, .sus-plan-top p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+.sus-plan-top p strong { color: var(--text-dark); }
+
+.sus-comparar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; margin-bottom: 14px; }
+.sus-comp { background: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px; padding: 11px 14px; display: flex; flex-direction: column; gap: 2px; }
+.sus-comp small { font-size: 0.7rem; color: var(--text-muted); }
+.sus-comp b { font-size: 1.15rem; color: var(--text-dark); }
+.sus-comp em { font-style: normal; font-size: 0.72rem; color: var(--text-muted); }
+.sus-comp-flecha { align-self: center; color: var(--text-muted); font-size: 0.85rem; }
+.sus-comp-anual { border-color: var(--active-bg); background: linear-gradient(135deg, var(--card-bg), var(--sidebar-hover-bg)); }
+.sus-comp-anual em.sus-ahorro { color: #166534; font-weight: 700; }
+
+.sus-plan-upgrade .sus-nota-migrar { font-size: 0.8rem; color: var(--accent-text); margin: -4px 0 12px; font-weight: 600; animation: susSube 0.3s ease both; }
 .sus-plan-upgrade .sus-nota-migrar:empty { display: none; }
 
 .sus-btn-migrar {
-    width: 100%;
-    padding: 11px 16px;
-    border: none;
-    border-radius: 8px;
-    background: #2563eb; color: #fff;
-    font-size: 0.9rem; font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
+    position: relative; overflow: hidden; width: 100%; padding: 12px 16px; border: none; border-radius: 10px;
+    background: var(--active-bg); color: #fff; font-size: 0.88rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: background 0.2s, transform 0.15s, opacity 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.sus-btn-migrar:hover:not(:disabled) { background: #1d4ed8; }
-.sus-btn-migrar:disabled { opacity: 0.5; cursor: not-allowed; }
+.sus-btn-migrar:hover:not(:disabled) { box-shadow: 0 4px 12px rgba(30, 41, 59, 0.25); }
+.sus-btn-migrar:hover:not(:disabled) { background: var(--active-deep); }
+.sus-btn-migrar:active:not(:disabled) { transform: scale(0.985); }
+.sus-btn-migrar:disabled { opacity: 0.7; cursor: not-allowed; }
 .sus-btn-migrar.confirmar { background: #16a34a; }
 .sus-btn-migrar.confirmar:hover:not(:disabled) { background: #15803d; }
+.sus-btn-migrar.cargando::before {
+    content: ""; width: 15px; height: 15px; border: 2px solid rgba(255, 255, 255, 0.4); border-top-color: #fff; border-radius: 50%;
+    animation: susGira 0.7s linear infinite;
+}
 
-.sus-plan-msg { font-size: 0.85rem; text-align: center; margin-bottom: 10px; min-height: 0; }
+.sus-plan-msg { font-size: 0.85rem; text-align: center; margin: 10px 0 0; }
 .sus-plan-msg:empty { display: none; }
 .sus-plan-msg.ok { color: #166534; }
-.sus-plan-msg.error { color: #b91c1c; }
+.sus-plan-msg.error { color: var(--danger-text); }
 
-.sus-plan-footer { display: flex; justify-content: center; margin-top: 8px; }
-.sus-btn-cerrar {
-    padding: 9px 26px;
-    border-radius: 8px;
-    border: 1px solid var(--sidebar-border);
-    background: var(--card-bg);
-    color: var(--text-dark);
-    font-weight: 500; font-size: 0.88rem;
-    cursor: pointer;
+/* Éxito al migrar */
+.sus-exito {
+    position: absolute; inset: 0; z-index: 2; background: var(--card-bg); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px;
+    opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s;
 }
-.sus-btn-cerrar:hover { background: var(--sidebar-hover-bg); }
+.sus-exito.visible { opacity: 1; visibility: visible; }
+.sus-exito h3 { margin: 10px 0 0; font-size: 1.3rem; color: var(--accent-text-strong); }
+.sus-exito p { margin: 0; font-size: 0.88rem; color: var(--text-muted); max-width: 320px; }
+.sus-check { width: 84px; height: 84px; }
+.sus-check-circulo { fill: none; stroke: #16a34a; stroke-width: 3; stroke-dasharray: 151; stroke-dashoffset: 151; }
+.sus-check-marca { fill: none; stroke: #16a34a; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; }
+.sus-exito.visible .sus-check { animation: susRebote 0.4s ease both; }
+.sus-exito.visible .sus-check-circulo { animation: susTrazo 0.4s ease forwards; }
+.sus-exito.visible .sus-check-marca { animation: susTrazo 0.3s 0.35s ease forwards; }
+.sus-exito.visible h3, .sus-exito.visible p { animation: susSube 0.3s 0.5s ease both; }
+@keyframes susTrazo { to { stroke-dashoffset: 0; } }
+@keyframes susRebote { 0% { transform: scale(0.6); } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+@media (max-width: 560px) {
+    .sus-datos { grid-template-columns: repeat(2, 1fr); }
+    .sus-comparar { grid-template-columns: 1fr; }
+    .sus-comp-flecha { display: none; }
+    .sus-hero-fila { flex-direction: column-reverse; align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .sus-entra .sus-anim { animation: none; }
+    .sus-linea-barra i { transition: none; }
+}
+
+/* Invitar */
+.modal-content.modal-invitar { width: 100%; max-width: 440px; height: auto; text-align: center; padding: 28px; }
+.invitar-icono {
+    width: 50px; height: 50px; border-radius: 14px; margin: 0 auto 12px; background: var(--sidebar-hover-bg); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+.modal-invitar h3 { font-size: 1.15rem; color: var(--accent-text-strong); margin: 0 0 6px; }
+.invitar-sub { font-size: 0.84rem; color: var(--text-muted); line-height: 1.45; margin: 0 0 14px; }
+.invitar-texto {
+    width: 100%; resize: none; border: 1px solid var(--sidebar-border); border-radius: 10px; padding: 12px; font-family: inherit;
+    font-size: 0.84rem; line-height: 1.5; color: var(--text-dark); background: var(--bg-main); text-align: left; margin-bottom: 14px;
+}
+.invitar-acciones { display: flex; gap: 10px; }
+.btn-copiar, .btn-whatsapp {
+    flex: 1; border-radius: 10px; padding: 10px 12px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer;
+    text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-copiar { background: var(--card-bg); color: var(--accent-text); border: 1px solid var(--sidebar-border); }
+.btn-copiar:hover { background: var(--sidebar-hover-bg); }
+.btn-copiar.listo { color: #16a34a; border-color: #86efac; }
+.btn-whatsapp { background: var(--active-bg); color: #fff; border: 1px solid var(--active-bg); }
+.btn-whatsapp:hover { background: var(--active-deep); }
+
+/* Modo oscuro */
+:root[data-tema="oscuro"] .sus-estado.ok { background: rgba(74, 222, 128, 0.16); color: #86efac; }
+:root[data-tema="oscuro"] .sus-comp-anual em.sus-ahorro,
+:root[data-tema="oscuro"] .sus-plan-msg.ok { color: #86efac; }
+:root[data-tema="oscuro"] .sus-chips i { color: #4ade80; }
+:root[data-tema="oscuro"] .btn-copiar.listo { color: #4ade80; border-color: #166534; }
+
+/* RENOVACIÓN (automática / cancelada / manual) y PAGO dentro de "Ver plan actual" */
+.sus-renov {
+    background: var(--bg-main); border: 1px solid var(--sidebar-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+}
+.sus-renov-cab { display: flex; gap: 12px; align-items: flex-start; }
+.sus-renov-icono {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; background: var(--sidebar-hover-bg); color: var(--accent-text);
+    display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+}
+.sus-renov h4 { font-size: 0.93rem; color: var(--accent-text-strong); margin: 0 0 3px; }
+.sus-renov p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+.sus-renov.apagada .sus-renov-icono { color: var(--text-muted); }
+.sus-renov.aviso .sus-renov-icono { background: var(--danger-soft); color: var(--danger-text); }
+.sus-renov-alerta {
+    margin: 10px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--danger-soft); color: var(--danger-text);
+    border: 1px solid var(--danger-line); font-size: 0.78rem; line-height: 1.45;
+}
+.sus-renov-alerta[hidden] { display: none; }
+.sus-renov .sus-nota-migrar { font-size: 0.78rem; color: var(--accent-text); margin: 10px 0 0; font-weight: 600; }
+.sus-renov .sus-nota-migrar:empty { display: none; }
+.sus-renov-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.sus-renov-acciones:not(:has(button:not([hidden]))) { display: none; }
+
+.sus-btn-sec, .sus-btn-prim, .sus-btn-pagar {
+    position: relative; border-radius: 10px; font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+    padding: 9px 14px; transition: background 0.2s, border-color 0.2s, transform 0.15s, opacity 0.2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.sus-btn-sec { background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--sidebar-border); }
+.sus-btn-sec:hover:not(:disabled) { background: var(--sidebar-hover-bg); }
+.sus-btn-sec.ancho { width: 100%; }
+.sus-btn-sec.confirmar { background: #fef2f2; border-color: #fca5a5; color: #b91c1c; }
+.sus-btn-prim, .sus-btn-pagar { background: var(--active-bg); color: #fff; border: 1px solid var(--active-bg); }
+.sus-btn-prim:hover:not(:disabled), .sus-btn-pagar:hover:not(:disabled) { background: var(--active-deep); }
+.sus-btn-sec:active:not(:disabled), .sus-btn-prim:active:not(:disabled), .sus-btn-pagar:active:not(:disabled) { transform: scale(0.985); }
+.sus-btn-sec:disabled, .sus-btn-prim:disabled, .sus-btn-pagar:disabled { opacity: 0.55; cursor: not-allowed; }
+.sus-btn-sec[hidden], .sus-btn-prim[hidden] { display: none; }
+.sus-btn-sec.cargando::before, .sus-btn-pagar.cargando::before {
+    content: ""; width: 14px; height: 14px; border: 2px solid rgba(100, 116, 139, 0.35); border-top-color: var(--accent-text); border-radius: 50%;
+    animation: susGira 0.7s linear infinite;
+}
+.sus-btn-pagar.cargando::before { border-color: rgba(255, 255, 255, 0.4); border-top-color: #fff; }
+
+/* Panel de pago */
+.sus-pago[hidden] { display: none; }
+.sus-pago { padding-top: 4px; }
+.sus-pago h3 { margin: 6px 0 12px; font-size: 1.1rem; color: var(--accent-text-strong); }
+.sus-pago-atras {
+    background: none; border: none; color: var(--text-muted); font-family: inherit; font-size: 0.82rem; cursor: pointer; padding: 4px 0;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.sus-pago-atras:hover { color: var(--text-dark); }
+.sus-pago-resumen {
+    background: var(--bg-main); border: 1px solid var(--sidebar-border); border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+}
+.sus-pago-resumen div { display: flex; justify-content: space-between; gap: 12px; font-size: 0.82rem; color: var(--text-muted); padding: 3px 0; }
+.sus-pago-resumen b { color: var(--text-dark); font-weight: 600; text-align: right; }
+.sus-pago-resumen .total { margin-top: 6px; padding-top: 8px; border-top: 1px dashed var(--sidebar-border); font-weight: 600; color: var(--text-dark); }
+.sus-pago-resumen .total b { font-size: 1.1rem; }
+
+.sus-metodos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.sus-metodo {
+    background: var(--card-bg); border: 1px solid var(--sidebar-border); border-radius: 12px; padding: 10px 8px; cursor: pointer;
+    font-family: inherit; font-size: 0.78rem; font-weight: 600; color: var(--text-dark);
+    display: flex; flex-direction: column; align-items: center; gap: 6px; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sus-metodo:hover { border-color: var(--active-bg); }
+.sus-metodo.activo { border-color: var(--active-bg); box-shadow: 0 0 0 2px rgba(51, 65, 85, 0.18); }
+.sus-m-ico { height: 36px; display: flex; align-items: center; justify-content: center; }
+.sus-m-tarjeta { font-size: 1.5rem; background: linear-gradient(135deg, #2563eb, #7c3aed); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sus-yape-img { width: 64px; height: 36px; object-fit: cover; border-radius: 7px; display: block; }
+.sus-yape-txt { background: #6b2d8b; color: #fff; border-radius: 7px; padding: 4px 10px; font-size: 0.9rem; }
+.sus-pp-img { width: 84px; height: 30px; object-fit: cover; display: block; border-radius: 8px; }
+.sus-pp-txt { color: #003087; font-style: italic; font-size: 1rem; }
+
+.sus-mpanel[hidden] { display: none; }
+.sus-campo { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.sus-campo label { font-size: 0.74rem; font-weight: 600; color: var(--text-muted); }
+/* Etiquetas de la tarjeta puestas por CSS y CVV enmascarado sin type=password: así Chrome no lo toma por un formulario de pago y no muestra el aviso de autocompletado inhabilitado. */
+.sus-etq::after { content: attr(data-t); }
+.sus-secreto { -webkit-text-security: disc; }
+.sus-campo input {
+    width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--sidebar-border); border-radius: 9px;
+    background: var(--card-bg); color: var(--text-dark); font-family: inherit; font-size: 0.88rem; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sus-campo input:focus { border-color: var(--active-bg); box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.12); }
+.sus-campo input.con-error { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+.sus-campo[hidden] { display: none; }
+.sus-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.sus-yape-app { background: #6b2d8b; color: #fff; border-radius: 12px; padding: 12px 14px; margin: 10px 0; text-align: center; }
+.sus-yape-app[hidden] { display: none; }
+.sus-yape-cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.sus-yape-cab small { font-size: 0.68rem; opacity: 0.8; }
+.sus-yape-app p { margin: 0; font-size: 0.78rem; opacity: 0.9; }
+.sus-yape-app strong { display: block; margin: 4px 0 2px; font-size: 1.7rem; letter-spacing: 5px; }
+.sus-yape-app > small { font-size: 0.68rem; opacity: 0.75; }
+.sus-pp-usd { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 6px; }
+.sus-pp-usd b { color: var(--text-dark); }
+
+.sus-auto { display: flex; gap: 9px; align-items: flex-start; font-size: 0.8rem; color: var(--text-dark); margin: 4px 0 6px; cursor: pointer; }
+.sus-auto[hidden] { display: none; }
+.sus-auto input { margin-top: 2px; accent-color: var(--active-bg); }
+.sus-auto-nota { font-size: 0.78rem; color: var(--text-muted); margin: 4px 0 6px; }
+.sus-auto-nota[hidden] { display: none; }
+.sus-pago-error { color: var(--danger-text); font-size: 0.82rem; margin: 8px 0 0; }
+.sus-pago-error[hidden] { display: none; }
+.sus-btn-pagar { width: 100%; margin-top: 12px; padding: 12px 16px; font-size: 0.9rem; }
+
+@media (max-width: 560px) {
+    .sus-metodos { gap: 6px; }
+    .sus-doble { grid-template-columns: 1fr; }
+}
+/* Ojo para ver la contraseña de PayPal */
+.sus-clave-caja { position: relative; }
+.sus-clave-caja input { padding-right: 40px; }
+.sus-ojo {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none;
+    padding: 8px 10px; color: var(--text-muted); cursor: pointer; font-size: 0.9rem;
+}
+.sus-ojo:hover { color: var(--text-dark); }

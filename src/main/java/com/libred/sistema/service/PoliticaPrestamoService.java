@@ -19,10 +19,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/**
- * POLÍTICA DE PRÉSTAMOS de cada librería: máximo de días y tarifa de servicio por día según la categoría.
- * La usan el administrador (Ajustes y Préstamos) y el lector (Préstamos), por eso vive en un servicio aparte.
- */
+/** POLÍTICA DE PRÉSTAMOS de cada librería: máximo de días y tarifa de servicio por día según la categoría. */
 @Service
 public class PoliticaPrestamoService {
 
@@ -148,15 +145,14 @@ public class PoliticaPrestamoService {
     }
 
     /**
-     * Guarda la política. "datos" trae "maxDias" y una clave "t_NOMBREENUM" por categoría.
-     * Se valida todo antes de guardar nada.
+     * Guarda la política. "datos" trae "maxDias" y una clave "t_NOMBREENUM" por categoría. Se valida todo antes de
+     * guardar nada.
      */
     @Transactional
     public void guardar(Integer libreriaId, Map<String, String> datos) {
         Libreria libreria = libreriaRepository.findById(libreriaId)
                 .orElseThrow(() -> new AjustesException(null, "No se encontró tu librería."));
 
-        // --- máximo de días ---
         String textoDias = datos.get("maxDias") == null ? "" : datos.get("maxDias").trim();
         int maxDias;
         try {
@@ -169,7 +165,7 @@ public class PoliticaPrestamoService {
                     "El máximo de días debe estar entre " + DIAS_MINIMO + " y " + DIAS_MAXIMO_PERMITIDO + ".");
         }
 
-        // --- límite de préstamos activos por lector (opcional) ---
+        // límite de préstamos activos por lector (opcional)
         Integer maxActivos = null;
         if ("true".equalsIgnoreCase(datos.get("limitarActivos"))) {
             String textoActivos = datos.get("maxActivos") == null ? "" : datos.get("maxActivos").trim();
@@ -184,7 +180,7 @@ public class PoliticaPrestamoService {
             }
         }
 
-        // --- categorías activas y tarifas ---
+        // categorías activas y tarifas
         Map<CategoriaRecurso, Boolean> activas = new LinkedHashMap<>();
         Map<CategoriaRecurso, BigDecimal> nuevas = new LinkedHashMap<>();
         int totalActivas = 0;
@@ -194,7 +190,6 @@ public class PoliticaPrestamoService {
 
             if (!activa) {
                 // Desactivar una categoría NO borra nada: sus artículos, préstamos e historial se conservan.
-                // Solo deja de ofrecerse para artículos nuevos y para préstamos.
                 continue;
             }
             totalActivas++;
@@ -219,7 +214,6 @@ public class PoliticaPrestamoService {
             throw new AjustesException(null, "Tu librería debe tener al menos una categoría activa.");
         }
 
-        // --- guardar ---
         libreria.setMaxDiasPrestamo(maxDias);
         libreria.setMaxPrestamosActivos(maxActivos);
         libreriaRepository.save(libreria);

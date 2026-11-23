@@ -1,7 +1,4 @@
-/* =====================================================================
-   MÓDULO AJUSTES DEL ADMINISTRADOR (tema oscuro)
-   Se apoya en las variables de layout_admin.css
-   ===================================================================== */
+/* MÓDULO AJUSTES DEL ADMINISTRADOR (tema oscuro) Se apoya en las variables de layout_admin.css */
 .dashboard-container {
     padding: 24px 30px;
     flex: 1;
@@ -64,7 +61,7 @@
     flex-shrink: 0;
 }
 
-/* --- Campos --- */
+/* Campos */
 .aj-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -148,7 +145,7 @@
     color: var(--text-dark);
 }
 
-/* --- Mensajes --- */
+/* Mensajes */
 .aj-error-campo,
 .aj-ok {
     margin-top: 14px;
@@ -157,12 +154,12 @@
     font-size: 0.84rem;
     font-weight: 500;
 }
-.aj-error-campo { background: #fee2e2; color: #b91c1c; }
-.aj-ok { background: #dcfce7; color: #166534; }
+.aj-error-campo { background: var(--surface-soft); color: var(--text-body); border: 1px solid var(--sidebar-border); border-left: 3px solid #f87171; }
+.aj-ok { background: var(--surface-soft); color: var(--text-body); border: 1px solid var(--sidebar-border); border-left: 3px solid #4ade80; }
 .aj-error-campo[hidden],
 .aj-ok[hidden] { display: none; }
 
-/* --- Botones --- */
+/* Botones */
 .aj-acciones {
     margin-top: 18px;
     display: flex;
@@ -206,18 +203,18 @@
 .aj-btn-claro:hover { background: var(--sidebar-hover-bg); }
 .aj-btn-peligro {
     background: transparent;
-    color: #dc2626;
-    border: 1px solid #fecaca;
+    color: var(--text-muted);
+    border: 1px solid var(--sidebar-border);
 }
-.aj-btn-peligro:hover { background: #fee2e2; }
+.aj-btn-peligro:hover { background: var(--surface-soft); color: var(--danger-text); border-color: var(--line-strong); }
 .aj-btn-peligro[hidden] { display: none; }
 .aj-btn-rojo {
-    background: #dc2626;
+    background: #b91c1c;
     color: #fff;
     border: none;
 }
 
-/* --- Lista de datos (membresía) --- */
+/* Lista de datos (membresía) */
 .aj-datos {
     list-style: none;
     border-top: 1px solid var(--sidebar-border);
@@ -233,7 +230,7 @@
 .aj-datos li span { color: var(--text-muted); }
 .aj-datos li strong { color: var(--text-dark); }
 
-/* --- Tarjeta de pago --- */
+/* Tarjeta de pago */
 .aj-tarjeta-vacia {
     border: 1px dashed var(--sidebar-border);
     border-radius: 12px;
@@ -305,13 +302,13 @@
 }
 .aj-nota-seg i { margin-right: 4px; }
 
-/* --- Modal de confirmación --- */
+/* Modal de confirmación */
 .aj-modal-box { text-align: center; padding: 10px; }
 .aj-modal-icono {
     width: 55px;
     height: 55px;
-    background: #fee2e2;
-    color: #dc2626;
+    background: var(--surface-icon);
+    color: var(--accent-text);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -324,7 +321,7 @@
 .aj-modal-acciones { display: flex; gap: 10px; justify-content: center; }
 .aj-modal-acciones .aj-btn-claro { margin-top: 0; width: auto; }
 
-/* --- Pantallas medianas y pequeñas --- */
+/* Pantallas medianas y pequeñas */
 @media (max-width: 1150px) {
     .aj-layout { grid-template-columns: 1fr; }
 }
@@ -334,7 +331,7 @@
     .dashboard-container { padding: 16px; }
 }
 
-/* --- POLÍTICA DE PRÉSTAMOS: tarifa por categoría --- */
+/* POLÍTICA DE PRÉSTAMOS: tarifa por categoría */
 .aj-tarifas {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -363,7 +360,7 @@
 }
 
 .aj-tarifa label i {
-    color: #2563eb;
+    color: var(--accent-text);
     width: 16px;
     text-align: center;
 }
@@ -390,8 +387,8 @@
 }
 
 .aj-moneda input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--active-bg);
+    box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .aj-moneda input.con-error {
@@ -402,7 +399,7 @@
     .aj-tarifas { grid-template-columns: 1fr; }
 }
 
-/* --- LÍMITE OPCIONAL DE PRÉSTAMOS ACTIVOS --- */
+/* Límite opcional de préstamos activos */
 .aj-limite {
     margin: 4px 0 18px 0;
     padding: 14px 16px;
@@ -422,8 +419,7 @@
     color: var(--text-dark);
 }
 .aj-switch input {
-    /* El input real se oculta DENTRO del interruptor (no en la esquina de la página):
-       si no, al hacer clic el navegador desplazaba toda la pantalla hacia arriba. */
+    /* El input real se oculta DENTRO del interruptor (no en la esquina de la página): si no, al hacer clic el navegador desplazaba toda la pantalla hacia arriba. */
     position: absolute;
     left: 0;
     top: 0;
@@ -439,7 +435,7 @@
     height: 22px;
     flex-shrink: 0;
     border-radius: 20px;
-    background: #cbd5e1;
+    background: var(--line-strong);
     transition: background 0.2s;
 }
 .aj-switch-pista::after {
@@ -450,19 +446,19 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--card-bg);
     transition: transform 0.2s;
 }
-.aj-switch input:checked + .aj-switch-pista { background: #2563eb; }
+.aj-switch input:checked + .aj-switch-pista { background: var(--active-bg); }
 .aj-switch input:checked + .aj-switch-pista::after { transform: translateX(18px); }
-.aj-switch input:focus-visible + .aj-switch-pista { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+.aj-switch input:focus-visible + .aj-switch-pista { box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.25); }
 
 .aj-campo-limite { margin-top: 12px; max-width: 260px; }
 .aj-campo-limite.apagado { opacity: 0.5; }
 .aj-campo-limite input:disabled { cursor: not-allowed; }
 .aj-ayuda-limite { margin-top: 10px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
 
-/* --- CATEGORÍAS DE LA LIBRERÍA (casillas) --- */
+/* CATEGORÍAS DE LA LIBRERÍA (casillas) */
 .aj-ayuda-categorias { margin: 0 0 10px 0; }
 .aj-tarifa.apagada { background: rgba(0, 0, 0, 0.03); }
 .aj-tarifa.apagada .aj-check-nombre,
@@ -494,15 +490,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--line-strong);
     border-radius: 6px;
     background: var(--card-bg);
     color: transparent;
     font-size: 0.7rem;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.aj-check input:checked + .aj-check-caja { background: #2563eb; border-color: #2563eb; color: #fff; }
-.aj-check input:focus-visible + .aj-check-caja { box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+.aj-check input:checked + .aj-check-caja { background: var(--active-bg); border-color: var(--active-bg); color: #fff; }
+.aj-check input:focus-visible + .aj-check-caja { box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.25); }
 .aj-check input.con-error + .aj-check-caja { border-color: #dc2626; }
 
 .aj-check-nombre {
@@ -514,8 +510,69 @@
     color: var(--text-dark);
     min-width: 0;
 }
-.aj-check-nombre > i { color: #2563eb; width: 16px; text-align: center; }
+.aj-check-nombre > i { color: var(--accent-text); width: 16px; text-align: center; }
 .aj-check-nombre small { font-size: 0.7rem; font-weight: 500; color: var(--text-muted); white-space: nowrap; }
 
 /* El icono de la casilla hereda el color de su caja (invisible hasta marcar) */
 .aj-tarifa .aj-check-caja i { color: inherit; width: auto; }
+
+/* HORARIO DE ATENCIÓN (selector de días y horas) */
+.aj-hor-presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.aj-hor-presets button {
+    padding: 6px 12px; border: 1px solid var(--sidebar-border); border-radius: 999px; background: var(--card-bg); font: inherit;
+    font-size: 0.78rem; font-weight: 600; color: var(--text-dark); cursor: pointer; transition: background 0.15s, border-color 0.15s;
+}
+.aj-hor-presets button:hover { background: var(--sidebar-hover-bg); border-color: var(--active-bg); }
+.aj-hor-presets .aj-hor-limpiar { border-color: transparent; background: none; color: var(--text-muted); }
+.aj-hor-dias { border: 1px solid var(--sidebar-border); border-radius: 11px; overflow: hidden; background: var(--card-bg); }
+.aj-hor-dia { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--sidebar-border); min-height: 46px; }
+.aj-hor-dia:last-child { border-bottom: 0; }
+.aj-hor-dia b { flex: 0 0 82px; font-size: 0.84rem; font-weight: 600; color: var(--text-dark); }
+.aj-hor-dia.off b { color: var(--text-muted); font-weight: 500; }
+.aj-sw { position: relative; flex: 0 0 36px; height: 20px; cursor: pointer; }
+.aj-sw input { position: absolute; opacity: 0; inset: 0; cursor: pointer; margin: 0; }
+.aj-sw span { position: absolute; inset: 0; border-radius: 999px; background: #cbd5e1; transition: background 0.2s; }
+.aj-sw span::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+.aj-sw input:checked + span { background: var(--active-bg); }
+.aj-sw input:checked + span::after { transform: translateX(16px); }
+.aj-sw input:focus-visible + span { box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.25); }
+.aj-hor-horas { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 0.8rem; color: var(--text-muted); }
+.aj-hor-horas[hidden], .aj-hor-cerrado[hidden] { display: none; }
+.aj-hor-horas select {
+    padding: 6px 8px; border: 1px solid var(--sidebar-border); border-radius: 8px; background: var(--bg-main); font: inherit;
+    font-size: 0.84rem; color: var(--text-dark); cursor: pointer; width: auto;
+}
+.aj-hor-horas select:focus { outline: none; border-color: var(--active-bg); }
+.aj-hor-cerrado { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); }
+.aj-hor-resumen { margin-top: 10px; padding: 9px 12px; border-radius: 9px; background: var(--sidebar-hover-bg); font-size: 0.82rem; color: var(--text-body); line-height: 1.5; }
+.aj-hor-resumen:empty { display: none; }
+
+/* CONFIGURACIÓN DE LA LIBRERÍA (anillo de avance) */
+.aj-anillo { position: relative; width: 150px; height: 150px; margin: 6px auto 14px; }
+.aj-anillo svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.aj-anillo-pista { fill: none; stroke: var(--sidebar-border); stroke-width: 9; }
+.aj-anillo-valor {
+    fill: none; stroke: var(--active-bg); stroke-width: 9; stroke-linecap: round; stroke-dasharray: 326.73;
+    transition: stroke-dashoffset 0.7s ease-out, stroke 0.3s;
+}
+.aj-anillo-centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.aj-anillo-centro strong { font-size: 1.9rem; font-weight: 700; color: var(--text-dark); line-height: 1; }
+.aj-anillo-centro span { font-size: 0.74rem; color: var(--text-muted); margin-top: 4px; }
+#cardCompleto.completo .aj-anillo-valor { stroke: #16a34a; }
+#cardCompleto.completo .aj-anillo-centro strong { color: #16a34a; }
+.aj-faltan-tit { margin: 0 0 8px; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.aj-faltan ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.aj-faltan li {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--sidebar-border); border-radius: 9px;
+    background: var(--bg-main); font-size: 0.84rem; color: var(--text-dark); cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.aj-faltan li:hover { border-color: var(--active-bg); background: var(--sidebar-hover-bg); }
+.aj-faltan li i { color: var(--text-muted); font-size: 0.8rem; }
+.aj-faltan-ok { margin: 0; text-align: center; font-size: 0.86rem; color: #15803d; font-weight: 600; }
+.aj-faltan-ok i { margin-right: 6px; }
+.aj-faltan-ok[hidden], #ajFaltanLista[hidden] { display: none; }
+
+@media (max-width: 560px) {
+    .aj-hor-dia { flex-wrap: wrap; }
+    .aj-hor-dia b { flex: 1 1 auto; }
+}

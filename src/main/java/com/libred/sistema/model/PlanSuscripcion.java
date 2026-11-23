@@ -3,9 +3,8 @@ package com.libred.sistema.model;
 import java.math.BigDecimal;
 
 /**
- * Planes de membresía de LibRed. Es la ÚNICA fuente de precios y duración:
- * la pantalla de registro y el modal "Ver plan actual" leen estos valores desde el servidor.
- * Para cambiar un precio o la duración, se modifica aquí y nada más.
+ * Planes de membresía de LibRed. Es la ÚNICA fuente de precios y duración: la pantalla de registro y el modal "Ver
+ * plan actual" leen estos valores desde el servidor.
  */
 public enum PlanSuscripcion {
 

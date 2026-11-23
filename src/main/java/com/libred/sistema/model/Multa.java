@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/** Multa por mora, daño o pérdida. */
 @Entity
 @Table(name = "multa")
 public class Multa {

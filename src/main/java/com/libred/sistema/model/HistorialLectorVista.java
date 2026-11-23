@@ -3,9 +3,7 @@ package com.libred.sistema.model;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Datos ya preparados para pintar la pantalla "Historial" del lector (no son tablas de la BD).
- */
+/** Datos ya preparados para pintar la pantalla "Historial" del lector (no son tablas de la BD). */
 public class HistorialLectorVista {
 
     /** Una fila de la pestaña "Préstamos". */
@@ -132,7 +130,6 @@ public class HistorialLectorVista {
         public String getFechaPago() { return fechaPago; }
     }
 
-    /** Todo lo que necesita la pantalla. */
     public static class Pantalla {
         private final String sedeNombre;
         private final int total;

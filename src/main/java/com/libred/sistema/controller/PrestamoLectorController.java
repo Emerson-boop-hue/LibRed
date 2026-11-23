@@ -20,12 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Módulo PRÉSTAMOS del lector:
- *  - GET  /lector/prestamos           -> formulario de solicitud + "Mis préstamos"
- *  - POST /lector/prestamos/solicitar -> registra el préstamo (JSON)
- * El interceptor de WebConfig garantiza que hay un lector en la sesión.
- */
+/** Módulo PRÉSTAMOS del lector: */
 @Controller
 public class PrestamoLectorController {
 

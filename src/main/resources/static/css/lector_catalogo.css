@@ -1,8 +1,6 @@
-/* =====================================================================
-   MÓDULO CATÁLOGO DEL LECTOR
-   ===================================================================== */
+/* Módulo catálogo del lector */
 
-/* --- BARRA DE FILTROS --- */
+/* Barra de filtros */
 .filtros-card {
     background: var(--card-bg);
     border: 1px solid var(--sidebar-border);
@@ -12,7 +10,7 @@
     grid-template-columns: 2fr 1.2fr 1.4fr 1.2fr auto;
     gap: 14px;
     align-items: end;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    box-shadow: var(--shadow-card);
 }
 
 .campo {
@@ -67,7 +65,7 @@
     gap: 8px;
 }
 
-/* --- RESULTADOS --- */
+/* Resultados */
 #catalogoResultados {
     display: flex;
     flex-direction: column;
@@ -85,7 +83,7 @@
 
 .catalogo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 16px;
 }
 
@@ -95,48 +93,86 @@
     border-radius: 12px;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;       /* portada a la izquierda, datos a la derecha */
+    gap: 14px;
+    padding: 12px;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 .articulo-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 22px rgba(30, 64, 175, 0.14);
+    box-shadow: var(--shadow-hover);
 }
 .articulo-card.sin-stock .articulo-portada {
     filter: grayscale(0.7);
     opacity: 0.85;
 }
 
+/* Portada: SIEMPRE el mismo tamaño (4:5), tenga imagen o no */
 .articulo-portada {
-    height: 110px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: rgba(255, 255, 255, 0.92);
+    flex: 0 0 112px;
+    width: 112px;
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--sidebar-border);
+    position: relative;
+}
+
+.articulo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.articulo-sin-imagen {
+    position: absolute;
+    inset: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 2.4rem;
-    position: relative;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+.articulo-sin-imagen i {
+    font-size: 1.7rem;
+    opacity: 0.7;
 }
 
 .articulo-categoria {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--primary-dark);
-    font-size: 0.68rem;
+    top: 6px;
+    left: 6px;
+    max-width: calc(100% - 12px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: var(--card-bg);
+    border: 1px solid var(--sidebar-border);
+    color: var(--primary-strong);
+    font-size: 0.62rem;
     font-weight: 700;
-    padding: 3px 9px;
+    padding: 2px 8px;
     border-radius: 20px;
 }
 
+.articulo-contenido {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .articulo-cuerpo {
-    padding: 14px 16px 6px 16px;
     flex: 1;
 }
 
 .articulo-titulo {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 700;
     color: var(--text-dark);
     line-height: 1.3;
@@ -164,10 +200,11 @@
 }
 
 .articulo-pie {
-    padding: 10px 16px 14px 16px;
+    padding: 8px 0 0 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     border-top: 1px solid var(--sidebar-border);
     margin-top: 8px;
 }
@@ -190,7 +227,7 @@
     color: var(--text-dark);
 }
 
-/* --- ESTADOS VACÍOS --- */
+/* Estados vacíos */
 .estado-vacio {
     background: var(--card-bg);
     border: 1px dashed var(--sidebar-border);
@@ -211,7 +248,7 @@
     margin: 0 auto;
 }
 
-/* --- ADAPTACIÓN A PANTALLAS MEDIANAS Y PEQUEÑAS --- */
+/* Adaptación a pantallas medianas y pequeñas */
 @media (max-width: 1200px) {
     .filtros-card {
         grid-template-columns: 1fr 1fr;
@@ -226,14 +263,14 @@
     }
 }
 
-/* --- BOTÓN "SOLICITAR PRÉSTAMO" DE CADA TARJETA --- */
+/* Botón "solicitar préstamo" de cada tarjeta */
 .btn-solicitar {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin: 0 16px 14px 16px;
-    padding: 9px 12px;
+    margin: 10px 0 0 0;
+    padding: 8px 12px;
     border-radius: 8px;
     background: var(--primary-soft);
     color: var(--primary-strong);

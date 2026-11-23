@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import java.util.List;
 import java.util.Optional;
 
+/** Acceso a los artículos del inventario. */
 public interface RecursoRepository extends JpaRepository<Recurso, Integer> {
     
     List<Recurso> findByLibreriaId(Integer libreriaId);
@@ -24,14 +25,16 @@ public interface RecursoRepository extends JpaRepository<Recurso, Integer> {
 
     boolean existsByLibreriaIdAndTituloIgnoreCase(Integer libreriaId, String titulo);
 
-    boolean existsByCodigo(String codigo);
+    // Artículos de la librería con ese título (sin importar mayúsculas ni tildes: lo decide el cotejamiento de MySQL)
+    List<Recurso> findByLibreriaIdAndTituloIgnoreCase(Integer libreriaId, String titulo);
 
-    // NUEVO: el código del recurso solo debe ser único dentro de SU librería (cada librería tiene su LIB-001)
+    // el código del recurso solo debe ser único dentro de SU librería (cada librería tiene su LIB-001)
     boolean existsByLibreriaIdAndCodigo(Integer libreriaId, String codigo);
 
     long countByLibreriaIdAndTipoRecurso(Integer libreriaId, String tipoRecurso);
 
-    // Bloquea la fila del artículo mientras se descuenta el stock (evita que dos préstamos simultáneos se lleven la última copia)
+    // Bloquea la fila del artículo mientras se descuenta el stock (evita que dos préstamos simultáneos se lleven la
+    // última copia)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM Recurso r WHERE r.id = :id")
     Optional<Recurso> bloquearPorId(@Param("id") Integer id);

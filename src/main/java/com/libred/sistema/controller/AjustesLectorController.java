@@ -20,8 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Módulo AJUSTES del lector: datos personales y contraseña.
- * La pantalla guarda con fetch (JSON) para mostrar el resultado sin recargar la página.
+ * Módulo AJUSTES del lector: datos personales y contraseña. La pantalla guarda con fetch (JSON) para mostrar el
+ * resultado sin recargar la página.
  */
 @Controller
 @RequestMapping("/lector/ajustes")
@@ -77,6 +77,7 @@ public class AjustesLectorController {
     public Map<String, Object> cambiarPassword(@RequestBody Map<String, String> datos, HttpSession session) {
         ajustesService.cambiarPassword(lectorActual(session),
                 datos.get("passwordActual"), datos.get("passwordNueva"), datos.get("passwordConfirmar"));
+        session.removeAttribute("lectorCambiarPassword");
 
         Map<String, Object> respuesta = new LinkedHashMap<>();
         respuesta.put("ok", true);

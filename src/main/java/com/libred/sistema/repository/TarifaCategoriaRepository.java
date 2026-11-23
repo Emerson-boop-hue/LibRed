@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
+/** Acceso a las tarifas por categoría. */
 public interface TarifaCategoriaRepository extends JpaRepository<TarifaCategoria, Integer> {
 
     List<TarifaCategoria> findByLibreriaId(Integer libreriaId);

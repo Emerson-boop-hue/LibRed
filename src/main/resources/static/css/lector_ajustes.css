@@ -1,6 +1,4 @@
-/* =====================================================================
-   MÓDULO AJUSTES DEL LECTOR (tema azul)
-   ===================================================================== */
+/* MÓDULO AJUSTES DEL LECTOR (tema azul) */
 .aj-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -20,7 +18,7 @@
     border: 1px solid var(--sidebar-border);
     border-radius: 12px;
     padding: 22px 24px;
-    box-shadow: 0 1px 3px rgba(30, 64, 175, 0.05);
+    box-shadow: var(--shadow-card);
 }
 
 .aj-card-head {
@@ -52,7 +50,7 @@
     flex-shrink: 0;
 }
 
-/* --- Campos --- */
+/* Campos */
 .aj-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -94,7 +92,7 @@
     cursor: not-allowed;
 }
 .aj-campo input.con-error {
-    border-color: #dc2626;
+    border-color: var(--st-bad);
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
@@ -119,7 +117,7 @@
     color: var(--primary);
 }
 
-/* --- Mensajes --- */
+/* Mensajes */
 .aj-error-campo,
 .aj-ok {
     margin-top: 14px;
@@ -151,7 +149,7 @@
     cursor: wait;
 }
 
-/* --- Tarjeta de resumen --- */
+/* Tarjeta de resumen */
 .aj-cuenta {
     text-align: center;
 }
@@ -159,7 +157,7 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: var(--active-bg);
     color: #fff;
     font-size: 1.9rem;
     font-weight: 700;
@@ -219,7 +217,7 @@
     margin-right: 4px;
 }
 
-/* --- Pantallas medianas y pequeñas --- */
+/* Pantallas medianas y pequeñas */
 @media (max-width: 1100px) {
     .aj-layout {
         grid-template-columns: 1fr;
@@ -236,3 +234,23 @@
         padding: 18px 16px;
     }
 }
+
+/* Aviso de contraseña temporal dentro de la tarjeta de contraseña */
+.aj-card-aviso {
+    border-color: var(--warn-border);
+    box-shadow: 0 0 0 3px var(--warn-bg);
+}
+.aj-aviso-temporal {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--warn-bg-soft);
+    border: 1px solid var(--warn-border-soft);
+    color: var(--warn-text);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+.aj-aviso-temporal i { color: var(--warn-accent); margin-top: 2px; }

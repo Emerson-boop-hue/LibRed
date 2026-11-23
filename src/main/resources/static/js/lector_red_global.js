@@ -1,4 +1,4 @@
-/* Módulo RED GLOBAL del lector. IIFE: el layout vuelve a cargar este script al navegar entre módulos. */
+// Módulo RED GLOBAL del lector. IIFE: el layout vuelve a cargar este script al navegar entre módulos.
 (function () {
   const grid = document.getElementById("rgGrid");
   if (!grid) return;
@@ -55,7 +55,7 @@
     inTexto.focus();
   });
 
-  // ---------- Aviso breve (el botón Ingresar todavía no lleva al catálogo de otra librería) ----------
+  // Aviso breve (el botón Ingresar todavía no lleva al catálogo de otra librería)
   let temporizador;
   function mostrarAviso(msg) {
     aviso.textContent = msg;
@@ -64,7 +64,6 @@
     temporizador = setTimeout(() => (aviso.hidden = true), 2600);
   }
 
-  // ---------- Ventana de detalles ----------
   function abrir(tarjeta) {
     const detalle = tarjeta.querySelector(".rg-detalle");
     if (!detalle) return;
@@ -75,8 +74,7 @@
   }
   function cerrar() { modal.hidden = true; modalContenido.innerHTML = ""; }
 
-
-  // ---- Cambio de librería (botón "Ingresar") ----
+  // Cambio de librería (botón "Ingresar")
   const carga = $("rgCarga"), cargaTexto = $("rgCargaTexto");
   let entrando = false;
 

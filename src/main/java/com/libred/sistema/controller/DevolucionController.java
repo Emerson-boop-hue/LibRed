@@ -1,5 +1,6 @@
 package com.libred.sistema.controller;
 
+import com.libred.sistema.model.Devolucion;
 import com.libred.sistema.service.DevolucionService;
 import com.libred.sistema.service.LectorService;
 import com.libred.sistema.service.MultaService;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+/** Módulo Devoluciones del administrador. */
 @Controller
 @RequestMapping("/admin/devoluciones")
 public class DevolucionController {
@@ -62,8 +66,16 @@ public class DevolucionController {
                                      RedirectAttributes redirectAttributes,
                                      HttpSession session) {
         try {
-            devolucionService.procesarDevolucion(libreriaActual(session), prestamoId, tarifaDiaria);
-            redirectAttributes.addFlashAttribute("exito", "¡Devolución completada con éxito! Stock actualizado y préstamos/multas liquidados.");
+            Devolucion dev = devolucionService.procesarDevolucion(libreriaActual(session), prestamoId, tarifaDiaria);
+            Map<String, String> ok = new LinkedHashMap<>();
+            ok.put("id", String.valueOf(dev.getId()));
+            ok.put("lector", dev.getPrestamo().getLector().getNombres() + " " + dev.getPrestamo().getLector().getApellidos());
+            ok.put("articulo", dev.getPrestamo().getRecurso().getTitulo());
+            ok.put("dias", String.valueOf(dev.getDiasRetraso()));
+            ok.put("mora", "S/ " + dev.getMontoMora().setScale(2, java.math.RoundingMode.HALF_UP).toPlainString());
+            ok.put("multa", "S/ " + dev.getMontoMulta().setScale(2, java.math.RoundingMode.HALF_UP).toPlainString());
+            ok.put("total", "S/ " + dev.getMontoTotal().setScale(2, java.math.RoundingMode.HALF_UP).toPlainString());
+            redirectAttributes.addFlashAttribute("devolucionOk", ok);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

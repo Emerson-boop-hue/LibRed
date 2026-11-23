@@ -1,22 +1,16 @@
-// =====================================================================
-// MÓDULO AJUSTES DEL ADMINISTRADOR
-// Datos de la librería, contraseña y método de pago. Todo se guarda con fetch (JSON), se muestra el
-// resultado en la misma pantalla y se mantiene al día el nombre de la tarjeta de la barra lateral.
-// =====================================================================
+// Módulo ajustes del administrador: datos de la librería, política de préstamos y contraseña.
 
 function inicializarAjustes() {
   const formDatos = document.getElementById("formDatos");
   const formPassword = document.getElementById("formPassword");
-  const formTarjeta = document.getElementById("formTarjeta");
   const formPolitica = document.getElementById("formPolitica");
-  if (!formDatos || !formPassword || !formTarjeta || !formPolitica) return;
+  if (!formDatos || !formPassword || !formPolitica) return;
 
-  // El script puede ejecutarse dos veces sobre la misma pantalla (carga normal + navegación AJAX):
-  // esta marca evita enganchar los eventos dos veces.
+  // El script puede ejecutarse dos veces sobre la misma pantalla (carga normal + navegación AJAX): esta marca evita
+  // enganchar los eventos dos veces.
   if (formDatos.dataset.listo === "1") return;
   formDatos.dataset.listo = "1";
 
-  // ---------- utilidades ----------
   function limpiarMensajes(form, idError, idOk) {
     form.querySelectorAll(".con-error").forEach((el) => el.classList.remove("con-error"));
     document.getElementById(idError).hidden = true;
@@ -89,7 +83,6 @@ function inicializarAjustes() {
 
   const soloDigitos = (v) => (v || "").replace(/\D/g, "");
 
-  // ---------- DATOS DE LA LIBRERÍA ----------
   const inputRuc = document.getElementById("ajRuc");
   const inputTel = document.getElementById("ajTelefono");
   inputRuc.addEventListener("input", () => (inputRuc.value = soloDigitos(inputRuc.value).slice(0, 11)));
@@ -111,6 +104,7 @@ function inicializarAjustes() {
     }),
     (r) => {
       document.getElementById("ajNombre").value = r.nombreComercial;
+      if (typeof pintarCompletitud === "function") pintarCompletitud(r.completitud);
       // Tarjeta de la barra lateral (nombre e inicial)
       const nombreBarra = document.querySelector(".sidebar .user-name");
       if (nombreBarra) nombreBarra.textContent = r.nombreComercial;
@@ -119,7 +113,7 @@ function inicializarAjustes() {
     }
   );
 
-  // ---------- POLÍTICA DE PRÉSTAMOS (máximo de días y tarifa por categoría) ----------
+  // POLÍTICA DE PRÉSTAMOS (máximo de días y tarifa por categoría)
   const inputMaxDias = document.getElementById("ajMaxDias");
   inputMaxDias.addEventListener("input", () => (inputMaxDias.value = soloDigitos(inputMaxDias.value).slice(0, 2)));
 
@@ -186,7 +180,6 @@ function inicializarAjustes() {
     null
   );
 
-  // ---------- CONTRASEÑA ----------
   conectar(
     formPassword,
     "/admin/ajustes/password",
@@ -211,113 +204,183 @@ function inicializarAjustes() {
     });
   });
 
-  // ---------- MÉTODO DE PAGO (TARJETA) ----------
-  const inputNumero = document.getElementById("ajNumero");
-  const inputTitular = document.getElementById("ajTitular");
-  const inputVence = document.getElementById("ajVence");
-  const inputCvv = document.getElementById("ajCvv");
+  // HORARIO DE ATENCIÓN (selector de días y horas)
+  const DIAS_CORTO = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const DIAS_LARGO = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+  const inputHorario = document.getElementById("ajHorario");
+  const filasHor = [];
+  let horarioTocado = false;                 // false = todavía no se usó el selector (se conserva el texto guardado)
+  const textoInicial = (inputHorario.value || "").trim();
 
-  // Formato mientras se escribe: grupos de 4 dígitos, MM/AA y CVV de 3 dígitos (igual que el registro)
-  inputNumero.addEventListener("input", () => {
-    inputNumero.value = soloDigitos(inputNumero.value).slice(0, 16).replace(/(.{4})(?=.)/g, "$1 ");
-  });
-  inputVence.addEventListener("input", () => {
-    const d = soloDigitos(inputVence.value).slice(0, 4);
-    inputVence.value = d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d;
-  });
-  inputCvv.addEventListener("input", () => (inputCvv.value = soloDigitos(inputCvv.value).slice(0, 3)));
-
-  function detectarMarca(numero) {
-    if (/^4/.test(numero)) return "VISA";
-    if (/^5[1-5]/.test(numero) || /^2(22[1-9]|2[3-9]\d|[3-6]\d\d|7[01]\d|720)/.test(numero)) return "MASTERCARD";
-    return "TARJETA";
+  const minutosATexto = (m) => Math.floor(m / 60) + ":" + String(m % 60).padStart(2, "0");
+  function crear(tag, clase, texto) {
+    const e = document.createElement(tag);
+    if (clase) e.className = clase;
+    if (texto !== undefined) e.textContent = texto;
+    return e;
   }
-
-  // Validación en el navegador. El número completo y el CVV NUNCA se envían al servidor.
-  function armarTarjeta() {
-    const falla = (mensaje, campo) => {
-      mostrarError(formTarjeta, "errorTarjeta", mensaje, campo);
-      return null;
-    };
-
-    const numero = soloDigitos(inputNumero.value);
-    if (numero.length !== 16) return falla("Ingresa los 16 dígitos de la tarjeta.", "numero");
-
-    if (inputTitular.value.trim().length < 3) return falla("Ingresa el nombre del titular.", "titular");
-
-    const m = /^(\d{2})\/(\d{2})$/.exec(inputVence.value);
-    if (!m) return falla("Ingresa el vencimiento como MM/AA.", "vence");
-    const mes = parseInt(m[1], 10);
-    const anio = 2000 + parseInt(m[2], 10);
-    const hoy = new Date();
-    const vencida = anio < hoy.getFullYear() || (anio === hoy.getFullYear() && mes < hoy.getMonth() + 1);
-    if (mes < 1 || mes > 12 || vencida) return falla("Fecha inválida o tarjeta vencida (MM/AA).", "vence");
-
-    if (!/^\d{3}$/.test(inputCvv.value)) return falla("El CVV tiene 3 dígitos.", "cvv");
-
-    return {
-      titular: inputTitular.value,
-      marca: detectarMarca(numero),
-      ultimosDigitos: numero.slice(-4),
-      venceMes: String(mes),
-      venceAnio: String(anio),
-    };
-  }
-
-  const tarjetaVista = document.getElementById("tarjetaVista");
-  const tarjetaVacia = document.getElementById("tarjetaVacia");
-  const btnQuitar = document.getElementById("btnQuitarTarjeta");
-  const tituloForm = document.getElementById("tituloFormTarjeta");
-
-  function mostrarTarjeta(t) {
-    const hay = !!t;
-    tarjetaVista.hidden = !hay;
-    tarjetaVacia.hidden = hay;
-    btnQuitar.hidden = !hay;
-    tituloForm.textContent = hay ? "Cambiar tarjeta" : "Agregar tarjeta";
-    if (hay) {
-      document.getElementById("tMarca").textContent = t.marca;
-      document.getElementById("tNumero").textContent = "•••• •••• •••• " + t.ultimosDigitos;
-      document.getElementById("tTitular").textContent = t.titular;
-      document.getElementById("tVence").textContent = t.vencimiento;
+  function llenarHoras(sel, desde, hasta, valor) {
+    sel.textContent = "";
+    for (let m = desde; m <= hasta; m += 30) {
+      const o = document.createElement("option");
+      o.value = m; o.textContent = minutosATexto(m);
+      if (m === valor) o.selected = true;
+      sel.appendChild(o);
     }
   }
 
-  conectar(formTarjeta, "/admin/ajustes/tarjeta", "errorTarjeta", "okTarjeta", armarTarjeta, (r) => {
-    mostrarTarjeta(r);
-    formTarjeta.reset(); // se borran número y CVV de la pantalla
-  });
+  function textoHorario() {
+    const act = filasHor.map((f, i) => ({ i, on: f.sw.checked, a: Number(f.ap.value), c: Number(f.ci.value) })).filter((x) => x.on);
+    const grupos = [];
+    act.forEach((d) => {
+      const g = grupos[grupos.length - 1];
+      if (g && g.fin === d.i - 1 && g.a === d.a && g.c === d.c) g.fin = d.i;
+      else grupos.push({ ini: d.i, fin: d.i, a: d.a, c: d.c });
+    });
+    return grupos.map((g) => {
+      const dias = g.ini === g.fin ? DIAS_CORTO[g.ini]
+        : g.fin === g.ini + 1 ? DIAS_CORTO[g.ini] + " y " + DIAS_CORTO[g.fin]
+        : DIAS_CORTO[g.ini] + " a " + DIAS_CORTO[g.fin];
+      return dias + " " + minutosATexto(g.a) + "–" + minutosATexto(g.c);
+    }).join("; ");
+  }
 
-  // Quitar tarjeta (con confirmación)
-  const modal = document.getElementById("modalQuitarTarjeta");
-  const btnConfirmar = document.getElementById("btnConfirmarQuitar");
+  // Lee un horario guardado con este mismo formato ("Lun a Vie 9:00–18:00; Sáb 9:00–13:00"). Devuelve false si es
+  // texto libre.
+  function cargarHorario(texto) {
+    const partes = texto.split(";").map((p) => p.trim()).filter(Boolean);
+    const dias = Array.from({ length: 7 }, () => null);
+    const re = /^(Lun|Mar|Mié|Jue|Vie|Sáb|Dom)(?: (a|y) (Lun|Mar|Mié|Jue|Vie|Sáb|Dom))? (\d{1,2}):(\d{2})[–-](\d{1,2}):(\d{2})$/;
+    for (const p of partes) {
+      const m = re.exec(p);
+      if (!m) return false;
+      const i = DIAS_CORTO.indexOf(m[1]);
+      const j = m[3] ? DIAS_CORTO.indexOf(m[3]) : i;
+      const a = Number(m[4]) * 60 + Number(m[5]);
+      const c = Number(m[6]) * 60 + Number(m[7]);
+      if (c <= a || a < 300 || c > 1410 || a % 30 || c % 30) return false;
+      const lista = m[2] === "y" ? [i, j] : Array.from({ length: Math.max(0, j - i) + 1 }, (_, k) => i + k);
+      if (m[2] !== "y" && j < i) return false;
+      lista.forEach((d) => (dias[d] = { a, c }));
+    }
+    filasHor.forEach((f, i) => {
+      f.sw.checked = !!dias[i];
+      if (dias[i]) { f.ap.value = dias[i].a; f.ci.value = dias[i].c; }
+    });
+    return true;
+  }
 
-  btnQuitar.addEventListener("click", () => modal.classList.add("active"));
-  document.getElementById("btnCancelarQuitar").addEventListener("click", () => modal.classList.remove("active"));
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.classList.remove("active");
-  });
+  function refrescarHorario() {
+    filasHor.forEach((f) => {
+      const on = f.sw.checked;
+      f.fila.classList.toggle("off", !on);
+      f.horas.hidden = !on;
+      f.cerrado.hidden = on;
+    });
+    const t = textoHorario();
+    if (horarioTocado) inputHorario.value = t;
+    const resumen = document.getElementById("ajHorResumen");
+    if (horarioTocado) resumen.textContent = t ? "Se mostrará así: " + t : "";
+  }
 
-  btnConfirmar.addEventListener("click", async () => {
-    limpiarMensajes(formTarjeta, "errorTarjeta", "okTarjeta");
-    btnConfirmar.disabled = true;
-    try {
-      const r = await enviar("/admin/ajustes/tarjeta/eliminar", {});
-      if (!r) return;
-      modal.classList.remove("active");
-      if (r.ok) {
-        mostrarTarjeta(null);
-        mostrarOk("okTarjeta", r.mensaje);
+  function tocarHorario() {
+    horarioTocado = true;
+    refrescarHorario();
+  }
+
+  function aplicarPreset(p) {
+    const base = filasHor.find((f) => f.sw.checked);
+    const ap = base ? Number(base.ap.value) : 540, ci = base ? Number(base.ci.value) : 1080;
+    const dias = p === "semana" ? [0, 1, 2, 3, 4] : p === "sabado" ? [0, 1, 2, 3, 4, 5] : p === "todos" ? [0, 1, 2, 3, 4, 5, 6] : [];
+    filasHor.forEach((f, i) => {
+      const on = dias.includes(i);
+      f.sw.checked = on;
+      if (on) { f.ap.value = ap; f.ci.value = ci; }
+    });
+    tocarHorario();
+  }
+
+  (function iniciarHorario() {
+    const cont = document.getElementById("ajHorDias");
+    DIAS_LARGO.forEach((nombre, i) => {
+      const fila = crear("div", "aj-hor-dia off");
+      const sw = crear("label", "aj-sw");
+      const chk = document.createElement("input"); chk.type = "checkbox"; chk.setAttribute("aria-label", "Atiende el " + nombre);
+      sw.appendChild(chk); sw.appendChild(crear("span"));
+      fila.appendChild(sw);
+      fila.appendChild(crear("b", "", nombre));
+      const cerrado = crear("span", "aj-hor-cerrado", "Cerrado");
+      const horas = crear("span", "aj-hor-horas");
+      horas.hidden = true;
+      const ap = document.createElement("select"); ap.setAttribute("aria-label", "Hora de apertura " + nombre);
+      const ci = document.createElement("select"); ci.setAttribute("aria-label", "Hora de cierre " + nombre);
+      llenarHoras(ap, 300, 1350, 540);
+      llenarHoras(ci, 360, 1410, 1080);
+      horas.appendChild(ap); horas.appendChild(document.createTextNode("a")); horas.appendChild(ci);
+      fila.appendChild(cerrado); fila.appendChild(horas);
+      cont.appendChild(fila);
+      filasHor.push({ fila, sw: chk, ap, ci, horas, cerrado });
+
+      chk.addEventListener("change", tocarHorario);
+      ap.addEventListener("change", () => {
+        if (Number(ci.value) <= Number(ap.value)) ci.value = Math.min(Number(ap.value) + 60, 1410);
+        tocarHorario();
+      });
+      ci.addEventListener("change", () => {
+        if (Number(ci.value) <= Number(ap.value)) ap.value = Math.max(Number(ci.value) - 60, 300);
+        tocarHorario();
+      });
+    });
+    document.getElementById("ajHorPresets").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-p]");
+      if (b) aplicarPreset(b.dataset.p);
+    });
+
+    // Horario ya guardado: si tiene el formato del selector se carga; si es texto libre se conserva hasta que lo
+    // cambien
+    if (textoInicial) {
+      if (cargarHorario(textoInicial)) {
+        horarioTocado = true;
       } else {
-        mostrarError(formTarjeta, "errorTarjeta", r.error || "No se pudo quitar la tarjeta.", null);
+        document.getElementById("ajHorResumen").textContent = "Horario actual: " + textoInicial + ". Elige los días y horas para reemplazarlo.";
       }
-    } catch (err) {
-      console.error("Error al quitar la tarjeta:", err);
-      modal.classList.remove("active");
-      mostrarError(formTarjeta, "errorTarjeta", "No se pudo conectar con el servidor.", null);
-    } finally {
-      btnConfirmar.disabled = false;
     }
+    refrescarHorario();
+  })();
+
+  // CONFIGURACIÓN DE LA LIBRERÍA (anillo de avance)
+  const CIRC = 326.73;
+  const cardCompleto = document.getElementById("cardCompleto");
+  const IR_A = { "Teléfono de contacto": "ajTelefono", "Correo de contacto": "ajCorreo", "Horario de atención": "ajHorPresets", "Descripción": "ajDescripcion" };
+
+  function pintarCompletitud(c) {
+    if (!cardCompleto || !c) return;
+    document.getElementById("ajAnilloValor").style.strokeDashoffset = String(CIRC * (100 - c.porcentaje) / 100);
+    document.getElementById("ajAnilloPct").textContent = c.porcentaje + "%";
+    document.getElementById("ajAnilloEtq").textContent = c.completo ? "completo" : "configurado";
+    cardCompleto.classList.toggle("completo", !!c.completo);
+    document.getElementById("ajFaltanOk").hidden = !c.completo;
+    document.getElementById("ajFaltanLista").hidden = !!c.completo;
+    const ul = document.getElementById("ajFaltanItems");
+    ul.textContent = "";
+    (c.faltan || []).forEach((f) => {
+      const li = document.createElement("li");
+      li.dataset.ir = IR_A[f] || "ajDescripcion";
+      const i = document.createElement("i"); i.className = "fa-regular fa-circle";
+      const sp = document.createElement("span"); sp.textContent = f;
+      li.appendChild(i); li.appendChild(document.createTextNode(" ")); li.appendChild(sp);
+      ul.appendChild(li);
+    });
+  }
+
+  // Al pulsar lo que falta, se baja hasta ese campo
+  document.getElementById("ajFaltanItems").addEventListener("click", (e) => {
+    const li = e.target.closest("li[data-ir]");
+    if (!li) return;
+    const destino = document.getElementById(li.dataset.ir);
+    if (!destino) return;
+    destino.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (destino.focus && destino.tagName === "INPUT") destino.focus();
   });
 }
 

@@ -18,7 +18,6 @@
   <body>
     <div class="lector-container">
 
-      <!-- FILTROS -->
       <div class="rg-filtros">
         <div class="rg-campo rg-campo-grande">
           <label for="rgTexto">Buscar librería</label>
@@ -59,7 +58,6 @@
         </div>
       </div>
 
-      <!-- RESUMEN -->
       <p class="rg-resumen">
         <strong id="rgContador" th:text="${r.totalLibrerias}">0</strong>
         <span id="rgContadorTexto" th:text="${r.totalLibrerias == 1} ? 'librería' : 'librerías'">librerías</span>
@@ -111,6 +109,7 @@
                 <span class="rg-estrellas" style="--p:0%">★★★★★</span>
                 <small>Aún sin calificaciones</small>
               </div>
+              <span class="rg-badge sin-pedidos" th:if="${t.suspendida}"><i class="fa-solid fa-ban"></i> Sin pedidos por ahora</span>
               <span class="rg-badge miembro" th:if="${t.miembro and !t.sedeActual}"><i class="fa-solid fa-circle-check"></i> Eres miembro</span>
             </div>
 
@@ -223,7 +222,7 @@
         </div>
       </div>
 
-      <!-- VENTANA DE DETALLES -->
+      <!-- Ventana de detalles -->
       <div class="rg-modal" id="rgModal" hidden>
         <div class="rg-modal-caja" role="dialog" aria-modal="true">
           <button type="button" class="rg-modal-cerrar" id="rgModalCerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>

@@ -5,33 +5,33 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
+/** Acceso a los lectores. */
 public interface LectorRepository extends JpaRepository<Lector, Integer> {
     
     // Un mismo código puede existir en varias librerías (una fila por librería)
     List<Lector> findAllByCodigoLector(String codigoLector);
 
-    Optional<Lector> findByCodigoLectorAndLibreriaId(String codigoLector, Integer libreriaId);
-
     boolean existsByCodigoLector(String codigoLector);
 
-    @Query("SELECT l FROM Lector l WHERE LOWER(l.nombres) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(l.apellidos) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(l.codigoLector) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-    List<Lector> search(String keyword);
+    // Celular guardado solo con dígitos (lo usan el registro y la recuperación de acceso)
+    List<Lector> findAllByTelefono(String telefono);
+
+    boolean existsByTelefono(String telefono);
+
+    // Reglas de duplicados POR LIBRERÍA (el mismo celular o nombre completo sí puede existir en otra librería).
+    // El nombre se compara sin importar mayúsculas ni tildes (lo decide el cotejamiento de MySQL).
+    List<Lector> findAllByLibreriaIdAndTelefono(Integer libreriaId, String telefono);
+
+    List<Lector> findAllByLibreriaIdAndNombresIgnoreCaseAndApellidosIgnoreCase(Integer libreriaId, String nombres, String apellidos);
 
     @Query("SELECT l.codigoLector FROM Lector l ORDER BY l.id DESC LIMIT 1")
     String findLastCodigo();
 
-    long countByEstadoCuenta(String estadoCuenta);
-
-    // --- NUEVOS MÉTODOS FILTRADOS POR LIBRERÍA ---
     List<Lector> findByLibreriaId(Integer libreriaId);
 
     @Query("SELECT l FROM Lector l WHERE l.libreriaId = :libreriaId AND (LOWER(l.nombres) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(l.apellidos) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(l.codigoLector) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     List<Lector> searchByLibreria(Integer libreriaId, String keyword);
-
-    @Query("SELECT l.codigoLector FROM Lector l WHERE l.libreriaId = :libreriaId ORDER BY l.id DESC LIMIT 1")
-    String findLastCodigoByLibreria(Integer libreriaId);
 
     long countByLibreriaId(Integer libreriaId);
 

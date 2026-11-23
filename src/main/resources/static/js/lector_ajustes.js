@@ -1,14 +1,10 @@
-// =====================================================================
-// MÓDULO AJUSTES DEL LECTOR
-// Guarda los datos personales y la contraseña con fetch (JSON), muestra el resultado en la misma
-// pantalla y mantiene al día el nombre de la barra lateral.
-// =====================================================================
+// Módulo ajustes del lector: guarda los datos personales y la contraseña con fetch (JSON), muestra el resultado en la
+// misma pantalla y mantiene al día el nombre de la barra lateral.
 (function () {
   const formPerfil = document.getElementById("formPerfil");
   const formPassword = document.getElementById("formPassword");
   if (!formPerfil || !formPassword) return;
 
-  // ---------- utilidades ----------
   function limpiarMensajes(form, idError, idOk) {
     form.querySelectorAll(".con-error").forEach((el) => el.classList.remove("con-error"));
     document.getElementById(idError).hidden = true;
@@ -76,7 +72,6 @@
     });
   }
 
-  // ---------- datos personales ----------
   const inputTelefono = document.getElementById("ajTelefono");
   // Solo dígitos y espacios en el teléfono
   inputTelefono.addEventListener("input", () => {
@@ -108,7 +103,6 @@
     }
   );
 
-  // ---------- contraseña ----------
   conectar(
     formPassword,
     "/lector/ajustes/password",
@@ -119,7 +113,12 @@
       passwordNueva: document.getElementById("ajPassNueva").value,
       passwordConfirmar: document.getElementById("ajPassConfirmar").value,
     }),
-    () => formPassword.reset()
+    () => {
+      formPassword.reset();
+      // Ya cambió la contraseña temporal: se quitan los avisos
+      document.querySelectorAll(".aviso-pass, .nav-alerta, .aj-aviso-temporal").forEach((el) => el.remove());
+      formPassword.classList.remove("aj-card-aviso");
+    }
   );
 
   // Ojito para mostrar / ocultar la contraseña

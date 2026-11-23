@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * Tarifa de servicio por día de UNA categoría de artículo en UNA librería.
- * Cada librería configura sus propias tarifas (Ajustes del administrador > Política de préstamos).
- * Si una categoría no tiene fila, su tarifa es S/ 0.00 (servicio gratuito).
+ * Tarifa de servicio por día de UNA categoría de artículo en UNA librería. Cada librería configura sus propias
+ * tarifas (Ajustes del administrador > Política de préstamos).
  */
 @Entity
 @Table(name = "tarifa_categoria",
         uniqueConstraints = @UniqueConstraint(name = "uk_tarifa_libreria_categoria", columnNames = {"libreria_id", "categoria"}))
+/** Tarifa de préstamo por categoría y librería. */
 public class TarifaCategoria {
 
     @Id

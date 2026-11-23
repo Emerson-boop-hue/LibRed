@@ -1,16 +1,17 @@
 package com.libred.sistema.model;
 
 import jakarta.persistence.*;
+import com.libred.sistema.util.TelefonoUtil;
 import java.time.LocalDateTime;
 
 /**
  * Un lector tiene UNA FILA POR LIBRERÍA en la que está registrado: la misma persona (mismo código y contraseña)
- * aparece en cada librería con su propio estado (HABILITADO / SANCIONADO). Así una sanción en una librería
- * no afecta a las demás. Por eso el código solo es único dentro de cada librería.
+ * aparece en cada librería con su propio estado (HABILITADO / BLOQUEADO).
  */
 @Entity
 @Table(name = "lector",
         uniqueConstraints = @UniqueConstraint(name = "uk_lector_libreria_codigo", columnNames = {"libreria_id", "codigo_lector"}))
+/** Lector registrado en una librería. */
 public class Lector {
 
     @Id
@@ -35,24 +36,26 @@ public class Lector {
     @Column(name = "estado_cuenta", length = 50)
     private String estadoCuenta = "HABILITADO";
 
-    // NUEVO: Fecha de registro automática
+    // Fecha de registro automática
     @Column(name = "fecha_registro", updatable = false)
     private LocalDateTime fechaRegistro;
 
-    // NUEVO: Llave foránea para saber a qué librería pertenece
+    // Llave foránea para saber a qué librería pertenece
     @Column(name = "libreria_id")
     private Integer libreriaId;
+
+    // true cuando el administrador le restableció la contraseña: debe cambiarla al ingresar
+    @Column(name = "debe_cambiar_password", nullable = false)
+    private boolean debeCambiarPassword = false;
 
     @PrePersist
     protected void onCreate() {
         this.fechaRegistro = LocalDateTime.now();
     }
 
-    // Constructores
     public Lector() {
     }
 
-    // --- Getters y Setters ---
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -68,6 +71,9 @@ public class Lector {
     public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
 
+    // Dato calculado (no se guarda): el teléfono siempre con el mismo formato "945 612 378"
+    public String getTelefonoFormateado() { return TelefonoUtil.formatear(telefono); }
+
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
@@ -79,4 +85,7 @@ public class Lector {
 
     public Integer getLibreriaId() { return libreriaId; }
     public void setLibreriaId(Integer libreriaId) { this.libreriaId = libreriaId; }
+
+    public boolean isDebeCambiarPassword() { return debeCambiarPassword; }
+    public void setDebeCambiarPassword(boolean debeCambiarPassword) { this.debeCambiarPassword = debeCambiarPassword; }
 }

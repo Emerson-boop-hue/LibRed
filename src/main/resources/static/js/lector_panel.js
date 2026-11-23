@@ -1,4 +1,5 @@
-/* Vista General del lector: saltar a otra librería donde ya tiene cuenta. IIFE: el layout vuelve a cargar este script al navegar. */
+// Vista General del lector: saltar a otra librería donde ya tiene cuenta. IIFE: el layout vuelve a cargar este script
+// al navegar.
 (function () {
   const raiz = document.getElementById("pnRaiz");
   if (!raiz) return;
@@ -61,7 +62,7 @@
 
   document.querySelectorAll(".pn-sede-chip").forEach((b) => b.addEventListener("click", () => entrar(b)));
 
-  // Tarjeta de sanción / vencido (esquina): abre y cierra la ventana con el detalle
+  // Cinta de estado (bloqueada / vencido): abre y cierra la ventana con el detalle
   const esquina = document.getElementById("pnEsquina");
   const modal = document.getElementById("pnModal");
   if (esquina && modal) {

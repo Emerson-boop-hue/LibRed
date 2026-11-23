@@ -4,7 +4,10 @@ import com.libred.sistema.service.PoliticaPrestamoService.FilaTarifa;
 
 import java.util.List;
 
-/** Datos que muestra la pantalla Ayuda y Soporte del lector: su librería actual y las reglas de préstamo de esa librería. */
+/**
+ * Datos que muestra la pantalla Ayuda y Soporte del lector: su librería actual y las reglas de préstamo de esa
+ * librería.
+ */
 public class AyudaLectorVista {
 
     private final String nombre;

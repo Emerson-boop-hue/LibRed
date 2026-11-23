@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
+/** Acceso a los préstamos. */
 public interface PrestamoRepository extends JpaRepository<Prestamo, Integer> {
 
     // Listar todos los préstamos de una librería específica
@@ -29,12 +30,16 @@ public interface PrestamoRepository extends JpaRepository<Prestamo, Integer> {
     
     long countByLibreriaIdAndEstadoPrestamo(Integer libreriaId, String estadoPrestamo);
 
-    // ---- Módulo Préstamos del LECTOR ----
+    // Módulo Préstamos del LECTOR
 
     // Todos los préstamos de un lector (su registro en esa librería), del más reciente al más antiguo
     List<Prestamo> findByLectorIdOrderByFechaPrestamoDesc(Integer lectorId);
 
     long countByLectorIdAndEstadoPrestamoIn(Integer lectorId, List<String> estados);
+
+    // Unidades de un artículo que están prestadas ahora mismo (el stock total no puede quedar por debajo de ese
+    // número)
+    long countByRecursoIdAndEstadoPrestamoIn(Integer recursoId, List<String> estados);
 
     boolean existsByLectorIdAndRecursoIdAndEstadoPrestamoIn(Integer lectorId, Integer recursoId, List<String> estados);
 

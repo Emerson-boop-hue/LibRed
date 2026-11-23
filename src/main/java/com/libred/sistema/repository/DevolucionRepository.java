@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
+/** Acceso a las devoluciones. */
 public interface DevolucionRepository extends JpaRepository<Devolucion, Integer> {
     List<Devolucion> findByLibreriaId(Integer libreriaId);
 

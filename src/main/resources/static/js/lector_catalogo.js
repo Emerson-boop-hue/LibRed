@@ -1,9 +1,5 @@
-// =====================================================================
-// MÓDULO CATÁLOGO DEL LECTOR
-// Filtra en vivo: al escribir o cambiar un filtro se vuelve a pedir la página al servidor
+// Módulo catálogo del lector: filtra en vivo: al escribir o cambiar un filtro se vuelve a pedir la página al servidor
 // y solo se reemplaza la zona de resultados (sin recargar toda la pantalla).
-// Si el JavaScript falla, el formulario sigue funcionando con el botón "Buscar".
-// =====================================================================
 (function () {
   const form = document.getElementById("formFiltros");
   if (!form) return;

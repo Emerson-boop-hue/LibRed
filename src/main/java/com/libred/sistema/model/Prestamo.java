@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/** Préstamo de un artículo a un lector. */
 @Entity
 @Table(name = "prestamo")
 public class Prestamo {
@@ -21,7 +22,6 @@ public class Prestamo {
     @JoinColumn(name = "recurso_id", nullable = false)
     private Recurso recurso;
 
-    // Relación con Lector
     @ManyToOne
     @JoinColumn(name = "lector_id", nullable = false)
     private Lector lector;
@@ -50,9 +50,22 @@ public class Prestamo {
     @Column(name = "monto_servicio", precision = 10, scale = 2)
     private BigDecimal montoServicio;
 
+    // Cobro del servicio: en mostrador se cobra al registrar; si lo pidió el lector, se cobra al recoger/devolver
+    @Column(name = "servicio_cobrado")
+    private boolean servicioCobrado = false;
+
+    @Column(name = "fecha_cobro_servicio")
+    private LocalDateTime fechaCobroServicio;
+
     // Quién registró el préstamo: ADMIN (en mostrador) o LECTOR (lo solicitó él mismo)
     @Column(name = "origen", length = 20)
     private String origen = "ADMIN";
+
+    public boolean isServicioCobrado() { return servicioCobrado; }
+    public void setServicioCobrado(boolean servicioCobrado) { this.servicioCobrado = servicioCobrado; }
+
+    public LocalDateTime getFechaCobroServicio() { return fechaCobroServicio; }
+    public void setFechaCobroServicio(LocalDateTime fechaCobroServicio) { this.fechaCobroServicio = fechaCobroServicio; }
 
     @PrePersist
     public void prePersist() {
@@ -63,10 +76,6 @@ public class Prestamo {
             estadoPrestamo = "ACTIVO";
         }
     }
-
-    // ==========================================
-    // GETTERS Y SETTERS
-    // ==========================================
 
     public Integer getId() {
         return id;

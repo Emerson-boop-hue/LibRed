@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Lógica del catálogo del lector.
- * El lector ve los artículos de la librería a la que entró al iniciar sesión (su registro de lector pertenece a esa librería).
+ * Lógica del catálogo del lector. El lector ve los artículos de la librería a la que entró al iniciar sesión (su
+ * registro de lector pertenece a esa librería).
  */
 @Service
 public class CatalogoService {
@@ -57,11 +57,6 @@ public class CatalogoService {
                 .toList();
     }
 
-    /** Cantidad total de artículos que tiene la librería (sin filtros). */
-    public long contarArticulos(Integer libreriaId) {
-        return libreriaId == null ? 0 : catalogoRepository.countByLibreriaId(libreriaId);
-    }
-
     // Convierte un Recurso de la BD en los datos que necesita la tarjeta
     private ArticuloCatalogo aTarjeta(Recurso r) {
         CategoriaRecurso categoria = CategoriaRecurso.desdeValor(r.getTipoRecurso());
@@ -85,7 +80,7 @@ public class CatalogoService {
                 ? "Autor no registrado" : r.getAutorOCreador();
 
         return new ArticuloCatalogo(r.getId(), r.getTitulo(), autor, r.getCodigo(),
-                categoria.getEtiqueta(), categoria.getIcono(), disponible, total, nivel, texto);
+                categoria.getEtiqueta(), categoria.getIcono(), disponible, total, nivel, texto, r.getImagenUrl());
     }
 
     private String limpiar(String valor) {

@@ -1,13 +1,5 @@
-// =====================================================================
-// PANEL DEL LECTOR: NAVEGACIÓN ENTRE MÓDULOS SIN PARPADEO
-// =====================================================================
-// Antes, cada clic en el menú recargaba TODA la página (y con ella el logo, que pesa ~1 MB),
-// por eso el logo parpadeaba. Ahora solo se cambia la zona de contenido y la barra lateral
-// (logo incluido) no se toca nunca.
-//  1) se pide la página nueva,  2) se precarga su CSS sin aplicarlo,
-//  3) en un solo paso se cambia el HTML y el CSS,  4) se carga el JS del módulo.
-// El CSS/JS de cada módulo se lee de la propia página recibida (#dynamic-specific-css / #dynamic-specific-js),
-// así que los módulos nuevos funcionan sin tocar este archivo.
+// Panel del lector: navegación entre módulos sin parpadeo: antes, cada clic en el menú recargaba TODA la página (y
+// con ella el logo, que pesa ~1 MB), por eso el logo parpadeaba.
 
 let navegacionEnCurso = 0; // para ignorar respuestas viejas si el usuario hace clic rápido
 
@@ -91,14 +83,12 @@ async function navegarA(url, empujarHistorial) {
     const cssNuevoHref = doc.getElementById("dynamic-specific-css")?.getAttribute("href") || "";
     const jsNuevoSrc = doc.getElementById("dynamic-specific-js")?.getAttribute("src") || "";
 
-    // 1) Descargar el CSS nuevo ANTES de tocar la pantalla
     const linkNuevo = await precargarCss(cssNuevoHref);
     if (miToken !== navegacionEnCurso) {
       if (linkNuevo && linkNuevo.media === "print") linkNuevo.remove();
       return;
     }
 
-    // 2) Cambio atómico (todo en el mismo ciclo: el navegador no pinta nada a medias)
     const linkViejo = document.getElementById("dynamic-specific-css");
     const scriptViejo = document.getElementById("dynamic-specific-js");
 
@@ -120,8 +110,6 @@ async function navegarA(url, empujarHistorial) {
       linkViejo.remove(); // la página nueva no tiene CSS propio
     }
 
-    // 3) JS del módulo (los <script> insertados con innerHTML no se ejecutan, por eso se recrea).
-    //    Al cargarse, el script se ejecuta y se engancha a la zona de contenido nueva.
     if (scriptViejo) scriptViejo.remove();
     if (jsNuevoSrc) {
       const s = document.createElement("script");
@@ -130,7 +118,6 @@ async function navegarA(url, empujarHistorial) {
       document.body.appendChild(s);
     }
 
-    // 4) URL y menú activo
     if (empujarHistorial) window.history.pushState({}, "", url);
     marcarMenuActivo(url);
   } catch (err) {
@@ -146,10 +133,6 @@ function marcarMenuActivo(url) {
   });
 }
 
-// =====================================================================
-// FUNCIONES GLOBALES
-// =====================================================================
-
 // Contraer / expandir la barra lateral (se recuerda la última elección)
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -157,7 +140,7 @@ function toggleSidebar() {
   try {
     localStorage.setItem("lectorSidebarCollapsed", sidebar.classList.contains("collapsed") ? "1" : "0");
   } catch (e) {
-    /* si el navegador bloquea el almacenamiento, simplemente no se recuerda */
+    // si el navegador bloquea el almacenamiento, simplemente no se recuerda
   }
 }
 
@@ -178,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("sidebar").classList.add("collapsed");
     }
   } catch (e) {
-    /* sin almacenamiento: se queda expandida */
+    // sin almacenamiento: se queda expandida
   }
 
   // Cerrar el modal al hacer clic fuera de él o con la tecla Esc
@@ -193,32 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ---------- Modo claro / oscuro ----------
-function aplicarTema(tema) {
-  if (tema === "oscuro") document.documentElement.setAttribute("data-tema", "oscuro");
-  else document.documentElement.removeAttribute("data-tema");
-  document.querySelectorAll("[data-tema-btn]").forEach((b) => {
-    b.classList.toggle("activo", b.dataset.temaBtn === (tema === "oscuro" ? "oscuro" : "claro"));
-  });
-}
-
-document.addEventListener("click", (e) => {
-  const boton = e.target.closest("[data-tema-btn]");
-  if (!boton) return;
-  const tema = boton.dataset.temaBtn;
-  aplicarTema(tema);
-  try {
-    localStorage.setItem("lectorTema", tema);
-  } catch (err) {
-    /* sin almacenamiento: el tema solo dura mientras la página esté abierta */
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  aplicarTema(document.documentElement.getAttribute("data-tema") === "oscuro" ? "oscuro" : "claro");
-});
-
-// ---------- Invitar a un amigo ----------
+// Invitar a un amigo
 function textoInvitacion() {
   const nombre = (document.querySelector(".user-name") || {}).textContent || "";
   const quien = nombre.trim() ? "Soy " + nombre.trim() + " y " : "";
@@ -229,7 +187,6 @@ function textoInvitacion() {
 function abrirModalInvitar() {
   const texto = textoInvitacion();
   document.getElementById("invitarTexto").value = texto;
-  document.getElementById("invitarWhatsapp").href = "https://wa.me/?text=" + encodeURIComponent(texto);
   document.getElementById("invitarCopiarTxt").textContent = "Copiar mensaje";
   document.querySelector(".btn-copiar").classList.remove("listo");
   document.getElementById("modalInvitar").classList.add("active");

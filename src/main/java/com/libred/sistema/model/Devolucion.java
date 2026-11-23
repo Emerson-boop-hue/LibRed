@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/** Devolución de un préstamo. */
 @Entity
 @Table(name = "devolucion")
 public class Devolucion {

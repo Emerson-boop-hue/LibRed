@@ -18,18 +18,9 @@
   <body>
     <div class="lector-container">
 
-      <!-- Aviso cuando no puede solicitar (sanción, vencidos, límite, sin stock). Se refresca tras cada préstamo -->
-      <div id="plBanner" th:attr="data-bloqueado=${p.bloqueo != null}">
-        <div class="pl-aviso" th:classappend="${p.sancionado} ? 'sancionado'" th:if="${p.bloqueo != null}">
-          <i class="fa-solid fa-triangle-exclamation"></i>
-          <span th:text="${p.bloqueo}">Motivo</span>
-        </div>
-      </div>
-
       <div class="pl-grid" id="plRoot"
            th:attr="data-max-dias=${p.maxDias}, data-pre=${preseleccionado}">
 
-        <!-- ============ FORMULARIO ============ -->
         <form class="pl-card" id="plForm" novalidate>
           <div class="pl-card-head">
             <div class="pl-icono"><i class="fa-solid fa-file-circle-plus"></i></div>
@@ -114,9 +105,16 @@
               <i class="fa-solid fa-check"></i> Solicitar préstamo
             </button>
           </div>
+
+          <!-- Motivo por el que no puede solicitar (bloqueo, vencidos, límite, sin stock): una línea de texto bajo el botón deshabilitado. -->
+          <div id="plBanner" th:attr="data-bloqueado=${p.bloqueo != null}">
+            <p class="pl-aviso" th:classappend="${p.bloqueado} ? 'bloqueado'" th:if="${p.bloqueo != null}">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span th:text="${p.bloqueo}">Motivo</span>
+            </p>
+          </div>
         </form>
 
-        <!-- ============ COMPROBANTE ============ -->
         <aside class="pl-ticket">
           <div class="pl-ticket-head">
             <h4>Comprobante de préstamo</h4>
@@ -139,7 +137,7 @@
           </div>
           <p class="pl-ticket-nota">
             <i class="fa-solid fa-circle-info"></i>
-            El servicio se cancela en la librería al recoger el artículo. Si devuelves después del último día se aplica mora.
+            El servicio se cancela en la librería. Si devuelves después del último día se aplica mora.
           </p>
         </aside>
       </div>
@@ -150,7 +148,7 @@
             th:attr="data-id=${a.id}, data-categoria=${a.categoria}, data-titulo=${a.titulo}, data-codigo=${a.codigo}, data-autor=${a.autor}, data-stock=${a.stock}"></li>
       </ul>
 
-      <!-- MODAL: PRÉSTAMO REGISTRADO -->
+      <!-- Modal: préstamo registrado -->
       <div id="plModalOk" class="modal-overlay">
         <div class="modal-content modal-sm">
           <div class="pl-modal-box">
@@ -163,6 +161,8 @@
               <div><span>Servicio a cobrar</span><strong id="okMonto">--</strong></div>
             </div>
             <p class="pl-modal-nota">Acércate a la librería para recoger tu artículo y cancelar el servicio.</p>
+            <a class="btn-secundario pl-btn-descarga" id="okDescargar" href="#" th:unless="${sedeSuspendida}"><i class="fa-solid fa-file-pdf"></i> Descargar comprobante</a>
+            <button type="button" class="btn-secundario pl-btn-descarga" disabled th:if="${sedeSuspendida}"><i class="fa-solid fa-lock"></i> Descargar comprobante</button>
             <button type="button" class="btn-primario" id="plModalCerrar">Entendido</button>
           </div>
         </div>
